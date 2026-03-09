@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 | Suite Not Found</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=Geist:wght@300;400;500&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --gold: #C49A3A;
+            --bg-dark: #050505;
+            --text-light: #E3E4E0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            background-color: var(--bg-dark);
+            overflow: hidden;
+            width: 100%;
+        }
+
+        @media (pointer: fine) {
+
+            html,
+            body {
+                cursor: none;
+            }
+        }
+
+        /* The background interior */
+        .background-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Minimalist dark empty concrete hallway */
+            background: url("https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=2000") no-repeat center center;
+            background-size: cover;
+            z-index: 1;
+            /* Dim and desaturate slightly for a moody, high-end feel */
+            filter: brightness(0.6) contrast(1.1) grayscale(0.2);
+        }
+
+        /* The darkness that covers the background */
+        .darkness-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 5, 0.98);
+            z-index: 2;
+            /* Wider, softer mask for the light */
+            mask-image: radial-gradient(circle min(600px, 80vw) at var(--x, 50%) var(--y, 50%), transparent 5%, rgba(0, 0, 0, 1) 85%);
+            -webkit-mask-image: radial-gradient(circle min(600px, 80vw) at var(--x, 50%) var(--y, 50%), transparent 5%, rgba(0, 0, 0, 1) 85%);
+        }
+
+        .text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+            text-align: center;
+            user-select: none;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .text .subtitle {
+            font-family: 'Geist', sans-serif;
+            color: var(--gold);
+            font-size: 11px;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            font-weight: 500;
+            opacity: 0.8;
+            margin: 0;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .text h1 {
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--text-light);
+            font-size: clamp(6rem, 15vw, 15rem);
+            line-height: 0.8;
+            font-weight: 400;
+            font-style: italic;
+            text-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            margin: 0;
+        }
+
+        .text .description {
+            font-family: 'Geist', sans-serif;
+            color: rgba(227, 228, 224, 0.7);
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            letter-spacing: 0.05em;
+            font-weight: 300;
+            max-width: 400px;
+            margin: 0;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .text .return-home {
+            margin-top: 1rem;
+            padding: 12px 24px;
+            font-family: 'Geist', sans-serif;
+            font-size: 13px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--gold);
+            text-decoration: none;
+            border: 1px solid rgba(196, 154, 58, 0.3);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            pointer-events: auto;
+            /* Ensure it's clickable through the light beam */
+            backdrop-filter: blur(2px);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .text .return-home:hover {
+            background: rgba(196, 154, 58, 0.1);
+            border-color: rgba(196, 154, 58, 0.8);
+            transform: translateY(-2px);
+        }
+
+        /* Softens the edges of everything inside the beam */
+        .torch-blur {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 4;
+            backdrop-filter: blur(4px);
+            mask-image: radial-gradient(circle min(500px, 70vw) at var(--x, 50%) var(--y, 50%), transparent 0%, rgba(0, 0, 0, 1) 100%);
+            -webkit-mask-image: radial-gradient(circle min(500px, 70vw) at var(--x, 50%) var(--y, 50%), transparent 0%, rgba(0, 0, 0, 1) 100%);
+        }
+
+        /* The actual light beam effect (the bloom) */
+        .torch-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+            background: radial-gradient(circle min(800px, 90vw) at var(--x, 50%) var(--y, 50%),
+                    rgba(196, 154, 58, 0.05) 0%,
+                    /* Subtle gold tint */
+                    rgba(255, 255, 255, 0.02) 40%,
+                    transparent 100%);
+            mix-blend-mode: screen;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="background-layer"></div>
+    <div class="darkness-overlay"></div>
+    <div class="torch-blur"></div>
+    <div class="torch-glow"></div>
+
+    <div class="text">
+        <p class="subtitle">404 Error</p>
+        <h1>Lost</h1>
+        <p class="description">This suite appears to be unoccupied.</p>
+        <a href="/" class="return-home">Return Home</a>
+    </div>
+
+    <script>
+        const root = document.documentElement;
+
+        // Start coordinates in the center of the screen
+        let targetX = window.innerWidth / 2;
+        let targetY = window.innerHeight / 2;
+        let currentX = targetX;
+        let currentY = targetY;
+
+        // Smooth interpolation loop
+        function animate() {
+            // Linear interpolation for smooth trailing effect
+            currentX += (targetX - currentX) * 0.1;
+            currentY += (targetY - currentY) * 0.1;
+
+            root.style.setProperty('--x', currentX + 'px');
+            root.style.setProperty('--y', currentY + 'px');
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // 1. Mouse Drag Tracking (Desktop)
+        document.addEventListener('mousemove', (e) => {
+            targetX = e.clientX;
+            targetY = e.clientY;
+        });
+
+        // 2. Touch Tracking (Mobile Fallback if gyro sits still or is disabled)
+        document.addEventListener('touchmove', (e) => {
+            const t = e.touches[0];
+            targetX = t.clientX;
+            targetY = t.clientY;
+        }, { passive: true });
+
+        document.addEventListener('touchstart', (e) => {
+            const t = e.touches[0];
+            targetX = t.clientX;
+            targetY = t.clientY;
+        }, { passive: true });
+
+        // 3. Gyroscope Tracking (Mobile Option A)
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener('deviceorientation', (e) => {
+                // Null check for devices that fire the event but have no gyro
+                if (e.gamma !== null && e.beta !== null) {
+                    // e.gamma = left/right tilt (-90 to 90)
+                    let gamma = Math.max(-45, Math.min(45, e.gamma));
+                    targetX = (window.innerWidth / 2) + (gamma / 45) * (window.innerWidth / 2);
+
+                    // e.beta = front/back tilt (-180 to 180)
+                    // Assuming baseline hold is 45 degrees, we subtract 45.
+                    let beta = e.beta - 45;
+                    beta = Math.max(-45, Math.min(45, beta));
+                    targetY = (window.innerHeight / 2) + (beta / 45) * (window.innerHeight / 2);
+                }
+            });
+        }
+
+        // Keep it centered if window is resized
+        window.addEventListener('resize', () => {
+            // Optional: only center if we haven't moved yet, but doing nothing is usually fine
+            // as the mouse or gyro will quickly update it again.
+        });
+    </script>
+
+</body>
+
+</html>

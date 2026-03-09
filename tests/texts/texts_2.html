@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Text Animation Demo</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Geist:wght@300;400;500&display=swap');
+
+:root {
+    --bg: #050505;
+    --gold: #c8a95c;
+    --text: #eaeaea;
+    --muted: rgba(255,255,255,0.6);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+    background: var(--bg);
+    font-family: 'Geist', sans-serif;
+    color: var(--text);
+    overflow: hidden;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    text-align: center;
+    max-width: 600px;
+    padding: 40px 20px;
+    width: 100%;
+}
+
+/* Typography */
+h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 7vw, 3.5rem);
+    font-weight: 300;
+    letter-spacing: 0.15em;
+    color: var(--text);
+    margin-bottom: 30px;
+}
+
+p {
+    font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+    font-weight: 300;
+    line-height: 2;
+    color: var(--muted);
+}
+
+/* Text Animation Classes */
+@keyframes anim-fade {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.preset-fade { animation: anim-fade 0.8s cubic-bezier(0.2,0.8,0.2,1) both; }
+
+.text-animate {
+    display: inline-block;
+    white-space: pre;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1 id="title"></h1>
+    <p id="paragraph"></p>
+</div>
+
+<script>
+// Text Animation: Split text into characters with staggered animation
+function animateText(element, text) {
+    if (!element) return;
+    
+    element.innerHTML = '';
+    const chars = text.split('');
+    
+    chars.forEach((char, index) => {
+        const span = document.createElement('span');
+        span.textContent = char;
+        span.className = 'text-animate';
+        span.style.display = 'inline-block';
+        span.style.animationDelay = `${index * 0.03}s`;
+        span.classList.add('preset-fade');
+        element.appendChild(span);
+    });
+}
+
+// Animate title and paragraph on load
+const titleEl = document.getElementById('title');
+const paraEl = document.getElementById('paragraph');
+
+const titleText = "Creativity";
+const paraText = "Every great endeavor begins with a single spark of imagination, a vision that defies conventional thinking and embraces the extraordinary.";
+
+animateText(titleEl, titleText);
+animateText(paraEl, paraText);
+</script>
+
+</body>
+</html>

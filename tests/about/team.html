@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telescope Scroll Animation | Unified</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0f0f0f;
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100dvh;
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 7vw, 4rem);
+            font-weight: 500;
+            line-height: 1;
+            text-wrap: balance;
+        }
+
+        p {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            font-weight: 500;
+            line-height: 1;
+        }
+
+        section {
+            position: relative;
+            width: 100vw;
+            height: 100dvh;
+            overflow: hidden;
+        }
+
+        .intro, .outro {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #0f0f0f;
+        }
+
+        .spotlight-intro-text-wrapper {
+            position: absolute;
+            width: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 0.5rem;
+            padding: 0 1rem;
+            z-index: 5;
+        }
+
+        .spotlight-intro-text {
+            flex: 1;
+            position: relative;
+            will-change: transform;
+        }
+
+        .spotlight-intro-text:nth-child(1) {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .spotlight-bg-img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            transform: scale(0);
+            will-change: transform;
+            display: none; /* Hide on desktop - only show images on cards */
+        }
+
+        .spotlight-bg-img img {
+            transform: scale(1.5);
+            will-change: transform;
+        }
+
+        .spotlight-titles-container {
+            position: absolute;
+            top: 0;
+            left: 15vw;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            clip-path: polygon(50vh 0px, 0px 50%, 50vh 100%, 100% calc(100% + 100vh), 100% -100vh);
+            --before-opacity: 0;
+            --after-opacity: 0;
+        }
+
+        .spotlight-titles-container::before,
+        .spotlight-titles-container::after {
+            content: "";
+            position: absolute;
+            width: 100vh;
+            height: 2.5px;
+            background: #fff;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+        }
+
+        .spotlight-titles-container::before {
+            top: 0; left: 0;
+            transform: rotate(-45deg) translate(-7rem);
+            opacity: var(--before-opacity);
+        }
+
+        .spotlight-titles-container::after {
+            bottom: 0; left: 0;
+            transform: rotate(45deg) translate(-7rem);
+            opacity: var(--after-opacity);
+        }
+
+        .spotlight-titles {
+            position: relative;
+            left: 15%;
+            width: 75%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 5rem;
+            transform: translateY(100%);
+            z-index: 2;
+        }
+
+        .spotlight-titles h1 {
+            color: #fff;
+            opacity: 0.25;
+            transition: opacity 0.3s ease;
+        }
+
+        .spotlight-images {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            min-width: 300px;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .spotlight-img {
+            position: absolute;
+            width: 200px;
+            height: 150px;
+            will-change: transform;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .spotlight-header {
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            transform: translateY(-50%);
+            color: #fff;
+            transition: opacity 0.3s ease;
+            z-index: 2;
+            opacity: 0;
+        }
+
+        @media (max-width: 1000px) {
+            h1 { font-size: 2rem; }
+            .spotlight-titles-container { clip-path: none; }
+            .spotlight-titles-container::before,
+            .spotlight-titles-container::after { display: none; }
+            .spotlight-titles { left: 0; }
+            .spotlight-header { display: none; }
+        }
+
+        @media (max-width: 768px) {
+            .spotlight-bg-img {
+                display: block; /* Show background on mobile */
+            }
+
+            h1 {
+                font-size: clamp(1.4rem, 7.5vw, 2rem);
+            }
+
+            p {
+                font-size: clamp(0.9rem, 3.6vw, 1rem);
+            }
+
+            .intro, .outro {
+                text-align: center;
+                padding: 0 1rem;
+            }
+
+            .spotlight-intro-text-wrapper {
+                top: 36%;
+                gap: 0.2rem;
+                justify-content: center;
+            }
+
+            .spotlight-intro-text:nth-child(1) {
+                justify-content: center;
+            }
+
+            .spotlight-titles-container {
+                left: 0;
+                width: 100%;
+                padding: 0 1rem;
+            }
+
+            .spotlight-titles {
+                left: 0;
+                width: 100%;
+                gap: 2rem;
+            }
+
+            .spotlight-images {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .spotlight-intro-text-wrapper {
+                top: 34%;
+            }
+
+            .spotlight-titles {
+                gap: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <section class="spotlight">
+        <div class="spotlight-intro-text-wrapper">
+            <div class="spotlight-intro-text"><p>Team</p></div>
+            <div class="spotlight-intro-text"><p>Members</p></div>
+        </div>
+
+        <div class="spotlight-bg-img">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000" alt="background" />
+        </div>
+
+        <div class="spotlight-titles-container">
+            <div class="spotlight-titles"></div>
+        </div>
+
+        <div class="spotlight-images"></div>
+
+        <div class="spotlight-header">
+            <p>Mayaakars</p>
+        </div>
+    </section>
+
+    <section class="outro">
+        <h1>Moments in still motion.</h1>
+    </section>
+
+    <script>
+        // Config & Data
+        const config = {
+            gap: 0.08,
+            speed: 0.3,
+            arcRadius: 500,
+        };
+
+        const spotlightItems = [
+            { name: "Silent Arc", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000" },
+            { name: "Bloom24", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1000" },
+            { name: "Glass Fade", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1000" },
+            { name: "Echo 9", img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=1000" },
+            { name: "Velvet Loop", img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=1000" },
+            { name: "Field Two", img: "https://images.unsplash.com/photo-1463453091185-61582044d556?q=80&w=1000" },
+            { name: "Pale Thread", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000" },
+            { name: "Stillroom", img: "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?q=80&w=1000" },
+            { name: "Ghostline", img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1000" },
+            { name: "Mono 73", img: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=1000" },
+        ];
+
+        // Init Lenis
+        const lenis = new Lenis();
+        lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add((time) => lenis.raf(time * 1000));
+        gsap.ticker.lagSmoothing(0);
+
+        gsap.registerPlugin(ScrollTrigger);
+
+        const titlesContainer = document.querySelector(".spotlight-titles");
+        const imagesContainer = document.querySelector(".spotlight-images");
+        const spotlightHeader = document.querySelector(".spotlight-header");
+        const titlesContainerElement = document.querySelector(".spotlight-titles-container");
+        const introTextElements = document.querySelectorAll(".spotlight-intro-text");
+        const imageElements = [];
+
+        // Dynamic creation
+        spotlightItems.forEach((item, index) => {
+            const titleElement = document.createElement("h1");
+            titleElement.textContent = item.name;
+            if (index === 0) titleElement.style.opacity = "1";
+            titlesContainer.appendChild(titleElement);
+
+            const imgWrapper = document.createElement("div");
+            imgWrapper.className = "spotlight-img";
+            const imgElement = document.createElement("img");
+            imgElement.src = item.img;
+            imgWrapper.appendChild(imgElement);
+            imagesContainer.appendChild(imgWrapper);
+            imageElements.push(imgWrapper);
+        });
+
+        const titleElements = titlesContainer.querySelectorAll("h1");
+        let currentActiveIndex = 0;
+
+        function calculateArcMetrics() {
+            const isSmallScreen = window.innerWidth <= 768;
+            const containerWidth = window.innerWidth * (isSmallScreen ? 0.55 : 0.3);
+            const containerHeight = window.innerHeight;
+            const arcStartX = containerWidth - (isSmallScreen ? 140 : 220);
+            const arcStartY = -200;
+            const arcEndY = containerHeight + 200;
+            const arcControlPointX = arcStartX + (isSmallScreen ? config.arcRadius * 0.45 : config.arcRadius);
+            const arcControlPointY = containerHeight / 2;
+
+            return { arcStartX, arcStartY, arcEndY, arcControlPointX, arcControlPointY };
+        }
+
+        let arcMetrics = calculateArcMetrics();
+
+        function getBezierPosition(t) {
+            const x = (1 - t) * (1 - t) * arcMetrics.arcStartX
+                + 2 * (1 - t) * t * arcMetrics.arcControlPointX
+                + t * t * arcMetrics.arcStartX;
+            const y = (1 - t) * (1 - t) * arcMetrics.arcStartY
+                + 2 * (1 - t) * t * arcMetrics.arcControlPointY
+                + t * t * arcMetrics.arcEndY;
+            return { x, y };
+        }
+
+        function getImgProgressState(index, overallProgress) {
+            const startTime = index * config.gap;
+            const endTime = startTime + config.speed;
+            if (overallProgress < startTime) return -1;
+            if (overallProgress > endTime) return 2;
+            return (overallProgress - startTime) / config.speed;
+        }
+
+        imageElements.forEach((img) => gsap.set(img, { opacity: 0 }));
+
+        ScrollTrigger.create({
+            trigger: ".spotlight",
+            start: "top top",
+            end: () => `+=${window.innerHeight * 10}px`,
+            pin: true,
+            pinSpacing: true,
+            scrub: 1,
+            onUpdate: (self) => {
+                const progress = self.progress;
+
+                // Intro Phase
+                if (progress <= 0.2) {
+                    const animationProgress = progress / 0.2;
+                    const moveDistance = window.innerWidth * 0.6;
+                    
+                    gsap.set(introTextElements[0], { x: -animationProgress * moveDistance, opacity: 1 });
+                    gsap.set(introTextElements[1], { x: animationProgress * moveDistance, opacity: 1 });
+                    gsap.set(".spotlight-bg-img", { transform: `scale(${animationProgress})` });
+                    gsap.set(".spotlight-bg-img img", { transform: `scale(${1.5 - animationProgress * 0.5})` });
+
+                    imageElements.forEach((img) => gsap.set(img, { opacity: 0 }));
+                    spotlightHeader.style.opacity = "0";
+                    gsap.set(titlesContainerElement, { "--before-opacity": "0", "--after-opacity": "0" });
+                } 
+                // Hold/Transition Phase
+                else if (progress > 0.2 && progress <= 0.25) {
+                    gsap.set(".spotlight-bg-img, .spotlight-bg-img img", { transform: "scale(1)" });
+                    gsap.set(introTextElements[0], { opacity: 0 });
+                    gsap.set(introTextElements[1], { opacity: 0 });
+                    imageElements.forEach((img) => gsap.set(img, { opacity: 0 }));
+                    spotlightHeader.style.opacity = "1";
+                    gsap.set(titlesContainerElement, { "--before-opacity": "1", "--after-opacity": "1" });
+                } 
+                // Main Scroll Phase
+                else if (progress > 0.25 && progress <= 0.95) {
+                    spotlightHeader.style.opacity = "1";
+                    gsap.set(titlesContainerElement, { "--before-opacity": "1", "--after-opacity": "1" });
+
+                    const switchProgress = (progress - 0.25) / 0.7;
+                    const viewportHeight = window.innerHeight;
+                    const titlesHeight = titlesContainer.scrollHeight;
+                    const currentY = viewportHeight - (switchProgress * (viewportHeight + titlesHeight));
+
+                    gsap.set(".spotlight-titles", { transform: `translateY(${currentY}px)` });
+
+                    imageElements.forEach((img, index) => {
+                        const imgProgress = getImgProgressState(index, switchProgress);
+                        if (imgProgress < 0 || imgProgress > 1) {
+                            gsap.set(img, { opacity: 0 });
+                        } else {
+                            const pos = getBezierPosition(imgProgress);
+                            gsap.set(img, { x: pos.x - 100, y: pos.y - 75, opacity: 1 });
+                        }
+                    });
+
+                    // Active Title Logic
+                    const viewportMiddle = viewportHeight / 2;
+                    let closestIndex = 0;
+                    let closestDistance = Infinity;
+
+                    titleElements.forEach((title, index) => {
+                        const titleRect = title.getBoundingClientRect();
+                        const dist = Math.abs((titleRect.top + titleRect.height / 2) - viewportMiddle);
+                        if (dist < closestDistance) {
+                            closestDistance = dist;
+                            closestIndex = index;
+                        }
+                    });
+
+                    if (closestIndex !== currentActiveIndex) {
+                        titleElements[currentActiveIndex].style.opacity = "0.25";
+                        titleElements[closestIndex].style.opacity = "1";
+                        document.querySelector(".spotlight-bg-img img").src = spotlightItems[closestIndex].img;
+                        currentActiveIndex = closestIndex;
+                    }
+                } 
+                // Outro Phase
+                else if (progress > 0.95) {
+                    spotlightHeader.style.opacity = "0";
+                    gsap.set(titlesContainerElement, { "--before-opacity": "0", "--after-opacity": "0" });
+                }
+            }
+        });
+
+        window.addEventListener("resize", () => {
+            arcMetrics = calculateArcMetrics();
+            ScrollTrigger.refresh();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fast & Interactive Custom Cursor</title>
+
+  <style>
+    :root {
+      --bg-color: #050507;
+      --text-color: #ffffff;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg-color);
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--text-color);
+    }
+
+    /* Hide default cursor completely for a seamless custom experience */
+    @media (pointer: fine) {
+
+      body,
+      html,
+      * {
+        cursor: none !important;
+      }
+    }
+
+    /* Subtle atmospheric dot grid (much cleaner than lines) */
+    .bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1.5px, transparent 1.5px);
+      background-size: 35px 35px;
+      z-index: 0;
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    /* Layout & Typography */
+    .content {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    .content h1 {
+      font-size: 5rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      margin: 0;
+      line-height: 1.1;
+      color: #fff;
+    }
+
+    .content p {
+      font-size: 1.25rem;
+      color: #ccc;
+      font-weight: 400;
+      margin-top: 1rem;
+      display: inline-block;
+      /* Helps with hover detection */
+    }
+
+    .btn {
+      display: inline-block;
+      margin-top: 2.5rem;
+      padding: 1rem 3rem;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 100px;
+      font-weight: 500;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      /* Very subtle tactile feedback */
+    }
+
+    /* --- MODERN CURSOR STYLING --- */
+
+    /* Wrappers are used strictly for translate3d to ensure maximum hardware acceleration */
+    #cursor-dot-wrapper,
+    #cursor-ring-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      will-change: transform;
+      mix-blend-mode: difference;
+      /* Highly interactive inversion effect */
+    }
+
+    /* The bright center dot - instant precise tracking */
+    #cursor-dot {
+      width: 6px;
+      height: 6px;
+      background-color: #fff;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      /* Centered inside wrapper */
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    /* The glowing trailing ring - snappy physics interpolation */
+    #cursor-ring {
+      width: 36px;
+      height: 36px;
+      border: 1.5px solid rgba(255, 255, 255, 0.4);
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 80%);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      /* Centered inside wrapper */
+      transition: width 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        height 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        background 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* INTERACTIVE HOVER STATE */
+    body.cursor-hovering #cursor-dot {
+      opacity: 0;
+      /* Hide the dot when hovering to focus on the ring */
+      transform: translate(-50%, -50%) scale(0);
+    }
+
+    body.cursor-hovering #cursor-ring {
+      width: 110px;
+      /* Expand to encompass the text */
+      height: 110px;
+      background: rgba(255, 255, 255, 1);
+      /* Solid white inside difference mode perfectly inverts text to black */
+      border-color: transparent;
+    }
+
+    /* CLICK STATE */
+    body.cursor-clicking #cursor-ring {
+      width: 25px;
+      height: 25px;
+      background: rgba(255, 255, 255, 0.2);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="bg-grid"></div>
+
+  <div class="content">
+    <h1 data-interactive>Fast & Fluid</h1>
+    <p data-interactive>A truly modern reactive cursor experience.</p>
+    <br>
+    <div class="btn" data-interactive>Explore</div>
+  </div>
+
+  <!-- Cursor Elements -->
+  <div id="cursor-ring-wrapper">
+    <div id="cursor-ring"></div>
+  </div>
+  <div id="cursor-dot-wrapper">
+    <div id="cursor-dot"></div>
+  </div>
+
+  <script>
+    const dotWrapper = document.getElementById('cursor-dot-wrapper');
+    const ringWrapper = document.getElementById('cursor-ring-wrapper');
+
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let ringX = mouseX;
+    let ringY = mouseY;
+
+    // Snappy physics config (higher = less lag, closer to instant)
+    const speed = 0.35;
+
+    const updateTarget = (e) => {
+      // Handle both mouse and touch coordinates
+      const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0].clientX);
+      const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0].clientY);
+
+      if (clientX !== undefined && clientY !== undefined) {
+        mouseX = clientX;
+        mouseY = clientY;
+      }
+
+      // Instant tracking for the bright core dot (0 lag)
+      dotWrapper.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+    };
+
+    window.addEventListener('mousemove', updateTarget);
+    window.addEventListener('touchmove', updateTarget, { passive: true });
+    window.addEventListener('touchstart', updateTarget, { passive: true });
+
+    // Click dynamics for satisfying tactile feedback
+    window.addEventListener('mousedown', () => document.body.classList.add('cursor-clicking'));
+    window.addEventListener('mouseup', () => document.body.classList.remove('cursor-clicking'));
+    window.addEventListener('touchstart', () => document.body.classList.add('cursor-clicking'), { passive: true });
+    window.addEventListener('touchend', () => document.body.classList.remove('cursor-clicking'));
+
+    // Hover dynamics that transform the cursor into a magnetic highlight
+    document.querySelectorAll('[data-interactive]').forEach(el => {
+      el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hovering'));
+      el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hovering'));
+    });
+
+    // High-performance render loop for the smooth trailing ring
+    function animate() {
+      // Linear interpolation (Lerp) for that ultra-smooth trailing feel
+      ringX += (mouseX - ringX) * speed;
+      ringY += (mouseY - ringY) * speed;
+
+      // Translate wrapper to ensure hardware acceleration
+      ringWrapper.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
+
+      requestAnimationFrame(animate);
+    }
+
+    // Initial positioning to prevent elements from jumping from the top-left on load
+    dotWrapper.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+    ringWrapper.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
+
+    // Start loop
+    animate();
+  </script>
+
+</body>
+
+</html>

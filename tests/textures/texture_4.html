@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LACE | Minimal Interior</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #080808; /* Premium Black */
+        }
+
+        canvas {
+            display: block;
+        }
+
+        /* Centered Branding */
+        .brand {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .brand h1 {
+            color: #FFFFFF;
+            font-family: 'serif';
+            font-weight: 200;
+            font-size: 3rem;
+            letter-spacing: 25px;
+            text-transform: uppercase;
+            margin: 0;
+            opacity: 0.7;
+        }
+
+        /* Simple Gold SVG Line */
+        .accent {
+            position: absolute;
+            top: 60px;
+            left: 60px;
+            width: 40px;
+            height: 1px;
+            background: #D4AF37;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="accent"></div>
+    <div class="brand">
+        <h1>LACE</h1>
+    </div>
+
+    <canvas id="minimalCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('minimalCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let points = [];
+        const spacing = 150; // Larger spacing = cleaner look
+        let reveal = 0;
+        let time = 0;
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initGrid();
+        }
+
+        function initGrid() {
+            points = [];
+            const cols = Math.ceil(canvas.width / spacing) + 1;
+            const rows = Math.ceil(canvas.height / spacing) + 1;
+            for (let i = 0; i < cols; i++) {
+                for (let j = 0; j < rows; j++) {
+                    points.push({
+                        x: i * spacing,
+                        y: j * spacing,
+                        delay: (i + j) * 10
+                    });
+                }
+            }
+        }
+
+        function animate() {
+            ctx.fillStyle = '#080808';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            reveal += 0.8; // Step-by-step drawing speed
+            time += 0.01;
+
+            points.forEach(p => {
+                if (reveal > p.delay) {
+                    const opacity = Math.min(0.15, (reveal - p.delay) * 0.01);
+                    
+                    // Liquid drift
+                    const driftX = Math.sin(time + p.y * 0.01) * 15;
+                    const driftY = Math.cos(time + p.x * 0.01) * 15;
+
+                    // Draw thin structural lines
+                    ctx.lineWidth = 0.5;
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
+                    
+                    // Horizontal
+                    ctx.beginPath();
+                    ctx.moveTo(0, p.y + driftY);
+                    ctx.lineTo(canvas.width, p.y + driftY);
+                    ctx.stroke();
+
+                    // Vertical
+                    ctx.beginPath();
+                    ctx.moveTo(p.x + driftX, 0);
+                    ctx.lineTo(p.x + driftX, canvas.height);
+                    ctx.stroke();
+
+                    // Gold Intersections (Small and Light)
+                    ctx.beginPath();
+                    ctx.arc(p.x + driftX, p.y + driftY, 1.2, 0, Math.PI * 2);
+                    ctx.fillStyle = '#D4AF37';
+                    ctx.globalAlpha = opacity * 4;
+                    ctx.fill();
+                    ctx.globalAlpha = 1;
+                }
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+        animate();
+    </script>
+</body>
+</html>
