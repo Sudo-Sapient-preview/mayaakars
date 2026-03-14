@@ -296,6 +296,7 @@ export default function Testimonials() {
                   src={`/brands/${brand.file}`}
                   alt={brand.name}
                   fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, (max-width: 1440px) 14vw, 12vw"
                   className="object-contain"
                 />
               </div>

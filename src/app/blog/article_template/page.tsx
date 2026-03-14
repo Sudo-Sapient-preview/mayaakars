@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { getArticleById } from "@/lib/blogData";
 
-export default function ArticleTemplatePage() {
+function ArticleTemplateContent() {
   const searchParams = useSearchParams();
   const articleId = searchParams.get("id");
   const article = getArticleById(articleId);
@@ -18,6 +18,48 @@ export default function ArticleTemplatePage() {
     document.title = "Article Not Found | Mayaakars";
   }, [article]);
 
+  return (
+    <>
+      <main className="mk-article-page">
+        <nav>
+          <Link href="/journal">{"<- Back to Journal"}</Link>
+        </nav>
+
+        {article ? (
+          <>
+            <header className="article-hero">
+              <img src={article.image} alt="Hero Image" className="hero-bg" />
+              <div className="hero-overlay" />
+              <div className="category-badge">{article.category}</div>
+              <h1 className="article-title">{article.title}</h1>
+              <div className="article-meta">{article.date}</div>
+            </header>
+
+            <article className="article-body">
+              <div className="summary-block">{article.summary}</div>
+              <div className="content" dangerouslySetInnerHTML={{ __html: article.content }} />
+            </article>
+          </>
+        ) : (
+          <div className="error-state">
+            <h1>Article Not Found</h1>
+            <p style={{ color: "var(--muted)", marginBottom: "30px" }}>
+              The journal entry you are looking for does not exist.
+            </p>
+            <Link
+              href="/journal"
+              style={{ color: "var(--gold)", textDecoration: "none", borderBottom: "1px solid var(--gold)", paddingBottom: "5px" }}
+            >
+              Return to Journal
+            </Link>
+          </div>
+        )}
+      </main>
+    </>
+  );
+}
+
+export default function ArticleTemplatePage() {
   return (
     <>
       <style>{`
@@ -166,41 +208,9 @@ export default function ArticleTemplatePage() {
         }
       `}</style>
 
-      <main className="mk-article-page">
-        <nav>
-          <Link href="/journal">{"← Back to Journal"}</Link>
-        </nav>
-
-        {article ? (
-          <>
-            <header className="article-hero">
-              <img src={article.image} alt="Hero Image" className="hero-bg" />
-              <div className="hero-overlay" />
-              <div className="category-badge">{article.category}</div>
-              <h1 className="article-title">{article.title}</h1>
-              <div className="article-meta">{article.date}</div>
-            </header>
-
-            <article className="article-body">
-              <div className="summary-block">{article.summary}</div>
-              <div className="content" dangerouslySetInnerHTML={{ __html: article.content }} />
-            </article>
-          </>
-        ) : (
-          <div className="error-state">
-            <h1>Article Not Found</h1>
-            <p style={{ color: "var(--muted)", marginBottom: "30px" }}>
-              The journal entry you are looking for does not exist.
-            </p>
-            <Link
-              href="/journal"
-              style={{ color: "var(--gold)", textDecoration: "none", borderBottom: "1px solid var(--gold)", paddingBottom: "5px" }}
-            >
-              Return to Journal
-            </Link>
-          </div>
-        )}
-      </main>
+      <Suspense fallback={null}>
+        <ArticleTemplateContent />
+      </Suspense>
     </>
   );
 }

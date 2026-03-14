@@ -138,8 +138,10 @@ export default function Menu({
                 className="menu-items absolute inset-0 flex gap-[clamp(2rem,4vw,4.5rem)] max-[1000px]:flex-col-reverse max-[1000px]:gap-14 max-[480px]:gap-10 overflow-y-auto"
                 style={{
                     zIndex: 6,
-                    padding:
-                        "max(8.25rem, env(safe-area-inset-top)) clamp(3.25rem, 8vw, 6rem) max(7.75rem, env(safe-area-inset-bottom))",
+                    paddingTop: "max(7rem, env(safe-area-inset-top))",
+                    paddingBottom: "max(6.5rem, env(safe-area-inset-bottom))",
+                    paddingLeft: "clamp(1.5rem, 6vw, 3rem)",
+                    paddingRight: "clamp(1.5rem, 6vw, 3rem)",
                 }}
             >
                 <div className="menu-col-1 flex-1 flex flex-col justify-center items-center gap-18 max-[1000px]:items-start max-[1000px]:gap-7">
@@ -181,8 +183,8 @@ export default function Menu({
                 </div>
 
                 <div
-                    className="menu-footer absolute bottom-0 left-0 w-full flex items-end max-[1000px]:static max-[1000px]:mt-3 max-[1000px]:p-0"
-                    style={{ padding: "3.4rem clamp(3.25rem, 8vw, 6rem)" }}
+                    className="menu-footer absolute bottom-0 left-0 w-full flex items-end max-[1000px]:static max-[1000px]:mt-3 max-[1000px]:p-0 max-[1000px]:items-start"
+                    style={{ padding: "2.5rem clamp(1.5rem, 6vw, 3rem)" }}
                 >
                     <div className="flex gap-12 max-[1000px]:flex-col max-[1000px]:gap-3">
                         {[

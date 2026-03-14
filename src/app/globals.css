@@ -324,6 +324,8 @@ nav[data-menu-open="true"] button {
 /* Legal page prose */
 .mk-legal-prose {
   max-width: 72ch;
+  width: min(72ch, 100%);
+  margin-inline: auto;
 }
 
 .mk-legal-prose h2 {
@@ -348,6 +350,19 @@ nav[data-menu-open="true"] button {
   list-style: disc;
   padding-left: 1.25rem;
   margin-top: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .mk-light-section {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .mk-legal-prose {
+    padding-inline: 0.75rem;
+  }
 }
 
 /* Careers form */
