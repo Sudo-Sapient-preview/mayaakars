@@ -1,0 +1,415 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg: #050505;
+    --bg-dark: #050505;
+    --bg-light: #E3E4E0;
+    --home-dark-bg: #050505;
+    --home-transition-duration: 0.85s;
+    --home-transition-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --page-blend-bg-duration: 2.4s;
+    --page-blend-text-duration: 2.2s;
+    --page-blend-ease: cubic-bezier(0.19, 1, 0.22, 1);
+    --home-texture-opacity: 0.04;
+    --gold: #C49A3A;
+    --gold-light: #C8A95C;
+    --text: #E3E4E0;
+    --text-light: #E3E4E0;
+    --text-dark: #0A0A0A;
+    --text-dark-soft: rgba(10, 10, 10, 0.7);
+    --text-dark-muted: rgba(10, 10, 10, 0.45);
+    --muted: rgba(227, 228, 224, 0.45);
+    --border: rgba(196, 154, 58, 0.15);
+    --bg-light-glass: rgba(227, 228, 224, 0.7);
+    --gold-ring: rgba(196, 154, 58, 0.35);
+    --accent: #2A2A2A;
+  }
+
+  body {
+    @apply bg-[var(--bg-dark)] text-[var(--text-light)] overflow-x-hidden min-h-screen selection:bg-[var(--gold)] selection:text-[var(--bg-dark)];
+  }
+
+  /* Utility classes from SKILL.md */
+  .font-display {
+    font-family: var(--font-cormorant), serif;
+  }
+
+  .font-sans {
+    font-family: var(--font-geist-sans), sans-serif;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Texture Utility Layer */
+  .texture-blend {
+    mix-blend-mode: color-dodge;
+    opacity: 0.15;
+  }
+
+  /* Map font-serif to Cormorant Garamond */
+  .font-serif {
+    font-family: var(--font-cormorant), serif;
+  }
+
+  /* Lenis smooth scroll fix */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
+  .mk-home-dark-section {
+    position: relative;
+    isolation: isolate;
+    background: var(--home-dark-bg);
+    transition:
+      background-color var(--home-transition-duration) var(--home-transition-ease),
+      color var(--home-transition-duration) var(--home-transition-ease),
+      opacity var(--home-transition-duration) var(--home-transition-ease);
+  }
+
+  .mk-home-dark-texture {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    opacity: var(--home-texture-opacity);
+    background-image:
+      linear-gradient(#C49A3A 1px, transparent 1px),
+      linear-gradient(90deg, #C49A3A 1px, transparent 1px);
+    background-size: 60px 60px;
+    transition: opacity var(--home-transition-duration) var(--home-transition-ease);
+  }
+
+  .mk-home-light-section {
+    background: transparent;
+    color: inherit;
+    transition:
+      background-color var(--home-transition-duration) var(--home-transition-ease),
+      color var(--home-transition-duration) var(--home-transition-ease);
+  }
+}
+
+@media (pointer: fine) {
+  body {
+    cursor: none;
+  }
+}
+
+.mk-route-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.mk-route-wipe.is-covering,
+.mk-route-wipe.is-revealing {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mk-route-wipe-half {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.mk-route-wipe-left {
+  left: 0;
+}
+
+.mk-route-wipe-right {
+  right: 0;
+}
+
+.mk-route-wipe-inner {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+  backface-visibility: hidden;
+  transition: transform 1.2s cubic-bezier(0.85, 0, 0.15, 1);
+}
+
+.mk-route-wipe-left .mk-route-wipe-inner {
+  background: #e5e3d9;
+  transform-origin: 100% 50%;
+  transform: rotate(180deg) scale(2);
+}
+
+.mk-route-wipe-right .mk-route-wipe-inner {
+  background: #e5e3d9;
+  transform-origin: 0% 50%;
+  transform: rotate(-180deg) scale(2);
+}
+
+.mk-route-wipe.is-covering .mk-route-wipe-inner {
+  transform: rotate(0deg) scale(2);
+}
+
+.mk-route-wipe.is-revealing .mk-route-wipe-left .mk-route-wipe-inner {
+  transform: rotate(180deg) scale(2);
+}
+
+.mk-route-wipe.is-revealing .mk-route-wipe-right .mk-route-wipe-inner {
+  transform: rotate(-180deg) scale(2);
+}
+
+@media (max-width: 768px) {
+  .mk-route-wipe-half {
+    width: 100%;
+  }
+
+  .mk-route-wipe-right {
+    display: none;
+  }
+}
+
+/* Logo glow pulse */
+@keyframes glow-pulse {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 20px rgba(196, 154, 58, 0.6));
+  }
+
+  50% {
+    filter: drop-shadow(0 0 40px rgba(196, 154, 58, 1));
+  }
+}
+
+.animate-glow {
+  animation: glow-pulse 1.5s ease-in-out infinite;
+}
+
+/* Nav links/buttons turn dark when menu is open */
+nav[data-menu-open="true"] a,
+nav[data-menu-open="true"] button {
+  color: #000 !important;
+}
+
+@media (max-height: 720px) {
+  .menu-col-1,
+  .menu-col-2 {
+    gap: clamp(1.2rem, 2.4vh, 2rem) !important;
+  }
+
+  .menu-col-1 a,
+  .menu-col-2 a {
+    font-size: clamp(2.25rem, 6.3vh, 4.8rem) !important;
+  }
+
+  .menu-footer a,
+  .menu-footer p {
+    font-size: clamp(1.2rem, 2.8vh, 1.8rem) !important;
+  }
+}
+
+/* Contact page styles (kept global to avoid styled-jsx hydration hash drift in dev) */
+.mk-contact-page {
+  background: var(--bg-light);
+}
+
+.mk-contact-section .mk-contact-reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 0.9s cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: opacity, transform;
+}
+
+.mk-contact-section[data-visible="true"] .mk-contact-reveal {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.mk-contact-delay-1 {
+  transition-delay: 0.08s;
+}
+
+.mk-contact-delay-2 {
+  transition-delay: 0.16s;
+}
+
+.mk-contact-input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-light-glass);
+  color: var(--text-dark);
+  padding: 0.9rem 1rem;
+  font-size: 0.9rem;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.mk-contact-input::placeholder {
+  color: var(--text-dark-muted);
+}
+
+.mk-contact-input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold-ring);
+}
+
+.mk-contact-btn {
+  border: 1px solid var(--text-dark);
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--text-dark);
+  padding: 0.85rem 2rem;
+  font-family: var(--font-geist-sans), sans-serif;
+  font-size: 0.9rem;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.mk-contact-btn:hover {
+  background: var(--text-dark);
+  color: var(--bg-light);
+  border-color: var(--text-dark);
+}
+
+@media (max-width: 768px) {
+  .mk-contact-section {
+    min-height: 65vh;
+    padding: 4rem 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .mk-contact-section {
+    padding: 3rem 1rem;
+  }
+}
+
+/* ── Shared light-page reveal (careers, legal pages) ─────────────────────── */
+.mk-light-page {
+  background: var(--bg-light);
+  color: var(--text-dark);
+}
+
+.mk-light-section .mk-reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity 0.9s cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: opacity, transform;
+}
+
+.mk-light-section[data-visible="true"] .mk-reveal {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.mk-reveal-d1 { transition-delay: 0.07s; }
+.mk-reveal-d2 { transition-delay: 0.14s; }
+.mk-reveal-d3 { transition-delay: 0.21s; }
+
+/* Legal page prose */
+.mk-legal-prose {
+  max-width: 72ch;
+}
+
+.mk-legal-prose h2 {
+  font-family: var(--font-geist-sans), sans-serif;
+  font-size: clamp(0.7rem, 1.5vw, 0.8rem);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-top: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.mk-legal-prose p,
+.mk-legal-prose li {
+  font-family: var(--font-geist-sans), sans-serif;
+  font-size: clamp(0.875rem, 1.5vw, 1rem);
+  line-height: 1.8;
+  color: var(--text-dark-soft);
+}
+
+.mk-legal-prose ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin-top: 0.5rem;
+}
+
+/* Careers form */
+.mk-careers-input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-light-glass);
+  color: var(--text-dark);
+  padding: 0.9rem 1rem;
+  font-size: 0.9rem;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  appearance: none;
+}
+
+.mk-careers-input::placeholder {
+  color: var(--text-dark-muted);
+}
+
+.mk-careers-input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold-ring);
+}
+
+.mk-careers-btn {
+  border: 1px solid var(--text-dark);
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--text-dark);
+  padding: 0.85rem 2.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.mk-careers-btn:hover {
+  background: var(--text-dark);
+  color: var(--bg-light);
+}
+
+/* Menu footer legal links hover */
+.menu-footer-link {
+  position: relative;
+}
+
+.menu-footer-link::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: currentColor;
+  transition: width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.menu-footer-link:hover::after {
+  width: 100%;
+}
+
+.menu-footer-link:hover {
+  color: var(--gold);
+  transition: color 0.25s ease;
+}

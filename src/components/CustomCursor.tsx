@@ -1,0 +1,197 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+const PRIMARY_INTERACTIVE_SELECTOR = "[data-interactive]";
+
+const FALLBACK_INTERACTIVE_SELECTOR = [
+    "a[href]",
+    "button",
+    "input",
+    "textarea",
+    "select",
+    "summary",
+    "[role='button']",
+    "[role='link']",
+    "[contenteditable='true']",
+    "[tabindex]:not([tabindex='-1'])",
+].join(", ");
+
+const CURSOR_IGNORE_SELECTOR = "[data-cursor-ignore]";
+const CURSOR_MEDIA_SELECTOR = "[data-cursor-media]";
+
+const getInteractiveTarget = (target: EventTarget | null): Element | null => {
+    if (!(target instanceof Element)) return null;
+    if (target.closest(CURSOR_IGNORE_SELECTOR)) return null;
+
+    const primaryTarget = target.closest(PRIMARY_INTERACTIVE_SELECTOR);
+    const fallbackTarget = target.closest(FALLBACK_INTERACTIVE_SELECTOR);
+    const interactiveTarget = primaryTarget ?? fallbackTarget;
+
+    if (!interactiveTarget) return null;
+    if (interactiveTarget.closest(CURSOR_IGNORE_SELECTOR)) return null;
+    if (interactiveTarget.closest(CURSOR_MEDIA_SELECTOR)) return null;
+
+    return interactiveTarget;
+};
+
+export default function CustomCursor() {
+    const [enabled, setEnabled] = useState(false);
+
+    useEffect(() => {
+        const mediaQuery = window.matchMedia("(pointer: fine)");
+        const updateEnabled = () => setEnabled(mediaQuery.matches);
+
+        updateEnabled();
+        mediaQuery.addEventListener("change", updateEnabled);
+
+        return () => mediaQuery.removeEventListener("change", updateEnabled);
+    }, []);
+
+    useEffect(() => {
+        if (!enabled) return;
+
+        const dotWrapper = document.getElementById("cursor-dot-wrapper");
+        const ringWrapper = document.getElementById("cursor-ring-wrapper");
+
+        if (!dotWrapper || !ringWrapper) return;
+
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let ringX = mouseX;
+        let ringY = mouseY;
+
+        const speed = 0.35;
+
+        // Instant tracking for the dot
+        const updateTarget = (e: MouseEvent) => {
+            const clientX = e.clientX;
+            const clientY = e.clientY;
+            mouseX = clientX;
+            mouseY = clientY;
+            dotWrapper.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+        };
+
+        // Click state
+        const onMouseDown = () => document.body.classList.add("cursor-clicking");
+        const onMouseUp = () => document.body.classList.remove("cursor-clicking");
+
+        // Event delegation — works on dynamically rendered [data-interactive] elements
+        const onMouseOver = (e: MouseEvent) => {
+            if (getInteractiveTarget(e.target)) {
+                document.body.classList.add("cursor-hovering");
+            }
+        };
+        const onMouseOut = (e: MouseEvent) => {
+            const currentInteractive = getInteractiveTarget(e.target);
+            if (!currentInteractive) return;
+
+            const nextInteractive = getInteractiveTarget(e.relatedTarget);
+            if (!nextInteractive) {
+                document.body.classList.remove("cursor-hovering");
+            }
+        };
+
+        window.addEventListener("mousemove", updateTarget as EventListener);
+        window.addEventListener("mousedown", onMouseDown);
+        window.addEventListener("mouseup", onMouseUp);
+        document.addEventListener("mouseover", onMouseOver);
+        document.addEventListener("mouseout", onMouseOut);
+
+        // Lerp render loop for the trailing ring
+        let animationFrameId: number;
+        function animate() {
+            ringX += (mouseX - ringX) * speed;
+            ringY += (mouseY - ringY) * speed;
+            ringWrapper!.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        dotWrapper.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+        ringWrapper.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
+        animate();
+
+        return () => {
+            window.removeEventListener("mousemove", updateTarget as EventListener);
+            window.removeEventListener("mousedown", onMouseDown);
+            window.removeEventListener("mouseup", onMouseUp);
+            document.removeEventListener("mouseover", onMouseOver);
+            document.removeEventListener("mouseout", onMouseOut);
+            cancelAnimationFrame(animationFrameId);
+            document.body.classList.remove("cursor-hovering", "cursor-clicking");
+        };
+    }, [enabled]);
+
+    if (!enabled) return null;
+
+    return (
+        <>
+            <style
+                dangerouslySetInnerHTML={{
+                    __html: `
+                @media (pointer: fine) {
+                    body, html, * { cursor: none !important; }
+                }
+
+        #cursor-dot-wrapper,
+        #cursor-ring-wrapper {
+          position: fixed;
+          top: 0;
+          left: 0;
+          pointer-events: none;
+          z-index: 99999;
+          will-change: transform;
+          mix-blend-mode: difference;
+        }
+
+        #cursor-dot {
+          width: 6px;
+          height: 6px;
+          background-color: #fff;
+          border-radius: 50%;
+          transform: translate(-50%, -50%);
+          transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        #cursor-ring {
+          width: 36px;
+          height: 36px;
+          border: 1.5px solid rgba(255, 255, 255, 0.4);
+          background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 80%);
+          border-radius: 50%;
+          transform: translate(-50%, -50%);
+          transition: width 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                      height 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                      background 0.3s ease, border-color 0.3s ease;
+        }
+
+        body.cursor-hovering #cursor-dot {
+          opacity: 0;
+          transform: translate(-50%, -50%) scale(0);
+        }
+
+        body.cursor-hovering #cursor-ring {
+          width: 110px;
+          height: 110px;
+          background: rgba(255, 255, 255, 1);
+          border-color: transparent;
+        }
+
+        body.cursor-clicking #cursor-ring {
+          width: 25px;
+          height: 25px;
+          background: rgba(255, 255, 255, 0.2);
+        }
+      `,
+                }}
+            />
+
+            <div id="cursor-ring-wrapper">
+                <div id="cursor-ring" />
+            </div>
+            <div id="cursor-dot-wrapper">
+                <div id="cursor-dot" />
+            </div>
+        </>
+    );
+}
