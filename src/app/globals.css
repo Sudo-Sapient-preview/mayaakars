@@ -254,7 +254,34 @@ nav[data-menu-open="true"] button {
     box-shadow 0.25s ease;
 }
 
+.mk-contact-select,
+.mk-contact-textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-light-glass);
+  color: var(--text-dark);
+  padding: 0.9rem 1rem;
+  font-size: 0.9rem;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.mk-contact-select {
+  min-height: 48px;
+}
+
+.mk-contact-textarea {
+  min-height: 132px;
+  resize: vertical;
+}
+
 .mk-contact-input::placeholder {
+  color: var(--text-dark-muted);
+}
+
+.mk-contact-textarea::placeholder {
   color: var(--text-dark-muted);
 }
 
@@ -262,6 +289,21 @@ nav[data-menu-open="true"] button {
   outline: none;
   border-color: var(--gold);
   box-shadow: 0 0 0 1px var(--gold-ring);
+}
+
+.mk-contact-select:focus,
+.mk-contact-textarea:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold-ring);
+}
+
+.mk-contact-note {
+  margin: 0;
+  text-align: left;
+  font-size: 0.76rem;
+  line-height: 1.6;
+  color: var(--text-dark-muted);
 }
 
 .mk-contact-btn {
@@ -282,6 +324,62 @@ nav[data-menu-open="true"] button {
   background: var(--text-dark);
   color: var(--bg-light);
   border-color: var(--text-dark);
+}
+
+.mk-contact-btn[data-state="sending"] {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.mk-contact-btn[data-state="done"] {
+  background: var(--text-dark);
+  color: var(--bg-light);
+  border-color: var(--text-dark);
+  animation: mk-thankyou-pop 1.35s cubic-bezier(0.22, 0.72, 0.13, 1);
+}
+
+.mk-thankyou-card {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--bg-light-glass);
+  color: var(--text-dark);
+  padding: 1.25rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  animation: mk-thankyou-pop 1.35s cubic-bezier(0.22, 0.72, 0.13, 1);
+  max-width: 420px;
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.06),
+    0 6px 16px rgba(0, 0, 0, 0.03);
+}
+
+.mk-thankyou-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--text-dark);
+  color: var(--bg-light);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+}
+
+.mk-thankyou-text {
+  margin: 0;
+  text-align: center;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+@keyframes mk-thankyou-pop {
+  0%   { transform: translateY(28px) scale(0.92); opacity: 0; filter: blur(2.5px); }
+  45%  { transform: translateY(-4px) scale(1.04); opacity: 0.95; filter: blur(0px); }
+  70%  { transform: translateY(0) scale(1.01); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 
 @media (max-width: 768px) {

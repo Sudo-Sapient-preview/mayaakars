@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { getServiceBySlug } from "@/lib/services-data";
 import ServiceSlider from "@/components/services/ServiceSlider";
@@ -48,6 +49,12 @@ export default function ServiceDetailPage() {
                     </div>
                 </div>
             </section>
+
+              <section className="svc-back-wrap">
+                <Link href="/services" className="svc-back-btn" data-interactive>
+                  Back to Services
+                </Link>
+              </section>
         </main>
     );
 }
@@ -146,6 +153,28 @@ const PAGE_STYLES = `
     line-height: 1.8;
     color: rgba(227, 228, 224, 0.55);
   }
+  .svc-back-wrap {
+    padding: 0 24px 120px;
+    display: flex;
+    justify-content: center;
+  }
+  .svc-back-btn {
+    border: 1px solid rgba(227, 228, 224, 0.85);
+    border-radius: 9999px;
+    background: transparent;
+    color: #e3e4e0;
+    padding: 0.85rem 2rem;
+    font-size: 0.9rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  }
+  .svc-back-btn:hover {
+    background: #e3e4e0;
+    color: #050505;
+    border-color: #e3e4e0;
+  }
 
   @media (max-width: 768px) {
 	    .svc-intro {
@@ -167,5 +196,15 @@ const PAGE_STYLES = `
 	    .svc-scope {
 	      padding: 52px 20px 72px;
 	    }
+      .svc-back-wrap {
+        padding: 0 20px 72px;
+      }
+      .svc-back-btn {
+        width: 100%;
+        max-width: 320px;
+        text-align: center;
+        font-size: 0.82rem;
+        letter-spacing: 0.12em;
+      }
 	  }
 `;

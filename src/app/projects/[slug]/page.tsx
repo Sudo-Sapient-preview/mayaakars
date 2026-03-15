@@ -63,6 +63,11 @@ export default function ProjectDetailPage() {
                                         </div>
                                 </div>
                         </section>
+            <section className="prj-back-wrap">
+                <Link href="/projects" className="prj-back-btn" data-interactive>
+                    Back to Projects
+                </Link>
+            </section>
         </main>
     );
 }
@@ -182,6 +187,28 @@ const PAGE_STYLES = `
         border-color: #c49a3a;
         color: #050505;
     }
+    .prj-back-wrap {
+        padding: 0 24px 120px;
+        display: flex;
+        justify-content: center;
+    }
+    .prj-back-btn {
+        border: 1px solid rgba(227, 228, 224, 0.85);
+        border-radius: 9999px;
+        background: transparent;
+        color: #e3e4e0;
+        padding: 0.85rem 2rem;
+        font-size: 0.9rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        text-decoration: none;
+        transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    }
+    .prj-back-btn:hover {
+        background: #e3e4e0;
+        color: #050505;
+        border-color: #e3e4e0;
+    }
 
     @media (max-width: 768px) {
         .prj-intro {
@@ -206,6 +233,16 @@ const PAGE_STYLES = `
         .prj-highlight-list li {
             font-size: 1.15rem;
             padding: 15px 0;
+        }
+        .prj-back-wrap {
+            padding: 0 20px 72px;
+        }
+        .prj-back-btn {
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+            font-size: 0.82rem;
+            letter-spacing: 0.12em;
         }
     }
 `;

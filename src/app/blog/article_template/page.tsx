@@ -21,10 +21,6 @@ function ArticleTemplateContent() {
   return (
     <>
       <main className="mk-article-page">
-        <nav>
-          <Link href="/journal">{"<- Back to Journal"}</Link>
-        </nav>
-
         {article ? (
           <>
             <header className="article-hero">
@@ -54,6 +50,12 @@ function ArticleTemplateContent() {
             </Link>
           </div>
         )}
+
+        <section className="article-footer-nav">
+          <Link href="/journal" className="article-back-btn" data-interactive>
+            Back to Journal
+          </Link>
+        </section>
       </main>
     </>
   );
@@ -84,30 +86,6 @@ export default function ArticleTemplatePage() {
           -webkit-font-smoothing: antialiased;
           overflow-x: hidden;
           min-height: 100vh;
-        }
-
-        .mk-article-page nav {
-          padding: 30px 40px;
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          z-index: 100;
-          display: flex;
-          justify-content: space-between;
-        }
-
-        .mk-article-page nav a {
-          color: var(--text);
-          text-decoration: none;
-          font-size: 0.8rem;
-          letter-spacing: 2px;
-          text-transform: uppercase;
-          transition: color 0.3s ease;
-        }
-
-        .mk-article-page nav a:hover {
-          color: var(--gold);
         }
 
         .mk-article-page .article-hero {
@@ -205,6 +183,45 @@ export default function ArticleTemplatePage() {
           font-family: "Cormorant Garamond", serif;
           font-size: 3rem;
           margin-bottom: 20px;
+        }
+
+        .mk-article-page .article-footer-nav {
+          padding: 0 30px 88px;
+          display: flex;
+          justify-content: center;
+        }
+
+        .mk-article-page .article-back-btn {
+          border: 1px solid rgba(242, 242, 242, 0.85);
+          border-radius: 9999px;
+          background: transparent;
+          color: #f2f2f2;
+          padding: 0.85rem 2rem;
+          font-size: 0.9rem;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          text-decoration: none;
+          transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+        }
+
+        .mk-article-page .article-back-btn:hover {
+          background: #e3e4e0;
+          color: #050505;
+          border-color: #e3e4e0;
+        }
+
+        @media (max-width: 768px) {
+          .mk-article-page .article-footer-nav {
+            padding: 0 20px 72px;
+          }
+
+          .mk-article-page .article-back-btn {
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+            font-size: 0.82rem;
+            letter-spacing: 0.12em;
+          }
         }
       `}</style>
 

@@ -105,7 +105,7 @@ export default function Home() {
 
         section.classList.toggle("is-visible", ratio > 0.03);
 
-        body.style.setProperty("--bg-color", mix("#050505", "#ffffff", blendProgress));
+        body.style.setProperty("--bg-color", mix("#050505", "#e3e4e0", blendProgress));
         body.style.setProperty("--text-color", mix("#f2f2f2", "#0a0a0a", blendProgress));
 
         if (blendProgress > 0.62) {

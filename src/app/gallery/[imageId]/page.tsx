@@ -11,11 +11,11 @@ export async function generateStaticParams() {
 }
 
 type GalleryInsidePageProps = {
-    params: { imageId: string };
+    params: Promise<{ imageId: string }>;
 };
 
 export default async function GalleryInsidePage({ params }: GalleryInsidePageProps) {
-    const { imageId } = params;
+    const { imageId } = await params;
     const item = getGalleryItem(imageId);
     if (!item) notFound();
 

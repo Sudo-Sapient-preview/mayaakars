@@ -103,9 +103,9 @@ export default function Testimonials() {
   const t = TESTIMONIALS[current];
 
   return (
-    <section className="relative py-28 px-4" style={{ background: "var(--bg-dark)" }}>
+    <section className="relative py-16 md:py-28 px-4" style={{ background: "var(--bg-dark)" }}>
       {/* Section header */}
-      <div className="text-center mb-16">
+      <div className="text-center mb-12 md:mb-16">
         <p
           className="uppercase mb-3"
           style={{

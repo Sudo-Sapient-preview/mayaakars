@@ -425,7 +425,7 @@ const MOBILE_STYLES = `
   .pc-mob-container {
     display: flex;
     width: 100vw;
-    height: 100dvh;
+    height: 82dvh;
     overflow-x: scroll;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
@@ -438,7 +438,7 @@ const MOBILE_STYLES = `
   .pc-mob-card {
     flex-shrink: 0;
     width: 100vw;
-    height: 100dvh;
+    height: 82dvh;
     scroll-snap-align: start;
     scroll-snap-stop: always;
     position: relative;
@@ -450,11 +450,20 @@ const MOBILE_STYLES = `
   .pc-mob-inner {
     width: 85vw;
     height: calc(85vw * 0.625);
-    margin-top: -15vh;
+    margin-top: -8vh;
     position: relative;
     background: transparent;
     will-change: transform;
     -webkit-box-reflect: below 25px linear-gradient(transparent, transparent 50%, rgba(255, 255, 255, 0.15));
+  }
+  @media (max-width: 480px) {
+    .pc-mob-container,
+    .pc-mob-card {
+      height: 78dvh;
+    }
+    .pc-mob-inner {
+      margin-top: -6vh;
+    }
   }
   .pc-mob-inner img {
     width: 100%;

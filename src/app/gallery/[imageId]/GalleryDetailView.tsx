@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -139,10 +140,43 @@ export default function GalleryDetailView({ title, category, images }: Props) {
           color: rgba(227,228,224,0.35);
         }
         .gd-footer-spacer { height: 20vh; background: #080808; }
+        .gd-footer-nav {
+          padding: 0 20px 84px;
+          display: flex;
+          justify-content: center;
+          background: #080808;
+        }
+        .gd-back-btn {
+          border: 1px solid rgba(227, 228, 224, 0.85);
+          border-radius: 9999px;
+          background: transparent;
+          color: #e3e4e0;
+          padding: 0.85rem 2rem;
+          font-size: 0.9rem;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          text-decoration: none;
+          transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+        }
+        .gd-back-btn:hover {
+          background: #e3e4e0;
+          color: #050505;
+          border-color: #e3e4e0;
+        }
 
         @media (max-width: 768px) {
           .gd-section { height: 72dvh; }
           .gd-hero { height: 72dvh; }
+          .gd-footer-nav {
+            padding-bottom: 72px;
+          }
+          .gd-back-btn {
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+            font-size: 0.82rem;
+            letter-spacing: 0.12em;
+          }
         }
         @media (max-width: 480px) {
           .gd-section { height: 60dvh; }
@@ -182,6 +216,11 @@ export default function GalleryDetailView({ title, category, images }: Props) {
                 ))}
 
                 <div className="gd-footer-spacer" />
+                <div className="gd-footer-nav">
+                  <Link href="/gallery" className="gd-back-btn" data-interactive>
+                    Back to Gallery
+                  </Link>
+                </div>
             </main>
         </>
     );

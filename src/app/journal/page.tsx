@@ -7,76 +7,7 @@ export default function JournalPage() {
   const { navigate } = useRouteTransition();
   const whiteSectionRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    const rows = Array.from(document.querySelectorAll<HTMLElement>(".grid-row"));
-
-    const updateActiveCard = () => {
-      let closestIndex = 0;
-      let minDistance = Infinity;
-      const triggerPoint = window.innerHeight / 2;
-
-      rows.forEach((row, index) => {
-        const rect = row.getBoundingClientRect();
-        const rowCenter = rect.top + rect.height / 2;
-        const distance = Math.abs(rowCenter - triggerPoint);
-        if (distance < minDistance) {
-          minDistance = distance;
-          closestIndex = index;
-        }
-      });
-
-      rows.forEach((row, index) => {
-        if (index === closestIndex) {
-          row.classList.add("active");
-        } else {
-          row.classList.remove("active");
-        }
-      });
-    };
-
-    const animateCardText = (row: Element) => {
-      if (!row.classList.contains("active")) return;
-
-      row.querySelectorAll(".anim-element").forEach((el) => {
-        [el.querySelector("h3"), el.querySelector("p"), el.querySelector(".badge")].forEach((item) => {
-          if (item && !item.querySelector(".text-animate")) {
-            const text = item.textContent || "";
-            item.innerHTML = "";
-            text.split("").forEach((char, i) => {
-              const span = document.createElement("span");
-              span.textContent = char;
-              span.className = "text-animate preset-fade";
-              span.style.animationDelay = `${i * 0.018}s`;
-              item.appendChild(span);
-            });
-          }
-        });
-      });
-    };
-
-    let ticking = false;
-    const onScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          updateActiveCard();
-          const activeRow = document.querySelector(".grid-row.active");
-          if (activeRow) animateCardText(activeRow);
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-
-    updateActiveCard();
-    const initialActive = document.querySelector(".grid-row.active");
-    if (initialActive) animateCardText(initialActive);
-
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-    };
-  }, []);
+  // Text animations removed for a calmer, static journal layout.
 
   useEffect(() => {
     const section = whiteSectionRef.current;
@@ -250,7 +181,7 @@ export default function JournalPage() {
 
         .mk-blog-page .image-wrapper {
           position: relative;
-          width: 30%;
+          width: 100%;
           aspect-ratio: 16 / 10;
           overflow: hidden;
           border-radius: 14px;
@@ -308,21 +239,8 @@ export default function JournalPage() {
           box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
         }
 
-        .mk-blog-page .grid-row.active .image-wrapper {
-          width: 100%;
-          box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9);
-        }
-
-        .mk-blog-page .grid-row.active .image-wrapper img {
-          filter: brightness(0.75);
-        }
-
-        .mk-blog-page .grid-row.active .image-wrapper:hover {
-          transform: scale(1.02);
-        }
-
-        .mk-blog-page .grid-row.active .image-wrapper:hover img {
-          transform: scale(1.05);
+        .mk-blog-page .image-wrapper {
+          box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85);
         }
 
         .mk-blog-page .left-col,
@@ -337,9 +255,8 @@ export default function JournalPage() {
           position: absolute;
           top: 50%;
           transform: translateY(-50%);
-          opacity: 0;
-          visibility: hidden;
-          transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s;
+          opacity: 1;
+          visibility: visible;
         }
 
         .mk-blog-page .left-col .anim-element {
@@ -387,38 +304,9 @@ export default function JournalPage() {
           font-weight: 400;
         }
 
-        .mk-blog-page .grid-row.active .anim-element {
-          opacity: 1;
-          visibility: visible;
-          transform: translateY(-50%);
-        }
-
-        .mk-blog-page .grid-row.active .left-col .anim-element {
-          transition-delay: 0.15s;
-        }
-
-        .mk-blog-page .grid-row.active .right-col .anim-element {
-          transition-delay: 0.25s;
-        }
-
-        .mk-blog-page .text-animate {
-          display: inline-block;
-          white-space: pre;
-        }
-
-        @keyframes anim-fade {
-          0% {
-            opacity: 0;
-            transform: translateY(15px);
-          }
-          100% {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
+        .mk-blog-page .text-animate,
         .mk-blog-page .preset-fade {
-          animation: anim-fade 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+          animation: none;
         }
 
         .mk-blog-page .browse-all {
@@ -568,19 +456,9 @@ export default function JournalPage() {
             margin-bottom: 16px;
           }
 
-          .mk-blog-page .grid-row.active .left-col .anim-element,
-          .mk-blog-page .grid-row.active .right-col .anim-element,
-          .mk-blog-page .grid-row.active .anim-element {
-            transform: translateY(0);
-          }
-
           .mk-blog-page .image-wrapper {
             width: 92%;
             aspect-ratio: 16/10;
-          }
-
-          .mk-blog-page .grid-row.active .image-wrapper {
-            width: 100%;
           }
 
           .mk-blog-page .manual-white-actions {

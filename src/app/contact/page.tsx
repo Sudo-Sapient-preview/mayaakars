@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
+
+type SubmitState = "idle" | "sending" | "done";
 
 export default function ContactPage() {
   const pageRef = useRef<HTMLElement>(null);
+  const [status, setStatus] = useState<SubmitState>("idle");
 
   useEffect(() => {
     document.body.setAttribute("data-navbar-variant", "light");
@@ -37,6 +40,17 @@ export default function ContactPage() {
     return () => observer.disconnect();
   }, []);
 
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (status === "sending") return;
+
+    setStatus("sending");
+    setTimeout(() => setStatus("done"), 500);
+  };
+
+  const buttonLabel =
+    status === "sending" ? "Sending..." : status === "done" ? "Thank you!" : "Send Enquiry";
+
   return (
     <main
       ref={pageRef}
@@ -47,11 +61,19 @@ export default function ContactPage() {
         data-contact-section
         className="mk-contact-section flex min-h-[70vh] flex-col items-center justify-center px-6 py-20 text-center"
       >
-        <div className="flex flex-col items-center">
-          <h1 className="mk-contact-reveal text-balance font-serif text-[clamp(2.75rem,12vw,9.5rem)] font-medium leading-[0.95] tracking-[0.08em]">
-            MAYAAKARS
+        <div className="flex w-full max-w-3xl flex-col items-center">
+          <p className="mk-contact-reveal uppercase tracking-[0.35em] text-[10px] font-semibold text-[var(--gold)]">
+            Contact Us
+          </p>
+          <h1 className="mk-contact-reveal mk-contact-delay-1 mt-3 text-balance font-serif text-[clamp(2.1rem,6vw,4rem)] font-medium leading-[1]">
+            Get in Touch
           </h1>
-          <div className="mk-contact-reveal mk-contact-delay-1 mt-4 flex flex-col font-sans">
+          <p className="mk-contact-reveal mk-contact-delay-1 mt-4 max-w-2xl text-sm leading-relaxed text-[var(--text-dark-soft)] md:text-base">
+            Whether you are planning a project, exploring a collaboration, or looking for a long-term design partner, we would be happy to hear from you.
+          </p>
+          <div className="mk-contact-reveal mk-contact-delay-2 mt-8 flex flex-col font-sans">
+            <p className="m-0 text-base font-medium">Mayaakars</p>
+            <p className="m-0 text-sm text-[var(--text-dark-soft)]">Architecture &amp; Interior Design Studio</p>
             <p className="m-0 text-base">Phone: +91 88844 96888</p>
             <p className="m-0 text-base">Email: info@mayaakars.com</p>
             <address className="mt-4 not-italic text-[clamp(1rem,2vw,1.35rem)] leading-relaxed text-[var(--text-dark-soft)]">
@@ -72,22 +94,110 @@ export default function ContactPage() {
         className="mk-contact-section flex min-h-[70vh] flex-col items-center justify-center px-6 py-20 text-center"
       >
         <h2 className="mk-contact-reveal text-balance font-serif text-[clamp(2rem,5vw,3.5rem)] font-medium leading-tight">
-          We are always happy to help
+          Schedule a Consultation
         </h2>
+        <p className="mk-contact-reveal mk-contact-delay-1 mt-4 max-w-2xl text-sm leading-relaxed text-[var(--text-dark-soft)] md:text-base">
+          Have a project or collaboration in mind? Share a few details and our team will get back to you shortly.
+        </p>
 
-        <form
-          className="mk-contact-reveal mk-contact-delay-1 mt-8 flex w-full max-w-[420px] flex-col gap-4 font-sans"
-          onSubmit={(event) => event.preventDefault()}
-        >
-          <input type="email" placeholder="Enter your email" className="mk-contact-input" data-cursor-ignore />
-          <input type="tel" placeholder="Enter your phone number" className="mk-contact-input" data-cursor-ignore />
-        </form>
+        {status !== "done" ? (
+          <form
+            className="mk-contact-reveal mk-contact-delay-2 mt-8 flex w-full max-w-3xl flex-col gap-4 font-sans"
+            onSubmit={handleSubmit}
+          >
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <input
+                type="text"
+                name="fullName"
+                placeholder="Full Name"
+                className="mk-contact-input"
+                data-cursor-ignore
+                required
+              />
+              <input
+                type="email"
+                name="email"
+                placeholder="Email Address"
+                className="mk-contact-input"
+                data-cursor-ignore
+                required
+              />
+              <input
+                type="tel"
+                name="phone"
+                placeholder="Phone Number"
+                className="mk-contact-input"
+                data-cursor-ignore
+                required
+              />
+              <input
+                type="text"
+                name="company"
+                placeholder="Company Name (optional)"
+                className="mk-contact-input"
+                data-cursor-ignore
+              />
+            </div>
 
-        <div className="mk-contact-reveal mk-contact-delay-2 mt-8">
-          <button type="button" className="mk-contact-btn" data-interactive>
-            Send Enquiry
-          </button>
-        </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <input
+                type="text"
+                name="location"
+                placeholder="Location / Country"
+                className="mk-contact-input"
+                data-cursor-ignore
+                required
+              />
+              <select
+                name="enquiryType"
+                className="mk-contact-select"
+                data-cursor-ignore
+                defaultValue=""
+                required
+              >
+                <option value="" disabled>
+                  Nature of Enquiry
+                </option>
+                <option value="architecture-services">Architecture Services</option>
+                <option value="interior-design-service">Interior Design Service</option>
+                <option value="general-enquiry">General Enquiry</option>
+              </select>
+            </div>
+
+            <textarea
+              name="message"
+              placeholder="Message / Project Brief"
+              className="mk-contact-textarea"
+              data-cursor-ignore
+              required
+            />
+
+            <p className="mk-contact-note">
+              We respect your privacy. Your information will be used only to respond to your enquiry.
+            </p>
+
+            <div className="mk-contact-reveal mk-contact-delay-2 mt-6">
+              <button
+                type="submit"
+                className="mk-contact-btn"
+                data-interactive
+                data-state={status}
+                disabled={status === "sending"}
+              >
+                {buttonLabel}
+              </button>
+            </div>
+          </form>
+        ) : (
+          <div
+            className="mk-thankyou-card mk-contact-reveal mk-contact-delay-1 mt-8"
+            role="status"
+            aria-live="polite"
+          >
+            <div className="mk-thankyou-icon" aria-hidden="true">✓</div>
+            <p className="mk-thankyou-text">Thank you for reaching out. We&apos;ll get back to you shortly.</p>
+          </div>
+        )}
       </section>
     </main>
   );

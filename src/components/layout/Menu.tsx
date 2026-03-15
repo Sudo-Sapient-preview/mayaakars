@@ -135,16 +135,16 @@ export default function Menu({
             </div>
 
             <div
-                className="menu-items absolute inset-0 flex gap-[clamp(2rem,4vw,4.5rem)] max-[1000px]:flex-col-reverse max-[1000px]:gap-14 max-[480px]:gap-10 overflow-y-auto"
+                className="menu-items absolute inset-0 flex gap-[clamp(2rem,4vw,4.5rem)] max-[1000px]:flex-col max-[1000px]:gap-10 max-[640px]:gap-8 max-[1000px]:justify-between overflow-y-auto"
                 style={{
                     zIndex: 6,
-                    paddingTop: "max(7rem, env(safe-area-inset-top))",
-                    paddingBottom: "max(6.5rem, env(safe-area-inset-bottom))",
-                    paddingLeft: "clamp(1.5rem, 6vw, 3rem)",
-                    paddingRight: "clamp(1.5rem, 6vw, 3rem)",
+                    paddingTop: "clamp(4.5rem, 10vw, 6.5rem)",
+                    paddingBottom: "clamp(3.75rem, 9vw, 5.5rem)",
+                    paddingLeft: "clamp(1.3rem, 6vw, 3rem)",
+                    paddingRight: "clamp(1.3rem, 6vw, 3rem)",
                 }}
             >
-                <div className="menu-col-1 flex-1 flex flex-col justify-center items-center gap-18 max-[1000px]:items-start max-[1000px]:gap-7">
+                <div className="menu-col-1 flex-1 flex flex-col justify-center items-center gap-18 max-[1000px]:items-start max-[1000px]:gap-6 max-[640px]:gap-5 max-[1000px]:order-2">
                     {COL1.map((item) => (
                         <div key={item.label} className="menu-link overflow-hidden">
                             <Link
@@ -153,7 +153,7 @@ export default function Menu({
                                 data-route-transition="false"
                                 onClick={onClose}
                                 className="uppercase font-medium tracking-[0.05em] text-black no-underline leading-none block"
-                                style={{ fontSize: "clamp(3.2rem, 6.4vw, 9rem)" }}
+                                style={{ fontSize: "clamp(2.4rem, 7vw, 6rem)" }}
                             >
                                 <span className="line block translate-y-[110%] will-change-transform">
                                     {item.label}
@@ -163,7 +163,7 @@ export default function Menu({
                     ))}
                 </div>
 
-                <div className="menu-col-2 flex-1 flex flex-col justify-center items-center gap-18 max-[1000px]:items-start max-[1000px]:gap-7">
+                <div className="menu-col-2 flex-1 flex flex-col justify-center items-center gap-18 max-[1000px]:items-start max-[1000px]:gap-6 max-[640px]:gap-5 max-[1000px]:order-1">
                     {COL2.map((item) => (
                         <div key={item.label} className="menu-link overflow-hidden">
                             <Link
@@ -172,7 +172,7 @@ export default function Menu({
                                 data-route-transition="false"
                                 onClick={onClose}
                                 className="font-display italic text-black no-underline leading-none block"
-                                style={{ fontSize: "clamp(2.9rem, 5.3vw, 7.2rem)" }}
+                                style={{ fontSize: "clamp(2.1rem, 6vw, 5.4rem)" }}
                             >
                                 <span className="line block translate-y-[110%] will-change-transform">
                                     {item.label}
@@ -183,7 +183,7 @@ export default function Menu({
                 </div>
 
                 <div
-                    className="menu-footer absolute bottom-0 left-0 w-full flex items-end max-[1000px]:static max-[1000px]:mt-3 max-[1000px]:p-0 max-[1000px]:items-start"
+                    className="menu-footer absolute bottom-0 left-0 w-full flex items-end max-[1000px]:static max-[1000px]:order-3 max-[1000px]:mt-auto max-[1000px]:pt-4 max-[1000px]:pb-6 max-[1000px]:items-start"
                     style={{ padding: "2.5rem clamp(1.5rem, 6vw, 3rem)" }}
                 >
                     <div className="flex gap-12 max-[1000px]:flex-col max-[1000px]:gap-3">
