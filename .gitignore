@@ -23,6 +23,9 @@
 # scripts
 /scripts
 
+# generated files
+src/lib/generated-projects.json
+
 # misc
 .DS_Store
 *.pem

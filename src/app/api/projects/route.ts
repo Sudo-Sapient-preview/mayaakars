@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { scanProjects } from "@/lib/projects-scanner";
+import projectsData from "@/lib/generated-projects.json";
 
-// Always scan fresh — no stale cache between deploys
+// Always return fresh data — no stale cache between deploys
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-    const projects = scanProjects();
-    return NextResponse.json(projects);
+    return NextResponse.json(projectsData);
 }
