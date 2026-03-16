@@ -3,6 +3,11 @@
 import { useEffect, useRef } from "react";
 import { useRouteTransition } from "@/components/navigation/RouteTransitionProvider";
 
+const CONTACT_PHONE = "+91 88844 96888";
+const CONTACT_EMAIL = "info@mayaakars.com";
+const INSTAGRAM_URL = "https://www.instagram.com/mayaakars/";
+const FACEBOOK_URL = "https://www.facebook.com/profile.php?id=100088682401205";
+
 export default function JournalPage() {
   const { navigate } = useRouteTransition();
   const whiteSectionRef = useRef<HTMLElement>(null);
@@ -401,6 +406,65 @@ export default function JournalPage() {
           border-color: #0a0a0a;
         }
 
+        .mk-blog-page .manual-white-contact-row {
+          margin-top: 26px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-wrap: wrap;
+          gap: 12px 18px;
+          font-family: 'Geist', sans-serif;
+          font-size: 0.92rem;
+          color: rgba(10, 10, 10, 0.72);
+          opacity: calc(var(--cta-actions-progress) * 0.98);
+          transform: translateY(calc((1 - var(--cta-actions-progress)) * 12px));
+          transition: opacity 2.2s cubic-bezier(0.19, 1, 0.22, 1), transform 2.2s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .mk-blog-page .manual-white-contact-link {
+          color: inherit;
+          text-decoration: none;
+          border-bottom: 1px solid rgba(10, 10, 10, 0.32);
+          padding-bottom: 1px;
+          transition: color 0.25s ease, border-color 0.25s ease;
+        }
+
+        .mk-blog-page .manual-white-contact-link:hover {
+          color: #0a0a0a;
+          border-color: rgba(10, 10, 10, 0.64);
+        }
+
+        .mk-blog-page .manual-white-socials {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .mk-blog-page .manual-white-social-link {
+          width: 34px;
+          height: 34px;
+          border-radius: 999px;
+          border: 1px solid rgba(10, 10, 10, 0.28);
+          color: rgba(10, 10, 10, 0.9);
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          text-decoration: none;
+          transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .mk-blog-page .manual-white-social-link svg {
+          width: 16px;
+          height: 16px;
+          display: block;
+        }
+
+        .mk-blog-page .manual-white-social-link:hover {
+          background: #0a0a0a;
+          color: #e3e4e0;
+          border-color: #0a0a0a;
+        }
+
         .mk-blog-page .manual-white-section.is-visible .manual-white-title,
         .mk-blog-page .manual-white-section.is-visible .manual-white-sub,
         .mk-blog-page .manual-white-section.is-visible .manual-white-actions {
@@ -464,6 +528,11 @@ export default function JournalPage() {
           .mk-blog-page .manual-white-actions {
             flex-direction: column;
             align-items: center;
+          }
+
+          .mk-blog-page .manual-white-contact-row {
+            flex-direction: column;
+            gap: 10px;
           }
         }
       `}</style>
@@ -581,6 +650,43 @@ export default function JournalPage() {
             <div className="manual-white-actions">
               <a href="/contact">Schedule a Consultation</a>
               <a href="/contact">Get in Touch</a>
+            </div>
+            <div className="manual-white-contact-row">
+              <a className="manual-white-contact-link" href={`tel:${CONTACT_PHONE.replace(/\s+/g, "")}`}>
+                {CONTACT_PHONE}
+              </a>
+              <a className="manual-white-contact-link" href={`mailto:${CONTACT_EMAIL}`}>
+                {CONTACT_EMAIL}
+              </a>
+              <div className="manual-white-socials" aria-label="Social links">
+                <a
+                  className="manual-white-social-link"
+                  href={INSTAGRAM_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Instagram"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="1.8" />
+                    <circle cx="12" cy="12" r="4.2" stroke="currentColor" strokeWidth="1.8" />
+                    <circle cx="17.3" cy="6.7" r="1.1" fill="currentColor" />
+                  </svg>
+                </a>
+                <a
+                  className="manual-white-social-link"
+                  href={FACEBOOK_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Facebook"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path
+                      d="M13.5 21V13.3H16.1L16.5 10.3H13.5V8.35C13.5 7.48 13.74 6.89 14.99 6.89H16.6V4.2C16.32 4.17 15.36 4.08 14.24 4.08C11.92 4.08 10.33 5.5 10.33 8.1V10.3H7.75V13.3H10.33V21H13.5Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </a>
+              </div>
             </div>
           </div>
         </section>

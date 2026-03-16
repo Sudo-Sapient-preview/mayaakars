@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import { CustomEase } from "gsap/CustomEase";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { ProjectSlide } from "@/lib/projects-data";
 
 type ProjectPerPageSliderProps = {
@@ -11,254 +11,226 @@ type ProjectPerPageSliderProps = {
 
 export default function ProjectPerPageSlider({ slides }: ProjectPerPageSliderProps) {
     const [activeIndex, setActiveIndex] = useState(0);
-    const [nextIndex, setNextIndex] = useState<number | null>(null);
-    const [direction, setDirection] = useState<"next" | "prev">("next");
-    const [isAnimating, setIsAnimating] = useState(false);
-    const rootRef = useRef<HTMLDivElement>(null);
-    const currentLayerRef = useRef<HTMLDivElement>(null);
-    const nextLayerRef = useRef<HTMLDivElement>(null);
-    const currentImgRef = useRef<HTMLImageElement>(null);
-    const nextImgRef = useRef<HTMLImageElement>(null);
-    const currentTitleRef = useRef<HTMLHeadingElement>(null);
-    const nextTitleRef = useRef<HTMLHeadingElement>(null);
-    const touchStartXRef = useRef(0);
-    const easeReadyRef = useRef(false);
+    const sectionRef = useRef<HTMLElement>(null);
+    const titlesTrackRef = useRef<HTMLDivElement>(null);
+    const titleRefs = useRef<(HTMLHeadingElement | null)[]>([]);
+    const thumbRefs = useRef<(HTMLDivElement | null)[]>([]);
+    const activeIndexRef = useRef(0);
 
     useEffect(() => {
-        if (easeReadyRef.current) return;
-        gsap.registerPlugin(CustomEase);
-        CustomEase.create("pps-hop", "M0,0 C0.071,0.505 0.192,0.726 0.318,0.852 0.45,0.984 0.504,1 1,1");
-        easeReadyRef.current = true;
-    }, []);
+        if (!slides.length) return;
+        gsap.registerPlugin(ScrollTrigger);
 
-    useEffect(() => {
-        const currentTitle = currentTitleRef.current;
-        if (!currentTitle) return;
+        const section = sectionRef.current;
+        const titlesTrack = titlesTrackRef.current;
+        if (!section || !titlesTrack) return;
 
-        const words = currentTitle.querySelectorAll(".word");
-        if (!words.length) return;
+        const titleElements = titleRefs.current.filter((el): el is HTMLHeadingElement => Boolean(el));
+        const thumbElements = thumbRefs.current.filter((el): el is HTMLDivElement => Boolean(el));
+        if (!titleElements.length || !thumbElements.length) return;
 
-        gsap.set(words, { filter: "blur(75px)", opacity: 0 });
-        gsap.to(words, {
-            filter: "blur(0px)",
-            opacity: 1,
-            duration: 2,
-            ease: "power3.out",
-            stagger: 0.045,
-        });
-    }, []);
+        const isSmallScreen = () => window.innerWidth <= 768;
 
-    useEffect(() => {
-        if (nextIndex !== null) return;
+        const calculateArcMetrics = () => {
+            const containerWidth = window.innerWidth * (isSmallScreen() ? 0.55 : 0.32);
+            const containerHeight = window.innerHeight;
+            const arcStartX = containerWidth - (isSmallScreen() ? 132 : 220);
+            const arcStartY = -180;
+            const arcEndY = containerHeight + 180;
+            const arcControlPointX = arcStartX + (isSmallScreen() ? 210 : 430);
+            const arcControlPointY = containerHeight / 2;
 
-        const currentLayer = currentLayerRef.current;
-        const currentImg = currentImgRef.current;
-        const currentTitle = currentTitleRef.current;
-        if (!currentLayer || !currentImg || !currentTitle) return;
+            return { arcStartX, arcStartY, arcEndY, arcControlPointX, arcControlPointY };
+        };
 
-        const currentWords = currentTitle.querySelectorAll(".word");
+        const getBezierPosition = (
+            t: number,
+            arcMetrics: {
+                arcStartX: number;
+                arcStartY: number;
+                arcEndY: number;
+                arcControlPointX: number;
+                arcControlPointY: number;
+            },
+        ) => {
+            const x =
+                (1 - t) * (1 - t) * arcMetrics.arcStartX +
+                2 * (1 - t) * t * arcMetrics.arcControlPointX +
+                t * t * arcMetrics.arcStartX;
+            const y =
+                (1 - t) * (1 - t) * arcMetrics.arcStartY +
+                2 * (1 - t) * t * arcMetrics.arcControlPointY +
+                t * t * arcMetrics.arcEndY;
+            return { x, y };
+        };
 
-        gsap.set(currentLayer, {
-            clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-            clearProps: "transform",
-        });
-        gsap.set(currentImg, { x: 0, clearProps: "transform" });
-        gsap.set(currentWords, { filter: "blur(0px)", opacity: 1 });
-    }, [activeIndex, nextIndex]);
+        const getImgProgressState = (index: number, overallProgress: number) => {
+            const step = 1 / (slides.length + 1);
+            const speed = Math.min(0.36, step * 2.6);
+            const startTime = index * step;
+            const endTime = startTime + speed;
 
-    const navigate = useCallback(
-        (dir: "next" | "prev") => {
-            if (isAnimating || slides.length <= 1) return;
-            setDirection(dir);
-            setIsAnimating(true);
-            setNextIndex((current) => {
-                if (current !== null) return current;
-                if (dir === "next") return (activeIndex + 1) % slides.length;
-                return (activeIndex - 1 + slides.length) % slides.length;
-            });
-        },
-        [activeIndex, isAnimating, slides.length],
-    );
+            if (overallProgress < startTime) return -1;
+            if (overallProgress > endTime) return 2;
+            return (overallProgress - startTime) / speed;
+        };
 
-    useEffect(() => {
-        if (nextIndex === null) return;
-        const currentLayer = currentLayerRef.current;
-        const incomingLayer = nextLayerRef.current;
-        const currentImg = currentImgRef.current;
-        const incomingImg = nextImgRef.current;
-        const currentTitle = currentTitleRef.current;
-        const incomingTitle = nextTitleRef.current;
-        if (!currentLayer || !incomingLayer || !currentImg || !incomingImg || !currentTitle || !incomingTitle) {
-            return;
-        }
+        gsap.set(thumbElements, { opacity: 0 });
+        gsap.set(titleElements[0], { opacity: 1 });
 
-        const slideOffset = window.innerWidth < 1000 ? 200 : 800;
-        const startsFromRight = direction === "next";
-        const initialClip = startsFromRight
-            ? "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)"
-            : "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)";
+        let arcMetrics = calculateArcMetrics();
 
-        const currentWords = currentTitle.querySelectorAll(".word");
-        const incomingWords = incomingTitle.querySelectorAll(".word");
+        const trigger = ScrollTrigger.create({
+            trigger: section,
+            start: "top top",
+            end: () => `+=${window.innerHeight * 10}px`,
+            pin: true,
+            pinSpacing: true,
+            scrub: 1,
+            onUpdate: (self) => {
+                const progress = self.progress;
 
-        gsap.set(incomingImg, { x: startsFromRight ? slideOffset : -slideOffset });
-        gsap.set(incomingLayer, { clipPath: initialClip });
-        gsap.set(incomingWords, { filter: "blur(75px)", opacity: 0 });
+                if (progress <= 0.2) {
+                    const introProgress = progress / 0.2;
+                    const moveDistance = window.innerWidth * 0.6;
+                    gsap.set(".pps-intro-text-left", { x: -introProgress * moveDistance, opacity: 1 });
+                    gsap.set(".pps-intro-text-right", { x: introProgress * moveDistance, opacity: 1 });
+                    gsap.set(".pps-bg", { transform: `scale(${introProgress})` });
+                    gsap.set(".pps-bg img", { transform: `scale(${1.5 - introProgress * 0.5})` });
+                    gsap.set(thumbElements, { opacity: 0 });
+                    gsap.set(".pps-meta", { opacity: 0 });
+                    gsap.set(".pps-titles-shell", { "--before-opacity": "0", "--after-opacity": "0" });
+                    return;
+                }
 
-        const tl = gsap.timeline({
-            defaults: { duration: 1.5, ease: "pps-hop" },
-            onComplete: () => {
-                setActiveIndex(nextIndex);
-                setNextIndex(null);
-                setIsAnimating(false);
+                if (progress <= 0.25) {
+                    gsap.set(".pps-bg, .pps-bg img", { transform: "scale(1)" });
+                    gsap.set(".pps-intro-text-left, .pps-intro-text-right", { opacity: 0 });
+                    gsap.set(thumbElements, { opacity: 0 });
+                    gsap.set(".pps-meta", { opacity: 1 });
+                    gsap.set(".pps-titles-shell", { "--before-opacity": "1", "--after-opacity": "1" });
+                    return;
+                }
+
+                if (progress <= 0.95) {
+                    gsap.set(".pps-meta", { opacity: 1 });
+                    gsap.set(".pps-titles-shell", { "--before-opacity": "1", "--after-opacity": "1" });
+
+                    const switchProgress = (progress - 0.25) / 0.7;
+                    const viewportHeight = window.innerHeight;
+                    const titlesHeight = titlesTrack.scrollHeight;
+                    const currentY = viewportHeight - switchProgress * (viewportHeight + titlesHeight);
+                    gsap.set(titlesTrack, { transform: `translateY(${currentY}px)` });
+
+                    thumbElements.forEach((img, index) => {
+                        const imgProgress = getImgProgressState(index, switchProgress);
+                        if (imgProgress < 0 || imgProgress > 1) {
+                            gsap.set(img, { opacity: 0 });
+                        } else {
+                            const pos = getBezierPosition(imgProgress, arcMetrics);
+                            gsap.set(img, { x: pos.x - 120, y: pos.y - 84, opacity: 1 });
+                        }
+                    });
+
+                    const viewportMiddle = viewportHeight / 2;
+                    let closestIndex = 0;
+                    let closestDistance = Infinity;
+
+                    titleElements.forEach((title, index) => {
+                        const titleRect = title.getBoundingClientRect();
+                        const dist = Math.abs(titleRect.top + titleRect.height / 2 - viewportMiddle);
+                        if (dist < closestDistance) {
+                            closestDistance = dist;
+                            closestIndex = index;
+                        }
+                    });
+
+                    if (closestIndex !== activeIndexRef.current) {
+                        titleElements[activeIndexRef.current].style.opacity = "0.24";
+                        titleElements[closestIndex].style.opacity = "1";
+                        activeIndexRef.current = closestIndex;
+                        setActiveIndex(closestIndex);
+                    }
+                    return;
+                }
+
+                gsap.set(".pps-meta", { opacity: 0 });
+                gsap.set(".pps-titles-shell", { "--before-opacity": "0", "--after-opacity": "0" });
             },
         });
 
-        tl.to(
-            currentImg,
-            {
-                x: startsFromRight ? -slideOffset : slideOffset,
-            },
-            0,
-        )
-            .to(
-                incomingLayer,
-                {
-                    clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-                },
-                0,
-            )
-            .to(
-                incomingImg,
-                {
-                    x: 0,
-                },
-                0,
-            )
-            .to(
-                currentWords,
-                {
-                    filter: "blur(75px)",
-                    opacity: 0,
-                    duration: 1.2,
-                    ease: "power2.inOut",
-                    stagger: 0.03,
-                },
-                0,
-            )
-            .to(
-                incomingWords,
-                {
-                    filter: "blur(0px)",
-                    opacity: 1,
-                    duration: 1.5,
-                    ease: "power3.out",
-                    stagger: 0.035,
-                },
-                0.3,
-            );
+        const onResize = () => {
+            arcMetrics = calculateArcMetrics();
+            trigger.refresh();
+        };
+
+        window.addEventListener("resize", onResize);
 
         return () => {
-            tl.kill();
+            window.removeEventListener("resize", onResize);
+            trigger.kill();
         };
-    }, [direction, nextIndex]);
-
-    useEffect(() => {
-        const onKeyDown = (event: KeyboardEvent) => {
-            if (event.key === "ArrowRight") navigate("next");
-            if (event.key === "ArrowLeft") navigate("prev");
-        };
-        window.addEventListener("keydown", onKeyDown);
-        return () => window.removeEventListener("keydown", onKeyDown);
-    }, [navigate]);
+    }, [slides]);
 
     if (slides.length === 0) {
         return null;
     }
 
-    const currentSlide = slides[activeIndex];
-    const upcomingSlide = nextIndex !== null ? slides[nextIndex] : null;
-
     return (
-        <section className="pps-shell">
+        <section ref={sectionRef} className="pps-shell">
             <style dangerouslySetInnerHTML={{ __html: STYLES }} />
-            <svg className="pps-filter-defs" aria-hidden="true" focusable="false">
-                <filter id="pps-blur-matrix">
-                    <feColorMatrix
-                        in="SourceGraphic"
-                        type="matrix"
-                        values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 255 -140"
-                    />
-                </filter>
-            </svg>
-            <div
-                ref={rootRef}
-                className="pps-stage"
-                onTouchStart={(event) => {
-                    const t = event.changedTouches[0];
-                    if (!t) return;
-                    touchStartXRef.current = t.clientX;
-                }}
-                onTouchEnd={(event) => {
-                    const t = event.changedTouches[0];
-                    if (!t) return;
-                    const deltaX = t.clientX - touchStartXRef.current;
-                    if (Math.abs(deltaX) < 45) return;
-                    navigate(deltaX < 0 ? "next" : "prev");
-                }}
-            >
-                <div ref={currentLayerRef} className="pps-layer">
-                    <img ref={currentImgRef} src={currentSlide.image} alt={currentSlide.title} className="pps-image" />
-                </div>
-
-                {upcomingSlide ? (
-                    <div ref={nextLayerRef} className="pps-layer pps-layer-next">
-                        <img ref={nextImgRef} src={upcomingSlide.image} alt={upcomingSlide.title} className="pps-image" />
+            <div className="pps-stage">
+                <div className="pps-intro-text-wrap">
+                    <div className="pps-intro-text pps-intro-text-left">
+                        <p>Project</p>
                     </div>
-                ) : null}
-
-                <div className="pps-title-wrap">
-                    <h2 ref={currentTitleRef} className="pps-title">
-                        {currentSlide.title.split(" ").map((word, index) => (
-                            <span key={`current-${activeIndex}-${index}`} className="word">
-                                {word}
-                            </span>
-                        ))}
-                    </h2>
-                    {upcomingSlide ? (
-                        <h2 ref={nextTitleRef} className="pps-title pps-title-next">
-                            {upcomingSlide.title.split(" ").map((word, index) => (
-                                <span key={`next-${nextIndex}-${index}`} className="word">
-                                    {word}
-                                </span>
-                            ))}
-                        </h2>
-                    ) : null}
+                    <div className="pps-intro-text pps-intro-text-right">
+                        <p>Frames</p>
+                    </div>
                 </div>
 
-                <div className="pps-controls">
-                    <button
-                        type="button"
-                        className="pps-btn"
-                        onClick={() => navigate("prev")}
-                        disabled={isAnimating}
-                        aria-label="Previous slide"
-                    >
-                        <svg viewBox="0 -960 960 960" aria-hidden="true">
-                            <path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z" />
-                        </svg>
-                    </button>
-                    <button
-                        type="button"
-                        className="pps-btn"
-                        onClick={() => navigate("next")}
-                        disabled={isAnimating}
-                        aria-label="Next slide"
-                    >
-                        <svg viewBox="0 -960 960 960" aria-hidden="true">
-                            <path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z" />
-                        </svg>
-                    </button>
+                <div className="pps-bg">
+                    <img
+                        src={slides[activeIndex]?.image}
+                        alt={slides[activeIndex]?.title ?? "Project image"}
+                        loading="eager"
+                        decoding="async"
+                        fetchPriority="high"
+                    />
+                </div>
+
+                <div className="pps-titles-shell">
+                    <div ref={titlesTrackRef} className="pps-titles-track">
+                        {slides.map((slide, index) => (
+                            <h2
+                                key={`${slide.title}-${index}`}
+                                ref={(el) => {
+                                    titleRefs.current[index] = el;
+                                }}
+                                style={{ opacity: index === 0 ? 1 : 0.24 }}
+                            >
+                                {slide.title}
+                            </h2>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="pps-images-track">
+                    {slides.map((slide, index) => (
+                        <div
+                            key={`${slide.image}-${index}`}
+                            ref={(el) => {
+                                thumbRefs.current[index] = el;
+                            }}
+                            className="pps-thumb"
+                        >
+                            <img src={slide.image} alt={slide.title} loading="lazy" decoding="async" />
+                        </div>
+                    ))}
+                </div>
+
+                <div className="pps-meta">
+                    <p>Mayaakars</p>
                 </div>
 
                 <div className="pps-counter">
@@ -271,9 +243,7 @@ export default function ProjectPerPageSlider({ slides }: ProjectPerPageSliderPro
 
 const STYLES = `
   .pps-shell {
-    position: relative;
     width: 100%;
-    min-height: 100dvh;
     background: #050505;
   }
   .pps-stage {
@@ -281,155 +251,220 @@ const STYLES = `
     width: 100%;
     height: 100dvh;
     overflow: hidden;
-    background: #050505;
-  }
-    .pps-filter-defs {
-        position: absolute;
-        width: 0;
-        height: 0;
+        background-color: #050505;
     }
-  .pps-layer {
-    position: absolute;
-    inset: 0;
-  }
-  .pps-layer-next {
-    z-index: 2;
-  }
-  .pps-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: brightness(0.84);
-    will-change: transform;
-  }
-  .pps-title-wrap {
+    .pps-intro-text-wrap {
     position: absolute;
     top: 50%;
-    left: 50%;
-        width: min(68%, 980px);
-    transform: translate(-50%, -50%);
-    text-align: center;
-    pointer-events: none;
-    z-index: 10;
-        filter: url(#pps-blur-matrix) blur(0.25px);
-  }
-  .pps-title {
-    margin: 0;
-    text-transform: uppercase;
-    color: #ffffff;
-    font-family: var(--font-cormorant), serif;
-    font-size: clamp(1.8rem, 6vw, 4.8rem);
-    letter-spacing: 0.01em;
-    line-height: 0.9;
-        filter: blur(0px);
-    text-wrap: balance;
-    text-shadow: 0 12px 34px rgba(0, 0, 0, 0.68);
-  }
-    .pps-title .word {
-        display: inline-block;
-        margin: 0 0.18em;
-        opacity: 0;
-        filter: blur(75px);
-        will-change: filter, opacity;
-    }
-  .pps-title-next {
-    position: absolute;
-    inset: 0;
-  }
-  .pps-controls {
-    position: absolute;
-        top: 50%;
-        left: 0;
+    display: flex;
         width: 100%;
         transform: translateY(-50%);
-        padding: 0 2rem;
-    display: flex;
-        justify-content: space-between;
-    z-index: 20;
-  }
-  .pps-btn {
-        width: 64px;
-        height: 64px;
-        padding: 1.25rem;
-        border: 1px dashed rgba(255, 255, 255, 0.5);
-        border-radius: 9999px;
-        background: transparent;
-        color: #ffffff;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-  }
-  .pps-btn:hover:not(:disabled) {
-        background-color: #ffffff;
-        color: #000000;
-        border-color: #ffffff;
+        gap: 0.5rem;
+        padding: 0 1rem;
+        z-index: 5;
     }
-    .pps-btn svg {
-        width: 24px;
-        height: 24px;
-        fill: currentColor;
-  }
-  .pps-btn:disabled {
-    opacity: 0.55;
+    .pps-intro-text {
+        flex: 1;
+        will-change: transform;
+        display: flex;
+    }
+    .pps-intro-text-left {
+        justify-content: flex-end;
+    }
+    .pps-intro-text-right {
+        justify-content: flex-start;
+    }
+    .pps-intro-text p {
+        font-size: clamp(1rem, 3vw, 1.5rem);
+        line-height: 1;
+        font-weight: 500;
+        color: #ffffff;
+    }
+    .pps-bg {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        transform: scale(0);
+        will-change: transform;
+        z-index: 0;
+        pointer-events: none;
+    }
+    .pps-bg img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: scale(1.5);
+        will-change: transform;
+        opacity: 0.62;
+        filter: saturate(1) contrast(1);
+    }
+    .pps-bg::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at center, rgba(15, 15, 15, 0.08), rgba(15, 15, 15, 0.45) 70%);
+    }
+    .pps-titles-shell {
+        position: absolute;
+        top: 0;
+        left: 15vw;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        clip-path: polygon(50vh 0px, 0px 50%, 50vh 100%, 100% calc(100% + 100vh), 100% -100vh);
+        --before-opacity: 0;
+        --after-opacity: 0;
+    }
+    .pps-titles-shell::before,
+    .pps-titles-shell::after {
+        content: "";
+        position: absolute;
+        width: 100vh;
+        height: 2.5px;
+        background: #ffffff;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        z-index: 10;
+    }
+    .pps-titles-shell::before {
+        top: 0;
+        left: 0;
+        transform: rotate(-45deg) translate(-7rem);
+        opacity: var(--before-opacity);
+    }
+    .pps-titles-shell::after {
+        bottom: 0;
+        left: 0;
+        transform: rotate(45deg) translate(-7rem);
+        opacity: var(--after-opacity);
+    }
+    .pps-titles-track {
+        position: relative;
+        left: 15%;
+        width: 75%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 4rem;
+        transform: translateY(100%);
+        z-index: 2;
+    }
+    .pps-titles-track h2 {
+        margin: 0;
+        font-family: var(--font-geist), "Geist", sans-serif;
+        font-size: clamp(1.3rem, 4.1vw, 2.55rem);
+        font-weight: 500;
+        line-height: 1;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        color: #ffffff;
+        transition: opacity 0.3s ease;
+        text-wrap: balance;
+        text-shadow: 0 12px 34px rgba(0, 0, 0, 0.58);
+    }
+    .pps-images-track {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 52%;
+        min-width: 300px;
+        height: 100%;
+        z-index: 1;
+        pointer-events: none;
+    }
+    .pps-thumb {
+        position: absolute;
+        width: 240px;
+        height: 168px;
+        border-radius: 4px;
+        overflow: hidden;
+        will-change: transform;
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.32);
+    }
+    .pps-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .pps-meta {
+        position: absolute;
+        top: 50%;
+        left: 10%;
+        transform: translateY(-50%);
+        z-index: 2;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .pps-meta p {
+        margin: 0;
+        color: #ffffff;
+        font-size: clamp(1.1rem, 1.8vw, 1.5rem);
+        font-weight: 600;
+        letter-spacing: 0.01em;
   }
   .pps-counter {
     position: absolute;
-    top: max(106px, calc(env(safe-area-inset-top) + 72px));
-    right: clamp(16px, 4vw, 40px);
+        top: max(94px, calc(env(safe-area-inset-top) + 58px));
+        right: clamp(16px, 3.2vw, 42px);
     z-index: 20;
-    color: rgba(227, 228, 224, 0.76);
+        color: rgba(227, 228, 224, 0.8);
     text-transform: uppercase;
     font-size: 0.66rem;
     letter-spacing: 0.24em;
   }
-  @media (max-width: 900px) {
-    .pps-title-wrap {
+    @media (max-width: 1000px) {
+        .pps-titles-shell {
+            clip-path: none;
+    }
+        .pps-titles-shell::before,
+        .pps-titles-shell::after {
+            display: none;
+    }
+        .pps-titles-track {
+            left: 0;
             width: 100%;
             padding: 0 1.2rem;
-    }
-    .pps-title {
-            font-size: 3rem;
-      line-height: 0.95;
-    }
-        .pps-controls {
-            top: 80%;
-            padding: 0 2.2rem;
-            transform: translateY(-50%);
+            gap: 2.4rem;
+        }
+        .pps-meta {
+            display: none;
         }
   }
-  @media (max-width: 640px) {
-    .pps-controls {
-            top: auto;
-            bottom: max(18px, env(safe-area-inset-bottom));
-            transform: none;
+    @media (max-width: 768px) {
+        .pps-intro-text-wrap {
+            top: 36%;
+            gap: 0.2rem;
+            justify-content: center;
+    }
+        .pps-intro-text-left,
+        .pps-intro-text-right {
+            justify-content: center;
+        }
+        .pps-intro-text p {
+            font-size: clamp(0.9rem, 3.6vw, 1rem);
+    }
+        .pps-titles-shell {
+            left: 0;
+            width: 100%;
             padding: 0 1rem;
-    }
-    .pps-btn {
-            width: 52px;
-            height: 52px;
-            padding: 0.75rem;
         }
-        .pps-btn svg {
-            width: 20px;
-            height: 20px;
-    }
-    .pps-counter {
-      top: max(96px, calc(env(safe-area-inset-top) + 60px));
-      right: 16px;
-      letter-spacing: 0.2em;
-    }
-        .pps-title {
-            font-size: clamp(1.7rem, 9vw, 2.5rem);
-            letter-spacing: -0.04rem;
+        .pps-titles-track {
+            gap: 1.4rem;
         }
-    }
-    @media (max-width: 420px) {
-        .pps-title-wrap {
-            padding: 0 0.75rem;
+        .pps-titles-track h2 {
+            font-size: clamp(1rem, 5vw, 1.35rem);
         }
-        .pps-title {
-            font-size: clamp(1.45rem, 9vw, 2rem);
+        .pps-images-track {
+            display: none;
+    }
+    }
+    @media (max-width: 480px) {
+        .pps-intro-text-wrap {
+            top: 34%;
+        }
+        .pps-counter {
+            right: 12px;
+            letter-spacing: 0.2em;
         }
   }
 `;

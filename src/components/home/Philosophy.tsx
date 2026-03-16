@@ -7,7 +7,7 @@ const PHILOSOPHY_TEXT =
 
 export default function Philosophy() {
   const sectionRef = useRef<HTMLElement>(null);
-  const chars = useMemo(() => PHILOSOPHY_TEXT.split(""), []);
+  const tokens = useMemo(() => PHILOSOPHY_TEXT.split(/(\s+)/), []);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -42,6 +42,15 @@ export default function Philosophy() {
           white-space: pre;
         }
 
+        .philosophy-section .phil-word {
+          display: inline-block;
+          white-space: nowrap;
+        }
+
+        .philosophy-section .phil-space {
+          white-space: pre;
+        }
+
         .philosophy-section.is-visible .phil-char {
           animation: philFade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
         }
@@ -59,15 +68,34 @@ export default function Philosophy() {
           className="text-[clamp(1.25rem,3.5vw,2.5rem)] leading-[1.4] text-[#E3E4E0]/80"
           style={{ fontFamily: "var(--font-cormorant), serif", fontStyle: "italic" }}
         >
-          {chars.map((char, index) => (
-            <span
-              key={`${char}-${index}`}
-              className="phil-char"
-              style={{ animationDelay: `${index * 0.018}s` }}
-            >
-              {char}
-            </span>
-          ))}
+          {(() => {
+            let charIndex = 0;
+
+            return tokens.map((token, tokenIndex) => {
+              if (/^\s+$/.test(token)) {
+                return (
+                  <span key={`space-${tokenIndex}`} className="phil-space" aria-hidden="true">
+                    {token}
+                  </span>
+                );
+              }
+
+              return (
+                <span key={`word-${tokenIndex}`} className="phil-word">
+                  {token.split("").map((char, letterIndex) => {
+                    const delay = charIndex * 0.018;
+                    charIndex += 1;
+
+                    return (
+                      <span key={`${tokenIndex}-${letterIndex}`} className="phil-char" style={{ animationDelay: `${delay}s` }}>
+                        {char}
+                      </span>
+                    );
+                  })}
+                </span>
+              );
+            });
+          })()}
         </p>
       </div>
     </section>

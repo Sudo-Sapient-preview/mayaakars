@@ -1,14 +1,30 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import ProjectPerPageSlider from "@/components/projects/ProjectPerPageSlider";
-import { getProjectBySlug } from "@/lib/projects-data";
+import type { ProjectCategory } from "@/lib/projects-data";
 
 export default function ProjectDetailPage() {
     const params = useParams();
     const slug = params.slug as string;
-    const project = getProjectBySlug(slug);
+    const [project, setProject] = useState<ProjectCategory | null | undefined>(
+        undefined
+    );
+
+    useEffect(() => {
+        fetch("/api/projects")
+            .then((r) => r.json())
+            .then((projects: ProjectCategory[]) => {
+                const found = projects.find((p) => p.slug === slug);
+                setProject(found ?? null);
+            })
+            .catch(() => setProject(null));
+    }, [slug]);
+
+    // Still loading
+    if (project === undefined) return null;
 
     if (!project) {
         return (
@@ -27,42 +43,42 @@ export default function ProjectDetailPage() {
         );
     }
 
-        const highlights = project.slides.slice(0, 4).map((slide) => slide.title);
+    const highlights = project.slides.slice(0, 4).map((slide) => slide.title);
 
     return (
         <main className="bg-[#050505] text-[#E3E4E0]">
-                        <style dangerouslySetInnerHTML={{ __html: PAGE_STYLES }} />
+            <style dangerouslySetInnerHTML={{ __html: PAGE_STYLES }} />
 
-                        <section className="prj-intro">
-                                <span className="prj-label">{project.category}</span>
-                                <h1 className="prj-title">{project.title}</h1>
-                                <p className="prj-desc">{project.description}</p>
+            <section className="prj-intro">
+                <span className="prj-label">{project.category}</span>
+                <h1 className="prj-title">{project.title}</h1>
+                <p className="prj-desc">{project.description}</p>
             </section>
 
             <ProjectPerPageSlider slides={project.slides} />
 
-                        <section className="prj-cta">
-                                <div className="prj-cta-inner">
-                                        <div className="prj-cta-left">
-                                                <span className="prj-cta-label">Project Highlights</span>
-                                                <ul className="prj-highlight-list">
-                                                        {highlights.map((item) => (
-                                                                <li key={item}>{item}</li>
-                                                        ))}
-                                                </ul>
-                                        </div>
-                                        <div className="prj-cta-right">
-                                                <span className="prj-cta-label">Ready To Build Yours</span>
-                                                <p className="prj-cta-text">
-                                                        From concept sketches to full execution planning, we design projects with material depth,
-                                                        technical clarity, and timeless character.
-                                                </p>
-                                                <Link href="/contact" data-interactive className="prj-cta-button">
-                                                        Start Your Project
-                                                </Link>
-                                        </div>
-                                </div>
-                        </section>
+            <section className="prj-cta">
+                <div className="prj-cta-inner">
+                    <div className="prj-cta-left">
+                        <span className="prj-cta-label">Project Highlights</span>
+                        <ul className="prj-highlight-list">
+                            {highlights.map((item) => (
+                                <li key={item}>{item}</li>
+                            ))}
+                        </ul>
+                    </div>
+                    <div className="prj-cta-right">
+                        <span className="prj-cta-label">Ready To Build Yours</span>
+                        <p className="prj-cta-text">
+                            From concept sketches to full execution planning, we design projects with material depth,
+                            technical clarity, and timeless character.
+                        </p>
+                        <Link href="/contact" data-interactive className="prj-cta-button">
+                            Start Your Project
+                        </Link>
+                    </div>
+                </div>
+            </section>
             <section className="prj-back-wrap">
                 <Link href="/projects" className="prj-back-btn" data-interactive>
                     Back to Projects
@@ -94,7 +110,7 @@ const PAGE_STYLES = `
     }
     .prj-title {
         font-family: var(--font-cormorant), "Cormorant Garamond", serif;
-        font-size: clamp(2.5rem, 6vw, 5rem);
+        font-size: clamp(2rem, 5.6vw, 4rem);
         font-weight: 400;
         letter-spacing: 0.05em;
         text-transform: uppercase;
@@ -104,7 +120,7 @@ const PAGE_STYLES = `
     }
     .prj-desc {
         max-width: 680px;
-        font-size: 1.05rem;
+        font-size: 1rem;
         line-height: 1.8;
         color: rgba(227, 228, 224, 0.66);
         font-weight: 400;
@@ -151,7 +167,7 @@ const PAGE_STYLES = `
     }
     .prj-highlight-list li {
         font-family: var(--font-cormorant), serif;
-        font-size: 1.35rem;
+        font-size: 1.15rem;
         font-weight: 400;
         padding: 18px 0;
         border-bottom: 1px solid rgba(196, 154, 58, 0.12);
@@ -162,7 +178,7 @@ const PAGE_STYLES = `
         border-top: 1px solid rgba(196, 154, 58, 0.12);
     }
     .prj-cta-text {
-        font-size: 1.05rem;
+        font-size: 0.98rem;
         line-height: 1.8;
         color: rgba(227, 228, 224, 0.56);
         margin-bottom: 28px;
@@ -216,11 +232,11 @@ const PAGE_STYLES = `
             min-height: auto;
         }
         .prj-title {
-            font-size: clamp(2rem, 8.4vw, 2.8rem);
+            font-size: clamp(1.6rem, 6.8vw, 2.4rem);
             margin-bottom: 24px;
         }
         .prj-desc {
-            font-size: 0.98rem;
+            font-size: 0.94rem;
             line-height: 1.7;
         }
         .prj-cta {
@@ -231,7 +247,7 @@ const PAGE_STYLES = `
             gap: 48px;
         }
         .prj-highlight-list li {
-            font-size: 1.15rem;
+            font-size: 1.05rem;
             padding: 15px 0;
         }
         .prj-back-wrap {
@@ -241,7 +257,7 @@ const PAGE_STYLES = `
             width: 100%;
             max-width: 320px;
             text-align: center;
-            font-size: 0.82rem;
+            font-size: 0.78rem;
             letter-spacing: 0.12em;
         }
     }

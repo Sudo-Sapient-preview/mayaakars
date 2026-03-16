@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { PROJECT_CATEGORIES, type ProjectCategory } from "@/lib/projects-data";
+import type { ProjectCategory } from "@/lib/projects-data";
 import { useRouteTransition } from "@/components/navigation/RouteTransitionProvider";
 
 export default function ProjectsCarousel() {
     const [isMobile, setIsMobile] = useState(false);
+    const [projects, setProjects] = useState<ProjectCategory[]>([]);
 
     useEffect(() => {
         const check = () => setIsMobile(window.innerWidth <= 768);
@@ -14,10 +15,19 @@ export default function ProjectsCarousel() {
         return () => window.removeEventListener("resize", check);
     }, []);
 
+    useEffect(() => {
+        fetch("/api/projects")
+            .then((r) => r.json())
+            .then(setProjects)
+            .catch(console.error);
+    }, []);
+
+    if (!projects.length) return null;
+
     return isMobile ? (
-        <MobileCarousel projects={PROJECT_CATEGORIES} />
+        <MobileCarousel projects={projects} />
     ) : (
-        <DesktopCarousel projects={PROJECT_CATEGORIES} />
+        <DesktopCarousel projects={projects} />
     );
 }
 
@@ -186,7 +196,7 @@ function DesktopCarousel({ projects }: { projects: ProjectCategory[] }) {
                             aria-label={`Open ${project.title}`}
                             tabIndex={0}
                         >
-                            <img src={project.coverImage} alt={project.title} draggable={false} />
+                            <img src={project.coverImage} alt={project.title} draggable={false} loading="lazy" decoding="async" />
                             <div className="pc-card-info">
                                 <div className="pc-card-title">{project.title}</div>
                                 <div className="pc-card-subtitle">View Project</div>
@@ -301,7 +311,7 @@ function MobileCarousel({ projects }: { projects: ProjectCategory[] }) {
                         }}
                     >
                         <div className="pc-mob-inner">
-                            <img src={project.coverImage} alt={project.title} draggable={false} />
+                            <img src={project.coverImage} alt={project.title} draggable={false} loading="lazy" decoding="async" />
                             <div className="pc-mob-info">
                                 <div className="pc-mob-title">{project.title}</div>
                                 <div className="pc-mob-subtitle">View Project</div>

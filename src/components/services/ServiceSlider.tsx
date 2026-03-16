@@ -73,7 +73,7 @@ export default function ServiceSlider({ slides }: { slides: SlideData[] }) {
                 const newSlide = document.createElement("div");
                 newSlide.className = "svc-slide";
                 newSlide.innerHTML = `
-          <img src="${nextData.src}" alt="${nextData.title}" class="svc-slide-image" />
+                  <img src="${nextData.src}" alt="${nextData.title}" class="svc-slide-image" loading="lazy" decoding="async" />
           <h1 class="svc-slide-title">${nextData.title}</h1>
                 `;
                 slider.appendChild(newSlide);
@@ -111,7 +111,7 @@ export default function ServiceSlider({ slides }: { slides: SlideData[] }) {
                 const newSlide = document.createElement("div");
                 newSlide.className = "svc-slide";
                 newSlide.innerHTML = `
-          <img src="${prevData.src}" alt="${prevData.title}" class="svc-slide-image" />
+                  <img src="${prevData.src}" alt="${prevData.title}" class="svc-slide-image" loading="lazy" decoding="async" />
           <h1 class="svc-slide-title">${prevData.title}</h1>
                 `;
                 slider.prepend(newSlide);
@@ -161,7 +161,14 @@ export default function ServiceSlider({ slides }: { slides: SlideData[] }) {
           <div ref={sliderRef} className="svc-slider">
             {initialSlides.map((s, i) => (
               <div key={i} className="svc-slide">
-                <img src={s.src} alt={s.title} className="svc-slide-image" />
+                <img
+                  src={s.src}
+                  alt={s.title}
+                  className="svc-slide-image"
+                  loading={i === 0 ? "eager" : "lazy"}
+                  decoding="async"
+                  fetchPriority={i === 0 ? "high" : "auto"}
+                />
                 <h1 className="svc-slide-title">{s.title}</h1>
               </div>
             ))}

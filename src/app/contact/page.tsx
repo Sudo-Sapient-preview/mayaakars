@@ -7,6 +7,7 @@ type SubmitState = "idle" | "sending" | "done";
 export default function ContactPage() {
   const pageRef = useRef<HTMLElement>(null);
   const [status, setStatus] = useState<SubmitState>("idle");
+  const [submitError, setSubmitError] = useState<string>("");
 
   useEffect(() => {
     document.body.setAttribute("data-navbar-variant", "light");
@@ -40,12 +41,44 @@ export default function ContactPage() {
     return () => observer.disconnect();
   }, []);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (status === "sending") return;
 
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
     setStatus("sending");
-    setTimeout(() => setStatus("done"), 500);
+    setSubmitError("");
+
+    const payload = {
+      fullName: String(formData.get("fullName") ?? "").trim(),
+      email: String(formData.get("email") ?? "").trim(),
+      phone: String(formData.get("phone") ?? "").trim(),
+      company: String(formData.get("company") ?? "").trim(),
+      location: String(formData.get("location") ?? "").trim(),
+      message: String(formData.get("message") ?? "").trim(),
+    };
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Request failed");
+      }
+
+      setStatus("done");
+      form.reset();
+    } catch {
+      setStatus("idle");
+      setSubmitError("We could not send your enquiry right now. Please try again in a moment.");
+    }
   };
 
   const buttonLabel =
@@ -139,7 +172,7 @@ export default function ContactPage() {
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4">
               <input
                 type="text"
                 name="location"
@@ -148,20 +181,6 @@ export default function ContactPage() {
                 data-cursor-ignore
                 required
               />
-              <select
-                name="enquiryType"
-                className="mk-contact-select"
-                data-cursor-ignore
-                defaultValue=""
-                required
-              >
-                <option value="" disabled>
-                  Nature of Enquiry
-                </option>
-                <option value="architecture-services">Architecture Services</option>
-                <option value="interior-design-service">Interior Design Service</option>
-                <option value="general-enquiry">General Enquiry</option>
-              </select>
             </div>
 
             <textarea
@@ -169,7 +188,6 @@ export default function ContactPage() {
               placeholder="Message / Project Brief"
               className="mk-contact-textarea"
               data-cursor-ignore
-              required
             />
 
             <p className="mk-contact-note">
@@ -187,6 +205,12 @@ export default function ContactPage() {
                 {buttonLabel}
               </button>
             </div>
+
+            {submitError ? (
+              <p className="mt-4 text-sm text-[var(--text-dark-soft)]" role="alert">
+                {submitError}
+              </p>
+            ) : null}
           </form>
         ) : (
           <div

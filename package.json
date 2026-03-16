@@ -9,6 +9,8 @@
     "lint": "eslint",
     "convert-images": "node scripts/convert-to-webp.mjs",
     "convert-images:dry": "node scripts/convert-to-webp.mjs --dry-run",
+    "convert-arw": "node scripts/convert-arw-to-webp.mjs",
+    "convert-arw:dry": "node scripts/convert-arw-to-webp.mjs --dry-run",
     "update-refs": "node scripts/update-image-refs.mjs",
     "update-refs:dry": "node scripts/update-image-refs.mjs --dry-run"
   },
