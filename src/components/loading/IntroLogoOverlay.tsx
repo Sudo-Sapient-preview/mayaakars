@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import styles from "./home.module.css";
 
 type IntroLogoOverlayProps = {
   onComplete: () => void;
@@ -265,7 +264,10 @@ export default function IntroLogoOverlay({
       aria-modal={introActive ? "true" : undefined}
     >
       <div ref={chromeRef} className="absolute inset-0 grid grid-rows-[1fr_auto]">
-        <div className={`relative overflow-hidden bg-[#0A0A0A] ${styles.loaderBackdrop}`}>
+        <div
+            className="relative overflow-hidden bg-[#0A0A0A]"
+            style={{ background: "radial-gradient(ellipse 80% 60% at 50% 40%, rgba(196, 154, 58, 0.07) 0%, transparent 70%)" }}
+          >
           <div className="absolute inset-0 bg-black/60" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_42%,rgba(196,154,58,0.10),transparent_52%)]" />
         </div>

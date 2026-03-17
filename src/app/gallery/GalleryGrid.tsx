@@ -51,8 +51,9 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
             const item = items[i % items.length];
 
             const img = document.createElement("img");
-            img.src = item.coverImage;
+            img.src = `/thumbs/${item.id}.webp`;
             img.alt = item.title;
+            img.decoding = "async";
             img.classList.add("grid-item");
             img.dataset.imageId = item.id;
             img.setAttribute("data-interactive", "true");
@@ -76,11 +77,24 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
 
         let introFinished = false;
         let rafId = 0;
+        let rafRunning = false;
+        let mouseMoveRafPending = false;
+
+        const startRaf = () => {
+            if (rafRunning) return;
+            rafRunning = true;
+            rafId = window.requestAnimationFrame(renderLoop);
+        };
 
         const tl = gsap.timeline({
             onComplete: () => {
                 introFinished = true;
-                rafId = window.requestAnimationFrame(renderLoop);
+                // Remove GSAP inline transform/opacity so CSS hover works cleanly
+                gsap.set(gridItems, { clearProps: "transform,opacity" });
+                // Flatten 3D context — items are at z=0, preserve-3d no longer needed
+                dragContainer.style.transformStyle = "flat";
+                gridItems.forEach(img => img.classList.add("grid-item--ready"));
+                startRaf();
             },
         });
 
@@ -160,6 +174,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
             movedBeyondClickThreshold = false;
             pendingNavigationId = id;
             document.body.style.cursor = "grabbing";
+            startRaf();
         };
 
         const handleMove = (x: number, y: number, pointerId: number) => {
@@ -177,6 +192,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
             const limits = getLimits();
             targetX = Math.max(limits.minX, Math.min(initialTargetX + dx * 1.5, limits.maxX));
             targetY = Math.max(limits.minY, Math.min(initialTargetY + dy * 1.5, limits.maxY));
+            startRaf();
         };
 
         const releaseDrag = (allowNavigation: boolean, pointerId: number) => {
@@ -207,26 +223,46 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
             document.body.style.cursor = "default";
         };
 
+        let lastMouseX = 0;
+        let lastMouseY = 0;
         const onMouseMoveParallax = (e: MouseEvent) => {
             if (!introFinished || isMobile) return;
-            const xStr = (e.clientX / window.innerWidth - 0.5) * 2;
-            const yStr = (e.clientY / window.innerHeight - 0.5) * 2;
-            gsap.to(sceneWrapper, { rotationY: xStr * 3, rotationX: -yStr * 3, duration: 2, ease: "power2.out" });
-            gsap.to(titleContainer, { x: -xStr * 60, y: -yStr * 60, duration: 2, ease: "power2.out" });
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+            if (mouseMoveRafPending) return;
+            mouseMoveRafPending = true;
+            window.requestAnimationFrame(() => {
+                mouseMoveRafPending = false;
+                const xStr = (lastMouseX / window.innerWidth - 0.5) * 2;
+                const yStr = (lastMouseY / window.innerHeight - 0.5) * 2;
+                gsap.to(sceneWrapper, { rotationY: xStr * 3, rotationX: -yStr * 3, duration: 2, ease: "power2.out" });
+                gsap.to(titleContainer, { x: -xStr * 60, y: -yStr * 60, duration: 2, ease: "power2.out" });
+            });
         };
 
         const onWheel = (e: WheelEvent) => {
             if (!introFinished) return;
             targetScale -= e.deltaY * 0.0015;
             targetScale = Math.max(0.85, Math.min(targetScale, 3));
+            startRaf();
         };
 
         function renderLoop() {
-            currentX += (targetX - currentX) * 0.05;
-            currentY += (targetY - currentY) * 0.05;
+            const dx = targetX - currentX;
+            const dy = targetY - currentY;
+            const ds = targetScale - currentScale;
+            currentX += dx * 0.12;
+            currentY += dy * 0.12;
             dragContainer?.style.setProperty("transform", `translate3d(${currentX}px, ${currentY}px, 0)`);
-            currentScale += (targetScale - currentScale) * 0.05;
+            currentScale += ds * 0.12;
             zoomWrapper?.style.setProperty("transform", `scale(${currentScale})`);
+            const settled = !isDragging &&
+                Math.abs(dx) < 0.15 && Math.abs(dy) < 0.15 && Math.abs(ds) < 0.001;
+            if (settled) {
+                rafRunning = false;
+                rafId = 0;
+                return;
+            }
             rafId = window.requestAnimationFrame(renderLoop);
         }
 
@@ -287,28 +323,32 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
         .mk-gallery-page #zoom-wrapper {
           width: 100%; height: 100%; position: absolute;
           transform-origin: center center; transform-style: preserve-3d; z-index: 5;
+          will-change: transform;
         }
         .mk-gallery-page #scene-wrapper {
           width: 100%; height: 100%; position: absolute; transform-style: preserve-3d;
+          will-change: transform;
         }
         .mk-gallery-page #drag-container {
           position: absolute; top: 0; left: 0;
           transform-style: preserve-3d; cursor: grab; touch-action: none;
+          will-change: transform;
         }
         .mk-gallery-page #drag-container:active { cursor: grabbing; }
         .mk-gallery-page .grid-item {
           position: absolute; object-fit: cover;
           box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-          will-change: transform, opacity; pointer-events: auto;
+          pointer-events: auto;
           -webkit-user-drag: none;
-          transition: box-shadow 0.6s ease, transform 0.6s cubic-bezier(0.16,1,0.3,1), filter 0.6s ease;
           background-color: #111; color: transparent; border-radius: 4px;
-          filter: brightness(0.6) contrast(1.1) grayscale(0.2);
         }
-        .mk-gallery-page .grid-item:hover {
-          box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+        .mk-gallery-page .grid-item--ready {
+          transition: transform 0.45s cubic-bezier(0.16,1,0.3,1), opacity 0.35s ease;
+          opacity: 0.75;
+        }
+        .mk-gallery-page .grid-item--ready:hover {
           transform: scale(1.03); z-index: 100;
-          filter: brightness(1) contrast(1.05) grayscale(0);
+          opacity: 1;
         }
         @media (max-width: 768px) { .mk-gallery-page #title { font-size: 12vw; } }
         @media (max-width: 480px) { .mk-gallery-page #title { font-size: 14vw; } }

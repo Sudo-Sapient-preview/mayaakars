@@ -615,26 +615,26 @@ export default function HeroSection({ onReady }: HeroSectionProps) {
           <div className="relative flex h-[78vh] w-[90vw] max-h-[780px] max-w-[1100px] items-center justify-center overflow-hidden">
             <div className="relative w-full max-w-[700px] text-center">
               <div ref={step1Ref} className="step-content step-1 flex items-center justify-center">
-                <h2 className="px-6 text-center text-[20px] leading-[1.15] tracking-tight text-[#E3E4E0] sm:text-[24px] md:px-0 md:text-[32px] lg:text-[48px]" style={{ fontFamily: "var(--font-cormorant)" }}>
+                <h2 className="px-6 text-center text-[20px] leading-[1.15] tracking-tight text-white sm:text-[24px] md:px-0 md:text-[32px] lg:text-[48px]" style={{ fontFamily: "var(--font-cormorant)", textShadow: "0 4px 12px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.6)" }}>
                   Architecture and Interiors,
                   <br />
-                  <span className="italic text-[#C49A3A]" style={{ fontFamily: "var(--font-cormorant)" }}>Crafted as One</span>
+                  <span className="italic text-[#FFD700]" style={{ fontFamily: "var(--font-cormorant)" }}>Crafted as One</span>
                 </h2>
               </div>
 
               <div ref={step2Ref} className="step-content step-2 absolute inset-0 flex items-center justify-center">
-                <h2 className="px-6 text-center text-[18px] leading-[1.15] tracking-tight text-[#E3E4E0] sm:text-[22px] md:px-0 md:text-[28px] lg:text-[42px]" style={{ fontFamily: "var(--font-geist-sans)" }}>
-                  We design spaces that are deeply personal,
+                <h2 className="px-6 text-center text-[18px] leading-[1.15] tracking-tight text-white sm:text-[22px] md:px-0 md:text-[28px] lg:text-[42px]" style={{ fontFamily: "var(--font-cormorant)", textShadow: "0 4px 12px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.6)" }}>
+                  We design spaces that are deeply <span className="italic text-[#FFD700]">personal</span>,
                   <br />
                   architecturally grounded, and artistically refined.
                 </h2>
               </div>
 
               <div ref={step3Ref} className="step-content step-3 absolute inset-0 flex items-center justify-center">
-                <h2 className="px-6 text-center text-[18px] leading-[1.15] text-[#E3E4E0] sm:text-[22px] md:px-0 md:text-[28px] lg:text-[42px]" style={{ fontFamily: "var(--font-geist-sans)" }}>
+                <h2 className="px-6 text-center text-[18px] leading-[1.15] text-white sm:text-[22px] md:px-0 md:text-[28px] lg:text-[42px]" style={{ fontFamily: "var(--font-cormorant)", textShadow: "0 4px 12px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.6)" }}>
                   From concept
                   <br />
-                  to <span className="italic uppercase tracking-[0.16em] text-[#0A0A0A] lg:tracking-[0.3em]" style={{ fontFamily: "var(--font-geist-sans)" }}>completion.</span>
+                  to <span className="italic uppercase tracking-[0.16em] text-[#FFD700] lg:tracking-[0.3em]" style={{ fontFamily: "var(--font-cormorant)", textShadow: "0 4px 12px rgba(0,0,0,0.8)" }}>completion.</span>
                 </h2>
               </div>
             </div>

@@ -65,11 +65,10 @@ export default function CustomCursor() {
 
         // Instant tracking for the dot
         const updateTarget = (e: MouseEvent) => {
-            const clientX = e.clientX;
-            const clientY = e.clientY;
-            mouseX = clientX;
-            mouseY = clientY;
+            mouseX = e.clientX;
+            mouseY = e.clientY;
             dotWrapper.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+            startAnimate();
         };
 
         // Click state
@@ -98,18 +97,29 @@ export default function CustomCursor() {
         document.addEventListener("mouseover", onMouseOver);
         document.addEventListener("mouseout", onMouseOut);
 
-        // Lerp render loop for the trailing ring
+        // Lerp render loop for the trailing ring — stops when settled
         let animationFrameId: number;
+        let rafRunning = false;
         function animate() {
-            ringX += (mouseX - ringX) * speed;
-            ringY += (mouseY - ringY) * speed;
+            const dx = mouseX - ringX;
+            const dy = mouseY - ringY;
+            ringX += dx * speed;
+            ringY += dy * speed;
             ringWrapper!.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
+            if (Math.abs(dx) < 0.15 && Math.abs(dy) < 0.15) {
+                rafRunning = false;
+                return;
+            }
             animationFrameId = requestAnimationFrame(animate);
         }
+        const startAnimate = () => {
+            if (rafRunning) return;
+            rafRunning = true;
+            animationFrameId = requestAnimationFrame(animate);
+        };
 
         dotWrapper.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
         ringWrapper.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
-        animate();
 
         return () => {
             window.removeEventListener("mousemove", updateTarget as EventListener);
@@ -141,7 +151,6 @@ export default function CustomCursor() {
           pointer-events: none;
           z-index: 99999;
           will-change: transform;
-          mix-blend-mode: difference;
         }
 
         #cursor-dot {
@@ -149,20 +158,20 @@ export default function CustomCursor() {
           height: 6px;
           background-color: #fff;
           border-radius: 50%;
-          transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%) scale(1);
           transition: transform 0.2s ease, opacity 0.2s ease;
+          box-shadow: 0 0 0 1px rgba(0,0,0,0.25);
         }
 
         #cursor-ring {
           width: 36px;
           height: 36px;
-          border: 1.5px solid rgba(255, 255, 255, 0.4);
-          background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 80%);
+          border: 1.5px solid rgba(255, 255, 255, 0.55);
+          box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
           border-radius: 50%;
-          transform: translate(-50%, -50%);
-          transition: width 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-                      height 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-                      background 0.3s ease, border-color 0.3s ease;
+          transform: translate(-50%, -50%) scale(1);
+          transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                      opacity 0.3s ease, border-color 0.3s ease;
         }
 
         body.cursor-hovering #cursor-dot {
@@ -171,16 +180,12 @@ export default function CustomCursor() {
         }
 
         body.cursor-hovering #cursor-ring {
-          width: 110px;
-          height: 110px;
-          background: rgba(255, 255, 255, 1);
-          border-color: transparent;
+          transform: translate(-50%, -50%) scale(3.05);
+          border-color: rgba(255, 255, 255, 0.25);
         }
 
         body.cursor-clicking #cursor-ring {
-          width: 25px;
-          height: 25px;
-          background: rgba(255, 255, 255, 0.2);
+          transform: translate(-50%, -50%) scale(0.7);
         }
       `,
                 }}
