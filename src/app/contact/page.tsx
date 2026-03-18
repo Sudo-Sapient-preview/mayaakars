@@ -107,8 +107,8 @@ export default function ContactPage() {
           <div className="mk-contact-reveal mk-contact-delay-2 mt-8 flex flex-col font-sans">
             <p className="m-0 text-base font-medium">Mayaakars</p>
             <p className="m-0 text-sm text-[var(--text-dark-soft)]">Architecture &amp; Interior Design Studio</p>
-            <p className="m-0 text-base">Phone: +91 88844 96888</p>
-            <p className="m-0 text-base">Email: info@mayaakars.com</p>
+            <p className="m-0 text-base">Phone: +91 97318 47847</p>
+            <p className="m-0 text-base">Email: mail@ordientgroup.com</p>
             <address className="mt-4 not-italic text-[clamp(1rem,2vw,1.35rem)] leading-relaxed text-[var(--text-dark-soft)]">
               303, 2nd Floor, 15th A Cross Rd,
               <br />

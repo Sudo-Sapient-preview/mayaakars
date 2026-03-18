@@ -27,8 +27,8 @@ const Philosophy = dynamic(
 
 const INTRO_SEEN_KEY = "mayaakars:intro-seen";
 const INTRO_MAX_WAIT_MS = 8000;
-const CONTACT_PHONE = "+91 88844 96888";
-const CONTACT_EMAIL = "info@mayaakars.com";
+const CONTACT_PHONE = "+91 97318 47847";
+const CONTACT_EMAIL = "mail@ordientgroup.com";
 const INSTAGRAM_URL = "https://www.instagram.com/mayaakars/";
 const FACEBOOK_URL = "https://www.facebook.com/profile.php?id=100088682401205";
 

@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Cormorant_Garamond } from "next/font/google";
+import { Montserrat, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import CustomCursor from "@/components/CustomCursor";
 import SmoothScroll from "@/components/SmoothScroll";
 import Navbar from "@/components/layout/Navbar";
 import RouteTransitionProvider from "@/components/navigation/RouteTransitionProvider";
 
-const geistSans = Geist({
+const montserrat = Montserrat({
   variable: "--font-geist-sans",
   subsets: ["latin"],
   display: "swap",
@@ -79,7 +79,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${cormorant.variable} font-sans antialiased`}
+        className={`${montserrat.variable} ${cormorant.variable} font-sans antialiased`}
       >
         <SmoothScroll>
           <RouteTransitionProvider>

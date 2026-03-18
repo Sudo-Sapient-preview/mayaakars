@@ -17,8 +17,8 @@ const TEAM_ITEMS = [
   { name: "Mono 73", img: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=1000" },
 ];
 
-const CONTACT_PHONE = "+91 88844 96888";
-const CONTACT_EMAIL = "info@mayaakars.com";
+const CONTACT_PHONE = "+91 97318 47847";
+const CONTACT_EMAIL = "mail@ordientgroup.com";
 const INSTAGRAM_URL = "https://www.instagram.com/mayaakars/";
 const FACEBOOK_URL = "https://www.facebook.com/profile.php?id=100088682401205";
 

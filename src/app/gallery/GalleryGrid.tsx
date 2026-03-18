@@ -357,7 +357,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
             <main className="mk-gallery-page">
                 <div id="viewport">
                     <div id="title-container" ref={titleContainerRef}>
-                        <h1 id="title">Selected Works</h1>
+                        <h1 id="title">Gallery</h1>
                     </div>
                     <div id="zoom-wrapper" ref={zoomWrapperRef}>
                         <div id="scene-wrapper" ref={sceneWrapperRef}>
