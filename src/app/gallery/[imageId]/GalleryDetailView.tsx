@@ -14,7 +14,6 @@ type Props = {
 const CATEGORY_LABELS: Record<string, string> = {
     "architect-commercial": "Commercial Architecture",
     "architect-residence": "Residential Architecture",
-    constructions: "Construction",
     "interior-commercial": "Commercial Interior",
     "interior-residencial": "Residential Interior",
 };

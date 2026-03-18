@@ -21,7 +21,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
         "commercial-architecture",
         "residential-interiors",
         "commercial-interior",
-        "constructions",
     ].map((slug) => ({
         url: `${SITE_URL}/projects/${slug}`,
         lastModified: now,

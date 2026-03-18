@@ -151,6 +151,7 @@ export default function CustomCursor() {
           pointer-events: none;
           z-index: 99999;
           will-change: transform;
+          mix-blend-mode: difference;
         }
 
         #cursor-dot {
@@ -166,12 +167,13 @@ export default function CustomCursor() {
         #cursor-ring {
           width: 36px;
           height: 36px;
-          border: 1.5px solid rgba(255, 255, 255, 0.55);
-          box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
+          border: 1.5px solid rgba(255, 255, 255, 0.4);
+          background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 80%);
           border-radius: 50%;
-          transform: translate(-50%, -50%) scale(1);
-          transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-                      opacity 0.3s ease, border-color 0.3s ease;
+          transform: translate(-50%, -50%);
+          transition: width 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                      height 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                      background 0.3s ease, border-color 0.3s ease;
         }
 
         body.cursor-hovering #cursor-dot {
@@ -180,12 +182,16 @@ export default function CustomCursor() {
         }
 
         body.cursor-hovering #cursor-ring {
-          transform: translate(-50%, -50%) scale(3.05);
-          border-color: rgba(255, 255, 255, 0.25);
+          width: 110px;
+          height: 110px;
+          background: rgba(255, 255, 255, 1);
+          border-color: transparent;
         }
 
         body.cursor-clicking #cursor-ring {
-          transform: translate(-50%, -50%) scale(0.7);
+          width: 25px;
+          height: 25px;
+          background: rgba(255, 255, 255, 0.2);
         }
       `,
                 }}

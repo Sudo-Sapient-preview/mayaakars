@@ -87,10 +87,10 @@ export const SERVICES: Service[] = [
         idealFor: "Clients exploring design possibilities before committing to full-scale projects",
         images: [
             { title: "Floor Plan", src: "/Mayaakars/interior-residencial/kumar-residence/dining-area.webp" },
-            { title: "Blueprint", src: "/Mayaakars/constructions/gayatri-residnece-2826sqft/3d-design.webp" },
-            { title: "Concept Sketch", src: "/Mayaakars/constructions/chandrashekhar-residence-4297sqft-g3/3d-design-.webp" },
-            { title: "Design Review", src: "/Mayaakars/constructions/bose-residence-4963sqftsqft/3d-design.webp" },
-            { title: "Model Study", src: "/Mayaakars/constructions/sharma-residence-4753sqft/3d-design.webp" },
+            { title: "Concept Layout", src: "/Mayaakars/architect-residence/panorama-house/22.webp" },
+            { title: "Circulation Study", src: "/Mayaakars/architect-commercial/skyline-commercial-hub/25.webp" },
+            { title: "Interior Mockup", src: "/Mayaakars/interior-commercial/seabreeze-office/lobby-area-2-.webp" },
+            { title: "Spatial Flow", src: "/Mayaakars/interior-residencial/kumar-residence/living-area.webp" },
         ],
     },
     {

@@ -35,13 +35,6 @@ const CATEGORY_META: Record<
         description:
             "Interiors that improve workflow and customer experience while expressing brand personality.",
     },
-    constructions: {
-        slug: "constructions",
-        title: "Constructions",
-        category: "Constructions",
-        description:
-            "Execution-focused work where technical precision and site coordination bring design intent to reality.",
-    },
 };
 
 // Display order on the website
@@ -50,7 +43,6 @@ const CATEGORY_ORDER = [
     "architect-commercial",
     "interior-residencial",
     "interior-commercial",
-    "constructions",
 ];
 
 /** Convert a folder name to a human-readable title.
