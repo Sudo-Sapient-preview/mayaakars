@@ -98,8 +98,8 @@ export default function DisclaimerPage() {
           <h2>Contact</h2>
           <p>
             If you have any questions about this disclaimer, please contact us at{" "}
-            <a href="mailto:info@mayaakars.com" className="text-[var(--gold)] underline underline-offset-2">
-              info@mayaakars.com
+            <a href="mailto:mail@ordientgroup.com" className="text-[var(--gold)] underline underline-offset-2">
+              mail@ordientgroup.com
             </a>
             .
           </p>

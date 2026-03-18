@@ -114,8 +114,8 @@ export default function TermsPage() {
           <h2>Contact</h2>
           <p>
             For questions regarding these terms, please write to us at{" "}
-            <a href="mailto:info@mayaakars.com" className="text-[var(--gold)] underline underline-offset-2">
-              info@mayaakars.com
+            <a href="mailto:mail@ordientgroup.com" className="text-[var(--gold)] underline underline-offset-2">
+              mail@ordientgroup.com
             </a>
             .
           </p>

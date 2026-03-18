@@ -1,16 +1,46 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { gsap } from "gsap";
-import { useRouteTransition } from "@/components/navigation/RouteTransitionProvider";
+import Image from "next/image";
 import type { GalleryItem } from "@/lib/gallery-data";
 
+type LightboxState = { images: string[]; index: number } | null;
+
 export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
-    const { navigate } = useRouteTransition();
     const dragContainerRef = useRef<HTMLDivElement>(null);
     const zoomWrapperRef = useRef<HTMLDivElement>(null);
     const sceneWrapperRef = useRef<HTMLDivElement>(null);
     const titleContainerRef = useRef<HTMLDivElement>(null);
+    const openLightboxRef = useRef<((id: string) => void) | null>(null);
+
+    const [lightbox, setLightbox] = useState<LightboxState>(null);
+
+    // Expose open function to the imperative effect below
+    openLightboxRef.current = (id: string) => {
+        const item = items.find((it) => it.id === id);
+        if (item) setLightbox({ images: item.images, index: 0 });
+    };
+
+    const closeLightbox = useCallback(() => setLightbox(null), []);
+
+    const prev = useCallback(() =>
+        setLightbox((lb) => lb && { ...lb, index: (lb.index - 1 + lb.images.length) % lb.images.length }), []);
+
+    const next = useCallback(() =>
+        setLightbox((lb) => lb && { ...lb, index: (lb.index + 1) % lb.images.length }), []);
+
+    // Keyboard nav
+    useEffect(() => {
+        if (!lightbox) return;
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === "Escape") closeLightbox();
+            if (e.key === "ArrowLeft") prev();
+            if (e.key === "ArrowRight") next();
+        };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, [lightbox, closeLightbox, prev, next]);
 
     useEffect(() => {
         const dragContainer = dragContainerRef.current;
@@ -45,9 +75,6 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
         const total = numCols * numRows;
 
         for (let i = 0; i < total; i += 1) {
-            const r = Math.floor(i / numCols);
-            const c = i % numCols;
-
             const item = items[i % items.length];
 
             const img = document.createElement("img");
@@ -63,13 +90,12 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
             img.style.width = `${preset.w}px`;
             img.style.height = `${preset.h}px`;
 
+            const r = Math.floor(i / numCols);
+            const c = i % numCols;
             const offsetX = (Math.random() - 0.5) * (80 * mScale);
             const offsetY = (Math.random() - 0.5) * (80 * mScale);
-            const leftPos = c * cellW + cellW / 2 - preset.w / 2 + offsetX;
-            const topPos = r * cellH + cellH / 2 - preset.h / 2 + offsetY;
-
-            img.style.left = `${leftPos}px`;
-            img.style.top = `${topPos}px`;
+            img.style.left = `${c * cellW + cellW / 2 - preset.w / 2 + offsetX}px`;
+            img.style.top = `${r * cellH + cellH / 2 - preset.h / 2 + offsetY}px`;
 
             dragContainer.appendChild(img);
             gridItems.push(img);
@@ -89,37 +115,16 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
         const tl = gsap.timeline({
             onComplete: () => {
                 introFinished = true;
-                // Remove GSAP inline transform/opacity so CSS hover works cleanly
                 gsap.set(gridItems, { clearProps: "transform,opacity" });
-                // Flatten 3D context — items are at z=0, preserve-3d no longer needed
                 dragContainer.style.transformStyle = "flat";
-                gridItems.forEach(img => img.classList.add("grid-item--ready"));
+                gridItems.forEach((img) => img.classList.add("grid-item--ready"));
                 startRaf();
             },
         });
 
-        tl.fromTo(
-            titleContainer,
-            { z: -3000, opacity: 0 },
-            { z: -800, opacity: 0.9, duration: 4, ease: "power3.out" }
-        );
-
-        gsap.set(gridItems, {
-            z: () => -3000 - Math.random() * 2000,
-            opacity: 0,
-        });
-
-        tl.to(
-            gridItems,
-            {
-                z: 0,
-                opacity: 1,
-                duration: 4.5,
-                ease: "power3.out",
-                stagger: { amount: 2, from: "center" },
-            },
-            "-=3.5"
-        );
+        tl.fromTo(titleContainer, { z: -3000, opacity: 0 }, { z: -800, opacity: 0.9, duration: 4, ease: "power3.out" });
+        gsap.set(gridItems, { z: () => -3000 - Math.random() * 2000, opacity: 0 });
+        tl.to(gridItems, { z: 0, opacity: 1, duration: 4.5, ease: "power3.out", stagger: { amount: 2, from: "center" } }, "-=3.5");
 
         let currentX = window.innerWidth / 2 - gridW / 2;
         let currentY = window.innerHeight / 2 - gridH / 2;
@@ -134,7 +139,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
         let initialTargetX = targetX;
         let initialTargetY = targetY;
         let movedBeyondClickThreshold = false;
-        let pendingNavigationId: string | null = null;
+        let pendingImageId: string | null = null;
         const clickDragThreshold = 8;
 
         dragContainer.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
@@ -152,16 +157,13 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
 
         const getIdFromTarget = (target: EventTarget | null) => {
             if (!(target instanceof Element)) return null;
-            const image = target.closest<HTMLImageElement>(".grid-item[data-image-id]");
-            return image?.dataset.imageId ?? null;
+            return target.closest<HTMLImageElement>(".grid-item[data-image-id]")?.dataset.imageId ?? null;
         };
 
         const getIdFromPoint = (x: number, y: number) => {
-            const hit = document
-                .elementsFromPoint(x, y)
+            const hit = document.elementsFromPoint(x, y)
                 .find((el) => el instanceof HTMLImageElement && el.matches(".grid-item[data-image-id]"));
-            if (!(hit instanceof HTMLImageElement)) return null;
-            return hit.dataset.imageId ?? null;
+            return hit instanceof HTMLImageElement ? hit.dataset.imageId ?? null : null;
         };
 
         const handleDown = (x: number, y: number, id: string | null, pointerId: number) => {
@@ -172,37 +174,32 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
             initialTargetX = targetX;
             initialTargetY = targetY;
             movedBeyondClickThreshold = false;
-            pendingNavigationId = id;
+            pendingImageId = id;
             document.body.style.cursor = "grabbing";
             startRaf();
         };
 
         const handleMove = (x: number, y: number, pointerId: number) => {
             if (activePointerId !== pointerId || !isDragging) return;
-            if (
-                !movedBeyondClickThreshold &&
-                (Math.abs(x - startMouseX) > clickDragThreshold ||
-                    Math.abs(y - startMouseY) > clickDragThreshold)
-            ) {
+            if (!movedBeyondClickThreshold &&
+                (Math.abs(x - startMouseX) > clickDragThreshold || Math.abs(y - startMouseY) > clickDragThreshold)) {
                 movedBeyondClickThreshold = true;
             }
             const zoomMultiplier = isMobile ? 1.5 / targetScale : 1 / targetScale;
-            const dx = (x - startMouseX) * zoomMultiplier;
-            const dy = (y - startMouseY) * zoomMultiplier;
             const limits = getLimits();
-            targetX = Math.max(limits.minX, Math.min(initialTargetX + dx * 1.5, limits.maxX));
-            targetY = Math.max(limits.minY, Math.min(initialTargetY + dy * 1.5, limits.maxY));
+            targetX = Math.max(limits.minX, Math.min(initialTargetX + (x - startMouseX) * zoomMultiplier * 1.5, limits.maxX));
+            targetY = Math.max(limits.minY, Math.min(initialTargetY + (y - startMouseY) * zoomMultiplier * 1.5, limits.maxY));
             startRaf();
         };
 
-        const releaseDrag = (allowNavigation: boolean, pointerId: number) => {
+        const releaseDrag = (allowClick: boolean, pointerId: number) => {
             if (activePointerId !== pointerId) return;
-            if (allowNavigation && isDragging && !movedBeyondClickThreshold && pendingNavigationId) {
-                navigate(`/gallery/${pendingNavigationId}`);
+            if (allowClick && isDragging && !movedBeyondClickThreshold && pendingImageId) {
+                openLightboxRef.current?.(pendingImageId);
             }
             isDragging = false;
             activePointerId = null;
-            pendingNavigationId = null;
+            pendingImageId = null;
             document.body.style.cursor = "default";
         };
 
@@ -215,11 +212,10 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
         const onPointerMove = (e: PointerEvent) => handleMove(e.clientX, e.clientY, e.pointerId);
         const onPointerUp = (e: PointerEvent) => releaseDrag(true, e.pointerId);
         const onPointerCancel = (e: PointerEvent) => releaseDrag(false, e.pointerId);
-
         const onWindowBlur = () => {
             isDragging = false;
             activePointerId = null;
-            pendingNavigationId = null;
+            pendingImageId = null;
             document.body.style.cursor = "default";
         };
 
@@ -242,8 +238,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
 
         const onWheel = (e: WheelEvent) => {
             if (!introFinished) return;
-            targetScale -= e.deltaY * 0.0015;
-            targetScale = Math.max(0.85, Math.min(targetScale, 3));
+            targetScale = Math.max(0.85, Math.min(targetScale - e.deltaY * 0.0015, 3));
             startRaf();
         };
 
@@ -256,9 +251,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
             dragContainer?.style.setProperty("transform", `translate3d(${currentX}px, ${currentY}px, 0)`);
             currentScale += ds * 0.12;
             zoomWrapper?.style.setProperty("transform", `scale(${currentScale})`);
-            const settled = !isDragging &&
-                Math.abs(dx) < 0.15 && Math.abs(dy) < 0.15 && Math.abs(ds) < 0.001;
-            if (settled) {
+            if (!isDragging && Math.abs(dx) < 0.15 && Math.abs(dy) < 0.15 && Math.abs(ds) < 0.001) {
                 rafRunning = false;
                 rafId = 0;
                 return;
@@ -288,20 +281,14 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
             dragContainer.innerHTML = "";
             document.body.style.cursor = "";
         };
-    }, [items, navigate]);
+    }, [items]);
 
     return (
         <>
             <style>{`
-        :root {
-          --gold: #c49a3a;
-          --bg-dark: #050505;
-          --text-light: #e3e4e0;
-        }
         .mk-gallery-page {
           position: fixed; inset: 0; width: 100%; height: 100%;
-          background-color: var(--bg-dark);
-          font-family: "Geist", sans-serif;
+          background-color: #050505;
           overflow: hidden; user-select: none; -webkit-user-select: none;
         }
         .mk-gallery-page #viewport {
@@ -317,7 +304,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
           font-family: "Cormorant Garamond", serif;
           font-size: clamp(4rem, 8vw, 10rem);
           font-weight: 300; font-style: italic; letter-spacing: 0.05em;
-          color: var(--text-light); pointer-events: none; margin: 0;
+          color: #e3e4e0; pointer-events: none; margin: 0;
           white-space: nowrap; text-shadow: 0 10px 40px rgba(0,0,0,0.8);
         }
         .mk-gallery-page #zoom-wrapper {
@@ -338,20 +325,65 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
         .mk-gallery-page .grid-item {
           position: absolute; object-fit: cover;
           box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-          pointer-events: auto;
-          -webkit-user-drag: none;
+          pointer-events: auto; -webkit-user-drag: none;
           background-color: #111; color: transparent; border-radius: 4px;
         }
         .mk-gallery-page .grid-item--ready {
           transition: transform 0.45s cubic-bezier(0.16,1,0.3,1), opacity 0.35s ease;
           opacity: 0.75;
         }
-        .mk-gallery-page .grid-item--ready:hover {
-          transform: scale(1.03); z-index: 100;
-          opacity: 1;
-        }
+        .mk-gallery-page .grid-item--ready:hover { transform: scale(1.03); z-index: 100; opacity: 1; }
         @media (max-width: 768px) { .mk-gallery-page #title { font-size: 12vw; } }
         @media (max-width: 480px) { .mk-gallery-page #title { font-size: 14vw; } }
+
+        /* Lightbox */
+        .mk-lb-backdrop {
+          position: fixed; inset: 0; z-index: 9999;
+          background: rgba(5,5,5,0.96);
+          display: flex; align-items: center; justify-content: center;
+          animation: lb-in 0.25s ease;
+        }
+        @keyframes lb-in { from { opacity: 0 } to { opacity: 1 } }
+        .mk-lb-img-wrap {
+          position: relative;
+          max-width: min(92vw, 1200px);
+          max-height: 88vh;
+          display: flex; align-items: center; justify-content: center;
+        }
+        .mk-lb-img {
+          max-width: 100%; max-height: 88vh;
+          object-fit: contain; border-radius: 2px;
+          animation: lb-img-in 0.3s cubic-bezier(0.22,1,0.36,1);
+        }
+        @keyframes lb-img-in { from { opacity:0; transform: scale(0.97) } to { opacity:1; transform: scale(1) } }
+        .mk-lb-btn {
+          position: fixed; top: 20px; right: 24px;
+          width: 40px; height: 40px; border-radius: 50%;
+          border: 1px solid rgba(255,255,255,0.18);
+          background: transparent; color: #e3e4e0;
+          display: flex; align-items: center; justify-content: center;
+          cursor: pointer; transition: border-color 0.2s, background 0.2s;
+          z-index: 10000;
+        }
+        .mk-lb-btn:hover { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.08); }
+        .mk-lb-arrow {
+          position: fixed; top: 50%; transform: translateY(-50%);
+          width: 44px; height: 44px; border-radius: 50%;
+          border: 1px solid rgba(255,255,255,0.15);
+          background: transparent; color: #e3e4e0;
+          display: flex; align-items: center; justify-content: center;
+          cursor: pointer; transition: border-color 0.2s, background 0.2s;
+          z-index: 10000;
+        }
+        .mk-lb-arrow:hover { border-color: rgba(196,154,58,0.6); background: rgba(196,154,58,0.08); }
+        .mk-lb-arrow-left { left: 20px; }
+        .mk-lb-arrow-right { right: 20px; }
+        .mk-lb-counter {
+          position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+          font-family: var(--font-geist-sans), sans-serif;
+          font-size: 0.7rem; letter-spacing: 0.2em; color: rgba(255,255,255,0.35);
+          z-index: 10000;
+        }
       `}</style>
 
             <main className="mk-gallery-page">
@@ -366,6 +398,55 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
                     </div>
                 </div>
             </main>
+
+            {lightbox && (
+                <div className="mk-lb-backdrop" onClick={closeLightbox}>
+                    {/* Close */}
+                    <button className="mk-lb-btn" onClick={closeLightbox} aria-label="Close">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                        </svg>
+                    </button>
+
+                    {/* Prev */}
+                    {lightbox.images.length > 1 && (
+                        <button className="mk-lb-arrow mk-lb-arrow-left" onClick={(e) => { e.stopPropagation(); prev(); }} aria-label="Previous">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                        </button>
+                    )}
+
+                    {/* Image */}
+                    <div className="mk-lb-img-wrap" onClick={(e) => e.stopPropagation()}>
+                        <Image
+                            key={lightbox.images[lightbox.index]}
+                            src={lightbox.images[lightbox.index]}
+                            alt=""
+                            width={1200}
+                            height={800}
+                            className="mk-lb-img"
+                            priority
+                        />
+                    </div>
+
+                    {/* Next */}
+                    {lightbox.images.length > 1 && (
+                        <button className="mk-lb-arrow mk-lb-arrow-right" onClick={(e) => { e.stopPropagation(); next(); }} aria-label="Next">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <path d="M5 2l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                        </button>
+                    )}
+
+                    {/* Counter */}
+                    {lightbox.images.length > 1 && (
+                        <span className="mk-lb-counter">
+                            {lightbox.index + 1} / {lightbox.images.length}
+                        </span>
+                    )}
+                </div>
+            )}
         </>
     );
 }

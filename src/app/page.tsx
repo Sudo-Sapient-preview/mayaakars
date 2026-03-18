@@ -8,8 +8,8 @@ const IntroLogoOverlay = dynamic(
   () => import("@/components/loading/IntroLogoOverlay"),
   { ssr: false }
 );
-const ServicesAccordion = dynamic(
-  () => import("@/components/home/ServicesAccordion"),
+const ServicesBlocks = dynamic(
+  () => import("@/components/services/ServicesBlocks"),
   { ssr: false }
 );
 const ProjectsCarousel = dynamic(
@@ -22,6 +22,10 @@ const Testimonials = dynamic(
 );
 const Philosophy = dynamic(
   () => import("@/components/home/Philosophy"),
+  { ssr: false }
+);
+const ProcessSteps = dynamic(
+  () => import("@/components/home/ProcessSteps"),
   { ssr: false }
 );
 
@@ -330,9 +334,10 @@ export default function Home() {
         }}
       >
         <HeroSection onReady={() => setCriticalAssetsReady(true)} />
-        <ServicesAccordion titleScale="compact" />
+        <ServicesBlocks showSectionLabel />
         <ProjectsCarousel />
         <Testimonials />
+        <ProcessSteps />
         <Philosophy />
         <section ref={whiteSectionRef} className="mk-home-white-section">
           <div className="mk-home-white-content">

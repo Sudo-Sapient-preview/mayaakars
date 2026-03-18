@@ -51,23 +51,20 @@ export default function CustomCursor() {
     useEffect(() => {
         if (!enabled) return;
 
-        const dotWrapper = document.getElementById("cursor-dot-wrapper");
         const ringWrapper = document.getElementById("cursor-ring-wrapper");
 
-        if (!dotWrapper || !ringWrapper) return;
+        if (!ringWrapper) return;
 
         let mouseX = window.innerWidth / 2;
         let mouseY = window.innerHeight / 2;
         let ringX = mouseX;
         let ringY = mouseY;
 
-        const speed = 0.35;
+        const speed = 0.18;
 
-        // Instant tracking for the dot
         const updateTarget = (e: MouseEvent) => {
             mouseX = e.clientX;
             mouseY = e.clientY;
-            dotWrapper.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
             startAnimate();
         };
 
@@ -118,7 +115,6 @@ export default function CustomCursor() {
             animationFrameId = requestAnimationFrame(animate);
         };
 
-        dotWrapper.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
         ringWrapper.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
 
         return () => {
@@ -143,7 +139,6 @@ export default function CustomCursor() {
                     body, html, * { cursor: none !important; }
                 }
 
-        #cursor-dot-wrapper,
         #cursor-ring-wrapper {
           position: fixed;
           top: 0;
@@ -151,47 +146,33 @@ export default function CustomCursor() {
           pointer-events: none;
           z-index: 99999;
           will-change: transform;
-          mix-blend-mode: difference;
-        }
-
-        #cursor-dot {
-          width: 6px;
-          height: 6px;
-          background-color: #fff;
-          border-radius: 50%;
-          transform: translate(-50%, -50%) scale(1);
-          transition: transform 0.2s ease, opacity 0.2s ease;
-          box-shadow: 0 0 0 1px rgba(0,0,0,0.25);
         }
 
         #cursor-ring {
-          width: 36px;
-          height: 36px;
-          border: 1.5px solid rgba(255, 255, 255, 0.4);
-          background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 80%);
+          width: 32px;
+          height: 32px;
+          border: 1.5px solid rgba(10, 10, 10, 0.7);
+          box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.55);
           border-radius: 50%;
           transform: translate(-50%, -50%);
-          transition: width 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-                      height 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-                      background 0.3s ease, border-color 0.3s ease;
-        }
-
-        body.cursor-hovering #cursor-dot {
-          opacity: 0;
-          transform: translate(-50%, -50%) scale(0);
+          transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                      height 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                      border-color 0.35s ease,
+                      box-shadow 0.35s ease;
         }
 
         body.cursor-hovering #cursor-ring {
-          width: 110px;
-          height: 110px;
-          background: rgba(255, 255, 255, 1);
-          border-color: transparent;
+          width: 48px;
+          height: 48px;
+          border-color: #C49A3A;
+          box-shadow: 0 0 0 1px rgba(196, 154, 58, 0.3);
         }
 
         body.cursor-clicking #cursor-ring {
-          width: 25px;
-          height: 25px;
-          background: rgba(255, 255, 255, 0.2);
+          width: 22px;
+          height: 22px;
+          border-color: #C49A3A;
+          box-shadow: 0 0 0 1px rgba(196, 154, 58, 0.5);
         }
       `,
                 }}
@@ -199,9 +180,6 @@ export default function CustomCursor() {
 
             <div id="cursor-ring-wrapper">
                 <div id="cursor-ring" />
-            </div>
-            <div id="cursor-dot-wrapper">
-                <div id="cursor-dot" />
             </div>
         </>
     );
