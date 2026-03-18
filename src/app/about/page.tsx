@@ -756,6 +756,86 @@ export default function AboutPage() {
           max-width: 66ch;
         }
 
+        .mk-about-page .about-img-showcase {
+          padding: 0 0 120px;
+          background: transparent;
+        }
+
+        .mk-about-page .about-img-showcase-inner {
+          max-width: 1120px;
+          margin: 0 auto;
+          padding: 0 60px;
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+
+        .mk-about-page .about-img-row {
+          display: grid;
+          grid-template-columns: 1.6fr 1fr;
+          gap: 20px;
+        }
+
+        .mk-about-page .about-img-row--reverse {
+          grid-template-columns: 1fr 1.6fr;
+        }
+
+        .mk-about-page .about-img-cell {
+          position: relative;
+          overflow: hidden;
+          background: #111;
+        }
+
+        .mk-about-page .about-img-cell img {
+          width: 100%;
+          height: 420px;
+          object-fit: cover;
+          display: block;
+          filter: brightness(0.88);
+          transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.5s ease;
+        }
+
+        .mk-about-page .about-img-cell:hover img {
+          transform: scale(1.04);
+          filter: brightness(1);
+        }
+
+        .mk-about-page .about-img-caption {
+          display: block;
+          padding: 12px 0 0;
+          font-size: 0.72rem;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: rgba(200, 169, 92, 0.7);
+        }
+
+        @media (max-width: 900px) {
+          .mk-about-page .about-img-showcase-inner {
+            padding: 0 32px;
+            gap: 14px;
+          }
+          .mk-about-page .about-img-row,
+          .mk-about-page .about-img-row--reverse {
+            grid-template-columns: 1fr;
+            gap: 14px;
+          }
+          .mk-about-page .about-img-cell img {
+            height: 280px;
+          }
+        }
+
+        @media (max-width: 600px) {
+          .mk-about-page .about-img-showcase {
+            padding-bottom: 72px;
+          }
+          .mk-about-page .about-img-showcase-inner {
+            padding: 0 20px;
+          }
+          .mk-about-page .about-img-cell img {
+            height: 220px;
+          }
+        }
+
         .mk-about-page .spotlight {
           position: relative;
           width: 100vw;
@@ -1388,6 +1468,53 @@ export default function AboutPage() {
               <div className="content-split-right">
                 <AnimatedParagraph text="We invest time in understanding aspirations, lifestyle, and requirements before shaping a design language that feels authentic and enduring." />
                 <AnimatedParagraph text="Our process is structured yet flexible, supported by planning, 3D visualization, and execution oversight so every decision stays intentional." />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Image showcase — architectural & interior work */}
+        <section className="about-img-showcase">
+          <div className="about-img-showcase-inner">
+            <div className="about-img-row reveal about-reveal">
+              <div className="about-img-cell about-img-cell--wide">
+                <img
+                  src="/Mayaakars/architect-residence/panorama-house/title-photo.webp"
+                  alt="Panorama House — Residential Architecture"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span className="about-img-caption">Panorama House — Residential Architecture</span>
+              </div>
+              <div className="about-img-cell">
+                <img
+                  src="/Mayaakars/interior-residencial/kumar-residence/bedroom-1.webp"
+                  alt="Kumar Residence — Interior Design"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span className="about-img-caption">Kumar Residence — Interior Design</span>
+              </div>
+            </div>
+
+            <div className="about-img-row about-img-row--reverse reveal about-reveal">
+              <div className="about-img-cell">
+                <img
+                  src="/Mayaakars/interior-commercial/seabreeze-office/lobby-area-2-.webp"
+                  alt="Seabreeze Office — Commercial Interior"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span className="about-img-caption">Seabreeze Office — Commercial Interior</span>
+              </div>
+              <div className="about-img-cell about-img-cell--wide">
+                <img
+                  src="/Mayaakars/architect-commercial/aurora-healthcare/hospital-main-1.webp"
+                  alt="Aurora Healthcare — Commercial Architecture"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span className="about-img-caption">Aurora Healthcare — Commercial Architecture</span>
               </div>
             </div>
           </div>

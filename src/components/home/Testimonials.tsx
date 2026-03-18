@@ -38,6 +38,13 @@ const BRANDS = [
   { name: "Century Wood", file: "Century_Plyboards.webp" },
 ];
 
+const CLIENTS = [
+  "Living Walls",
+  "Waverly",
+  "Automac",
+  "Agrocorp",
+];
+
 export default function Testimonials() {
   const [current, setCurrent] = useState(0);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -309,6 +316,61 @@ export default function Testimonials() {
                 }}
               >
                 {brand.name}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Clients */}
+      <div
+        className="max-w-6xl mx-auto pt-16 mt-16"
+        style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
+      >
+        <div className="text-center mb-12">
+          <p
+            className="uppercase mb-3"
+            style={{
+              letterSpacing: "0.42em",
+              fontSize: "8px",
+              color: "rgba(255,255,255,0.25)",
+              fontWeight: 600,
+            }}
+          >
+            Clients
+          </p>
+          <h4
+            className="font-light italic"
+            style={{
+              fontFamily: "var(--font-cormorant), serif",
+              fontSize: "1.35rem",
+              color: "rgba(227,228,224,0.5)",
+              letterSpacing: "0.02em",
+            }}
+          >
+            Spaces We Have Shaped
+          </h4>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-px" style={{ border: "1px solid rgba(255,255,255,0.07)" }}>
+          {CLIENTS.map((client) => (
+            <div
+              key={client}
+              className="flex items-center justify-center px-6 py-10"
+              style={{ borderRight: "1px solid rgba(255,255,255,0.07)" }}
+            >
+              <span
+                style={{
+                  fontFamily: "var(--font-cormorant), serif",
+                  fontSize: "clamp(1.1rem, 2vw, 1.45rem)",
+                  fontWeight: 400,
+                  letterSpacing: "0.08em",
+                  color: "rgba(227,228,224,0.55)",
+                  textAlign: "center",
+                  fontStyle: "italic",
+                }}
+              >
+                {client}
               </span>
             </div>
           ))}
