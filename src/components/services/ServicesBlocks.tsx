@@ -119,7 +119,7 @@ function ServiceBlock({
                             fontWeight: 400,
                             letterSpacing: "0.02em",
                             color: isOpen ? "#C49A3A" : "#E3E4E0",
-                            transition: "color 0.4s ease",
+                            transition: "color 1.2s ease",
                             margin: 0,
                             lineHeight: 1.1,
                         }}
@@ -140,7 +140,7 @@ function ServiceBlock({
                         alignItems: "center",
                         justifyContent: "center",
                         flexShrink: 0,
-                        transition: "border-color 0.3s ease, transform 0.5s cubic-bezier(0.22,1,0.36,1)",
+                        transition: "border-color 1.2s ease, transform 1.2s cubic-bezier(0.22,1,0.36,1)",
                         transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
                         borderColor: isOpen ? "rgba(196,154,58,0.5)" : "rgba(255,255,255,0.15)",
                     }}
@@ -158,7 +158,7 @@ function ServiceBlock({
                 style={{
                     height: `${height}px`,
                     overflow: "hidden",
-                    transition: "height 0.6s cubic-bezier(0.22, 1, 0.36, 1)",
+                    transition: "height 1.8s cubic-bezier(0.22, 1, 0.36, 1)",
                 }}
             >
                 <div
@@ -268,7 +268,7 @@ function ServiceBlock({
                                     className="object-cover"
                                     style={{
                                         filter: "brightness(0.85)",
-                                        transition: "transform 0.5s ease, filter 0.4s ease",
+                                        transition: "transform 1.2s cubic-bezier(0.22, 1, 0.36, 1), filter 1.2s ease",
                                     }}
                                     onMouseEnter={(e) => {
                                         (e.currentTarget as HTMLImageElement).style.transform = "scale(1.04)";

@@ -1,9 +1,10 @@
-"use client";
+    "use client";
 
 import { useState } from "react";
 import Image from "next/image";
 import { useRouteTransition } from "@/components/navigation/RouteTransitionProvider";
 import manifest from "@/data/gallery-manifest.json";
+import ProjectSlider from "./ProjectSlider";
 
 type GalleryItem = { id: string; title: string; category: string; coverImage: string };
 const ALL_PROJECTS = manifest as GalleryItem[];
@@ -277,37 +278,8 @@ export default function ProjectsGrid() {
                     </aside>
 
                     {/* Grid */}
-                    <div className="pg-grid-wrap">
-                        <div className="pg-grid">
-                            {visibleProjects.length === 0 && (
-                                <p className="pg-empty">No projects found.</p>
-                            )}
-                            {visibleProjects.map((project) => (
-                                <div
-                                    key={project.id}
-                                    className="pg-card"
-                                    onClick={() => navigate(`/gallery/${project.id}`)}
-                                    data-interactive
-                                >
-                                    <Image
-                                        src={project.coverImage}
-                                        alt={project.title}
-                                        fill
-                                        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                                        className="object-cover pg-card-img"
-                                    />
-                                    <div className="pg-card-overlay" />
-                                    <div className="pg-card-info">
-                                        <h3 className="pg-card-title">{project.title}</h3>
-                                    </div>
-                                    <div className="pg-card-arrow" aria-hidden>
-                                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                                            <path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                    <div className="pg-grid-wrap" style={{ padding: 0, overflow: "hidden" }}>
+                        <ProjectSlider projects={visibleProjects} />
                     </div>
                 </div>
             </main>
