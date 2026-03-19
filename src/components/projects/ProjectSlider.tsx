@@ -260,8 +260,8 @@ const SLIDER_STYLES = `
     top: 45%;
     left: 50%;
     transform: translate3d(-50%, -50%, 0px);
-    width: 50%;
-    height: 480px;
+    width: min(50%, 900px);
+    height: 520px;
     border-radius: 0.25rem;
     display: flex;
     align-items: center;
@@ -269,6 +269,7 @@ const SLIDER_STYLES = `
     will-change: transform, opacity;
     overflow: hidden;
     transition: filter 0.3s ease;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
   }
   .proj-slide:hover {
     filter: brightness(1.1);
@@ -276,7 +277,7 @@ const SLIDER_STYLES = `
   .proj-slide-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.4) 100%);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.1) 60%, rgba(0, 0, 0, 0) 100%);
     pointer-events: none;
     z-index: 1;
   }
@@ -292,16 +293,17 @@ const SLIDER_STYLES = `
     position: relative;
     color: #fff;
     font-family: var(--font-cormorant), 'Inter', serif;
-    font-size: clamp(2.2rem, 7vw, 4rem);
-    font-weight: 450;
-    letter-spacing: -0.05rem;
+    font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+    font-weight: 400;
+    letter-spacing: 0.02em;
     z-index: 2;
     text-align: center;
     pointer-events: none;
-    line-height: 1.1;
+    line-height: 1.2;
     text-wrap: balance;
-    padding-inline: 16px;
-    text-shadow: 0 2px 20px rgba(0,0,0,0.8);
+    padding-inline: 24px;
+    margin-top: 10%;
+    text-shadow: 0 4px 24px rgba(0,0,0,0.9), 0 2px 6px rgba(0,0,0,0.8);
   }
   .proj-slider-controls {
     position: relative;

@@ -15,9 +15,9 @@ type NavigatorWithConnection = Navigator & {
   };
 };
 
-const FRAME_COUNT = 176;
+const FRAME_COUNT = 192;
 const FRAME_FPS = 24;
-const MAX_FRAME_CACHE = 70;
+const MAX_FRAME_CACHE = 400;
 
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 const norm = (value: number, start: number, end: number) =>
@@ -60,8 +60,7 @@ export default function HeroSection({ onReady }: HeroSectionProps) {
         connection.effectiveType.includes("3g"));
     const isLowPowerDevice = (navigator.hardwareConcurrency ?? 8) <= 4;
     const isMobileViewport = window.innerWidth <= 768;
-    const useVideoSequence =
-      prefersReducedMotion || saveData || isSlowConnection || isLowPowerDevice || isMobileViewport;
+    const useVideoSequence = false;
 
     let readyNotified = false;
     const markReady = () => {

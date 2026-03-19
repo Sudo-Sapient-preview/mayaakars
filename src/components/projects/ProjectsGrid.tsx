@@ -1,7 +1,8 @@
     "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { useRouteTransition } from "@/components/navigation/RouteTransitionProvider";
 import manifest from "@/data/gallery-manifest.json";
 import ProjectSlider from "./ProjectSlider";
@@ -23,9 +24,25 @@ const FILTER_CATEGORIES: Record<Exclude<Filter, "all">, string[]> = {
 };
 
 export default function ProjectsGrid() {
+    const searchParams = useSearchParams();
     const [tab, setTab] = useState<Tab>("architectural");
     const [filter, setFilter] = useState<Filter>("all");
     const { navigate } = useRouteTransition();
+
+    useEffect(() => {
+        const categorySlug = searchParams.get("category");
+        if (categorySlug) {
+            if (categorySlug === "residential-architecture") {
+                setTab("architectural"); setFilter("residential");
+            } else if (categorySlug === "commercial-architecture") {
+                setTab("architectural"); setFilter("commercial");
+            } else if (categorySlug === "residential-interiors") {
+                setTab("interior"); setFilter("residential");
+            } else if (categorySlug === "commercial-interior") {
+                setTab("interior"); setFilter("commercial");
+            }
+        }
+    }, [searchParams]);
 
     const tabCats = TAB_CATEGORIES[tab];
     const visibleProjects = ALL_PROJECTS.filter((p) => {

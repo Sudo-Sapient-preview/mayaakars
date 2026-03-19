@@ -33,8 +33,8 @@ export default function ProjectsCarousel() {
 
 function DesktopCarousel({ projects }: { projects: ProjectCategory[] }) {
     // Tunables that control how snappy the drag feels
-    const ROTATION_PER_PX = 0.28; // deg moved per px dragged (higher = faster)
-    const ROTATION_SMOOTHING = 0.12; // how quickly currentRotation approaches targetRotation
+    const ROTATION_PER_PX = 0.12; // deg moved per px dragged (higher = faster)
+    const ROTATION_SMOOTHING = 0.04; // how quickly currentRotation approaches targetRotation
 
     const [activeIndex, setActiveIndex] = useState(0);
     const lastActiveRef = useRef(0);
@@ -102,7 +102,7 @@ function DesktopCarousel({ projects }: { projects: ProjectCategory[] }) {
             const card = target?.closest<HTMLElement>(".pc-card");
             const slug = card?.dataset.slug;
             if (slug) {
-                navigate(`/projects/${slug}`);
+                navigate(`/projects?category=${slug}`);
             }
         };
 
@@ -307,7 +307,7 @@ function MobileCarousel({ projects }: { projects: ProjectCategory[] }) {
                         tabIndex={0}
                         onClick={() => {
                             if (touchRef.current.isSwipe) return;
-                            navigate(`/projects/${project.slug}`);
+                            navigate(`/projects?category=${project.slug}`);
                         }}
                     >
                         <div className="pc-mob-inner">

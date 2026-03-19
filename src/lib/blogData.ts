@@ -18,7 +18,7 @@ export const blogData: BlogArticle[] = [
     summary:
       "Interior design is often perceived as an aesthetic decision — colours, furniture, and décor. The true impact, however, goes far beyond visual appeal.",
     image:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1400&auto=format&fit=crop",
+      "/Mayaakars/interior-residencial/panorama-house/living-room.webp",
     content: `
       <p>Interior design is often perceived as an aesthetic decision — colours, furniture, and décor. However, the true impact of interior design goes far beyond visual appeal. Thoughtful design directly influences how people experience and interact with their living spaces on a daily basis.</p>
       <p>A well-designed interior creates harmony between functionality, comfort, and aesthetics. Every element — from spatial planning to lighting and materials — plays a role in shaping the atmosphere of a home. When these elements are carefully considered, the result is a space that feels intuitive, comfortable, and timeless.</p>
@@ -42,7 +42,7 @@ export const blogData: BlogArticle[] = [
     summary:
       "Architecture is the foundation upon which every home is built. While interiors define the character of a space, architecture determines how the structure interacts with its environment.",
     image:
-      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?q=80&w=1400&auto=format&fit=crop",
+      "/Mayaakars/architect-residence/panorama-house/title-photo.webp",
     content: `
       <p>Architecture is the foundation upon which every home is built. While interiors define the character of a space, architecture determines how the structure interacts with its environment, how spaces are organised, and how people experience the building as a whole.</p>
       <h3>Understanding the Site</h3>
@@ -67,7 +67,7 @@ export const blogData: BlogArticle[] = [
     summary:
       "Lighting is one of the most powerful yet often underestimated elements in interior design. While furniture and materials define the physical character of a space, lighting determines how that space is perceived.",
     image:
-      "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1400&auto=format&fit=crop",
+      "/Mayaakars/interior-commercial/shizuka-nook/chandelier.webp",
     content: `
       <p>Lighting is one of the most powerful yet often underestimated elements in interior design. While furniture and materials define the physical character of a space, lighting determines how that space is perceived and experienced.</p>
       <p>Effective lighting design involves more than simply illuminating a room. It is about creating layers of light that support both functionality and atmosphere.</p>

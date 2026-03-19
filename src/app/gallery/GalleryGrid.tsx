@@ -15,6 +15,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
     const openLightboxRef = useRef<((id: string) => void) | null>(null);
 
     const [lightbox, setLightbox] = useState<LightboxState>(null);
+    const lbTouchStartX = useRef(0);
 
     // Expose open function to the imperative effect below
     openLightboxRef.current = (id: string) => {
@@ -418,15 +419,21 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
                     )}
 
                     {/* Image */}
-                    <div className="mk-lb-img-wrap" onClick={(e) => e.stopPropagation()}>
-                        <Image
+                    <div
+                        className="mk-lb-img-wrap"
+                        onClick={(e) => e.stopPropagation()}
+                        onTouchStart={(e) => { lbTouchStartX.current = e.touches[0].clientX; }}
+                        onTouchEnd={(e) => {
+                            const delta = e.changedTouches[0].clientX - lbTouchStartX.current;
+                            if (delta > 40) prev();
+                            else if (delta < -40) next();
+                        }}
+                    >
+                        <img
                             key={lightbox.images[lightbox.index]}
-                            src={lightbox.images[lightbox.index]}
+                            src={encodeURI(lightbox.images[lightbox.index])}
                             alt=""
-                            width={1200}
-                            height={800}
                             className="mk-lb-img"
-                            priority
                         />
                     </div>
 

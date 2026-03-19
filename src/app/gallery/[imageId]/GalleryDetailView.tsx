@@ -216,8 +216,8 @@ export default function GalleryDetailView({ title, category, images }: Props) {
 
                 <div className="gd-footer-spacer" />
                 <div className="gd-footer-nav">
-                  <Link href="/gallery" className="gd-back-btn" data-interactive>
-                    Back to Gallery
+                  <Link href="/projects" className="gd-back-btn" data-interactive>
+                    Back to Projects
                   </Link>
                 </div>
             </main>

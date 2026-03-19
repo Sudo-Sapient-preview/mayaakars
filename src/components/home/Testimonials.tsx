@@ -356,10 +356,11 @@ export default function Testimonials() {
           {CLIENTS.map((client) => (
             <div
               key={client}
-              className="flex items-center justify-center px-6 py-10"
+              className="flex items-center justify-center px-6 py-10 group cursor-default"
               style={{ borderRight: "1px solid rgba(255,255,255,0.07)" }}
             >
               <span
+                className="transition-colors duration-300 !group-hover:text-white sm:group-hover:!text-white group-hover:!text-white"
                 style={{
                   fontFamily: "var(--font-cormorant), serif",
                   fontSize: "clamp(1.1rem, 2vw, 1.45rem)",

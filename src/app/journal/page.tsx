@@ -558,7 +558,7 @@ export default function JournalPage() {
             <div className="center-col">
               <div className="image-wrapper" onClick={() => navigate("/blog/article_template?id=how-interior-design-shapes-the-way-we-live")}>
                 <img
-                  src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1000&auto=format&fit=crop"
+                  src="/Mayaakars/interior-residencial/panorama-house/living-room.webp"
                   alt="Interior Design"
                 />
                 <div className="read-more-overlay">
@@ -593,7 +593,7 @@ export default function JournalPage() {
             <div className="center-col">
               <div className="image-wrapper" onClick={() => navigate("/blog/article_template?id=thoughtful-architecture-in-modern-homes")}>
                 <img
-                  src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?q=80&w=1000&auto=format&fit=crop"
+                  src="/Mayaakars/architect-residence/panorama-house/title-photo.webp"
                   alt="Modern Architecture"
                 />
                 <div className="read-more-overlay">
@@ -620,7 +620,7 @@ export default function JournalPage() {
             <div className="center-col">
               <div className="image-wrapper" onClick={() => navigate("/blog/article_template?id=the-role-of-lighting-in-interior-design")}>
                 <img
-                  src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1000&auto=format&fit=crop"
+                  src="/Mayaakars/interior-commercial/shizuka-nook/chandelier.webp"
                   alt="Lighting Design"
                 />
                 <div className="read-more-overlay">
