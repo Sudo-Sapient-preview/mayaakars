@@ -42,7 +42,7 @@ Built with **Next.js 14 App Router**, **Tailwind CSS**, **GSAP**, **Lenis smooth
 ### Typography
 
 ```
-Primary:   Cormorant Garamond — headings, display, hero text
+Primary:   	 — headings, display, hero text
            Use italic variant for gold emphasis words
 Secondary: Geist — body copy, UI, nav, labels
 Tertiary:  M PLUS Rounded 1C — tags, badges, supporting text

@@ -2,36 +2,60 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { gsap } from "gsap";
-import Image from "next/image";
-import type { GalleryItem } from "@/lib/gallery-data";
 
-type LightboxState = { images: string[]; index: number } | null;
+type GalleryItem = { thumb: string; full: string };
+type LightboxState = { index: number } | null;
 
 export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
+    const images = items.map((i) => i.thumb); // grid uses thumbs
     const dragContainerRef = useRef<HTMLDivElement>(null);
     const zoomWrapperRef = useRef<HTMLDivElement>(null);
     const sceneWrapperRef = useRef<HTMLDivElement>(null);
     const titleContainerRef = useRef<HTMLDivElement>(null);
-    const openLightboxRef = useRef<((id: string) => void) | null>(null);
+    const openLightboxRef = useRef<((src: string) => void) | null>(null);
 
     const [lightbox, setLightbox] = useState<LightboxState>(null);
-    const lbTouchStartX = useRef(0);
 
-    // Expose open function to the imperative effect below
-    openLightboxRef.current = (id: string) => {
-        const item = items.find((it) => it.id === id);
-        if (item) setLightbox({ images: item.images, index: 0 });
+    openLightboxRef.current = (src: string) => {
+        const index = images.indexOf(src);
+        const i = index === -1 ? 0 : index;
+        setLightbox({ index: i });
+        // preload current + adjacent full-res images
+        [i, (i + 1) % items.length, (i - 1 + items.length) % items.length].forEach((idx) => {
+            const link = document.createElement("link");
+            link.rel = "preload";
+            link.as = "image";
+            link.href = items[idx].full;
+            document.head.appendChild(link);
+        });
     };
 
     const closeLightbox = useCallback(() => setLightbox(null), []);
 
+    const preloadFull = useCallback((idx: number) => {
+        const link = document.createElement("link");
+        link.rel = "preload";
+        link.as = "image";
+        link.href = items[idx].full;
+        document.head.appendChild(link);
+    }, [items]);
+
     const prev = useCallback(() =>
-        setLightbox((lb) => lb && { ...lb, index: (lb.index - 1 + lb.images.length) % lb.images.length }), []);
+        setLightbox((lb) => {
+            if (!lb) return lb;
+            const next = (lb.index - 1 + items.length) % items.length;
+            preloadFull((next - 1 + items.length) % items.length);
+            return { index: next };
+        }), [items.length, preloadFull]);
 
     const next = useCallback(() =>
-        setLightbox((lb) => lb && { ...lb, index: (lb.index + 1) % lb.images.length }), []);
+        setLightbox((lb) => {
+            if (!lb) return lb;
+            const next = (lb.index + 1) % items.length;
+            preloadFull((next + 1) % items.length);
+            return { index: next };
+        }), [items.length, preloadFull]);
 
-    // Keyboard nav
     useEffect(() => {
         if (!lightbox) return;
         const onKey = (e: KeyboardEvent) => {
@@ -51,8 +75,9 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
         if (!dragContainer || !zoomWrapper || !sceneWrapper || !titleContainer) return;
 
         const isMobile = window.innerWidth <= 768;
-        const numCols = isMobile ? 5 : 7;
-        const numRows = isMobile ? 6 : 5;
+        const numCols = isMobile ? 4 : 7;
+        const total = images.length; // show every image exactly once
+        const numRows = Math.ceil(total / numCols);
         const baseSize = isMobile ? window.innerWidth * 0.4 : 320;
         const cellW = baseSize;
         const cellH = baseSize;
@@ -73,17 +98,16 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
         ];
 
         const gridItems: HTMLImageElement[] = [];
-        const total = numCols * numRows;
 
         for (let i = 0; i < total; i += 1) {
-            const item = items[i % items.length];
+            const src = images[i];
 
             const img = document.createElement("img");
-            img.src = `/thumbs/${item.id}.webp`;
-            img.alt = item.title;
+            img.src = src;
+            img.alt = "";
             img.decoding = "async";
             img.classList.add("grid-item");
-            img.dataset.imageId = item.id;
+            img.dataset.imageId = src;
             img.setAttribute("data-interactive", "true");
             img.draggable = false;
 
@@ -282,7 +306,11 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
             dragContainer.innerHTML = "";
             document.body.style.cursor = "";
         };
-    }, [items]);
+    }, [images]);
+
+    const lbIndex = lightbox?.index ?? 0;
+    const prevIndex = (lbIndex - 1 + items.length) % items.length;
+    const nextIndex = (lbIndex + 1) % items.length;
 
     return (
         <>
@@ -340,24 +368,81 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
         /* Lightbox */
         .mk-lb-backdrop {
           position: fixed; inset: 0; z-index: 9999;
-          background: rgba(5,5,5,0.96);
+          background: rgba(5,5,5,0.94);
           display: flex; align-items: center; justify-content: center;
-          animation: lb-in 0.25s ease;
+          animation: lb-in 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+          overflow: hidden;
         }
         @keyframes lb-in { from { opacity: 0 } to { opacity: 1 } }
-        .mk-lb-img-wrap {
-          position: relative;
-          max-width: min(92vw, 1200px);
-          max-height: 88vh;
+
+        /* Side previews */
+        .mk-lb-side {
+          position: absolute; top: 0; bottom: 0;
+          width: 22vw; max-width: 280px;
+          display: flex; align-items: center;
+          cursor: pointer; z-index: 2;
+        }
+        .mk-lb-side-left { left: 0; justify-content: flex-start; padding-left: 16px; }
+        .mk-lb-side-right { right: 0; justify-content: flex-end; padding-right: 16px; }
+        .mk-lb-side-left::after, .mk-lb-side-right::after {
+          content: ""; position: absolute; top: 0; bottom: 0; width: 60%;
+          pointer-events: none;
+        }
+        .mk-lb-side-left::after {
+          left: 0;
+          background: linear-gradient(to right, rgba(5,5,5,0.85) 0%, transparent 100%);
+        }
+        .mk-lb-side-right::after {
+          right: 0;
+          background: linear-gradient(to left, rgba(5,5,5,0.85) 0%, transparent 100%);
+        }
+        .mk-lb-side-img {
+          width: 100%; height: 62vh;
+          object-fit: cover; border-radius: 3px;
+          opacity: 0.28; filter: blur(1px);
+          transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), filter 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1);
+          pointer-events: none;
+        }
+        .mk-lb-side:hover .mk-lb-side-img {
+          opacity: 0.55; filter: blur(0px); transform: scale(1.02);
+        }
+
+        /* Side arrow indicators */
+        .mk-lb-side-arrow {
+          position: absolute; z-index: 3;
+          width: 40px; height: 40px; border-radius: 50%;
+          border: 1px solid rgba(255,255,255,0.2);
+          background: rgba(10,10,10,0.6);
           display: flex; align-items: center; justify-content: center;
+          color: #e3e4e0; transition: border-color 0.2s, background 0.2s;
+          pointer-events: none;
+        }
+        .mk-lb-side-left .mk-lb-side-arrow { left: 20px; }
+        .mk-lb-side-right .mk-lb-side-arrow { right: 20px; }
+        .mk-lb-side:hover .mk-lb-side-arrow {
+          border-color: rgba(196,154,58,0.6); background: rgba(196,154,58,0.12);
+        }
+
+        /* Main image */
+        .mk-lb-main {
+          position: relative; z-index: 3;
+          max-width: min(56vw, 900px); max-height: 88vh;
+          display: flex; align-items: center; justify-content: center;
+          flex-shrink: 0;
         }
         .mk-lb-img {
           max-width: 100%; max-height: 88vh;
           object-fit: contain; border-radius: 2px;
-          animation: lb-img-in 0.3s cubic-bezier(0.22,1,0.36,1);
+          box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+          animation: lb-img-in 2s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        @keyframes lb-img-in { from { opacity:0; transform: scale(0.97) } to { opacity:1; transform: scale(1) } }
-        .mk-lb-btn {
+        @keyframes lb-img-in {
+          from { opacity: 0; transform: scale(0.93) translateY(14px); filter: blur(6px); }
+          to   { opacity: 1; transform: scale(1)    translateY(0);    filter: blur(0px); }
+        }
+
+        /* Close */
+        .mk-lb-close {
           position: fixed; top: 20px; right: 24px;
           width: 40px; height: 40px; border-radius: 50%;
           border: 1px solid rgba(255,255,255,0.18);
@@ -366,24 +451,23 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
           cursor: pointer; transition: border-color 0.2s, background 0.2s;
           z-index: 10000;
         }
-        .mk-lb-btn:hover { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.08); }
-        .mk-lb-arrow {
-          position: fixed; top: 50%; transform: translateY(-50%);
-          width: 44px; height: 44px; border-radius: 50%;
-          border: 1px solid rgba(255,255,255,0.15);
-          background: transparent; color: #e3e4e0;
-          display: flex; align-items: center; justify-content: center;
-          cursor: pointer; transition: border-color 0.2s, background 0.2s;
-          z-index: 10000;
-        }
-        .mk-lb-arrow:hover { border-color: rgba(196,154,58,0.6); background: rgba(196,154,58,0.08); }
-        .mk-lb-arrow-left { left: 20px; }
-        .mk-lb-arrow-right { right: 20px; }
+        .mk-lb-close:hover { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.08); }
+
+        /* Counter */
         .mk-lb-counter {
           position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-          font-family: var(--font-geist-sans), sans-serif;
-          font-size: 0.7rem; letter-spacing: 0.2em; color: rgba(255,255,255,0.35);
-          z-index: 10000;
+          font-size: 0.68rem; letter-spacing: 0.22em; color: rgba(255,255,255,0.3);
+          z-index: 10000; pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+          .mk-lb-side { width: 28vw; }
+          .mk-lb-main { max-width: min(80vw, 600px); }
+          .mk-lb-side-img { height: 45vh; }
+        }
+        @media (max-width: 480px) {
+          .mk-lb-side { display: none; }
+          .mk-lb-main { max-width: 94vw; }
         }
       `}</style>
 
@@ -403,55 +487,39 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
             {lightbox && (
                 <div className="mk-lb-backdrop" onClick={closeLightbox}>
                     {/* Close */}
-                    <button className="mk-lb-btn" onClick={closeLightbox} aria-label="Close">
+                    <button className="mk-lb-close" onClick={closeLightbox} aria-label="Close">
                         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                             <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                         </svg>
                     </button>
 
-                    {/* Prev */}
-                    {lightbox.images.length > 1 && (
-                        <button className="mk-lb-arrow mk-lb-arrow-left" onClick={(e) => { e.stopPropagation(); prev(); }} aria-label="Previous">
-                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    {/* Left preview */}
+                    <div className="mk-lb-side mk-lb-side-left" onClick={(e) => { e.stopPropagation(); prev(); }}>
+                        <img src={items[prevIndex].thumb} alt="" className="mk-lb-side-img" />
+                        <div className="mk-lb-side-arrow">
+                            <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
                                 <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
-                        </button>
-                    )}
-
-                    {/* Image */}
-                    <div
-                        className="mk-lb-img-wrap"
-                        onClick={(e) => e.stopPropagation()}
-                        onTouchStart={(e) => { lbTouchStartX.current = e.touches[0].clientX; }}
-                        onTouchEnd={(e) => {
-                            const delta = e.changedTouches[0].clientX - lbTouchStartX.current;
-                            if (delta > 40) prev();
-                            else if (delta < -40) next();
-                        }}
-                    >
-                        <img
-                            key={lightbox.images[lightbox.index]}
-                            src={encodeURI(lightbox.images[lightbox.index])}
-                            alt=""
-                            className="mk-lb-img"
-                        />
+                        </div>
                     </div>
 
-                    {/* Next */}
-                    {lightbox.images.length > 1 && (
-                        <button className="mk-lb-arrow mk-lb-arrow-right" onClick={(e) => { e.stopPropagation(); next(); }} aria-label="Next">
-                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    {/* Main image — full resolution */}
+                    <div className="mk-lb-main" onClick={(e) => e.stopPropagation()}>
+                        <img key={items[lbIndex].full} src={items[lbIndex].full} alt="" className="mk-lb-img" />
+                    </div>
+
+                    {/* Right preview */}
+                    <div className="mk-lb-side mk-lb-side-right" onClick={(e) => { e.stopPropagation(); next(); }}>
+                        <img src={items[nextIndex].thumb} alt="" className="mk-lb-side-img" />
+                        <div className="mk-lb-side-arrow">
+                            <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
                                 <path d="M5 2l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
-                        </button>
-                    )}
+                        </div>
+                    </div>
 
                     {/* Counter */}
-                    {lightbox.images.length > 1 && (
-                        <span className="mk-lb-counter">
-                            {lightbox.index + 1} / {lightbox.images.length}
-                        </span>
-                    )}
+                    <span className="mk-lb-counter">{lbIndex + 1} / {items.length}</span>
                 </div>
             )}
         </>

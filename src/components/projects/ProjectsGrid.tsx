@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useRouteTransition } from "@/components/navigation/RouteTransitionProvider";
 import manifest from "@/data/gallery-manifest.json";
-import ProjectSlider from "./ProjectSlider";
+import ImageGallery from "@/components/ui/image-gallery";
 
 type GalleryItem = { id: string; title: string; category: string; coverImage: string };
 const ALL_PROJECTS = manifest as GalleryItem[];
@@ -25,6 +25,7 @@ const FILTER_CATEGORIES: Record<Exclude<Filter, "all">, string[]> = {
 
 export default function ProjectsGrid() {
     const searchParams = useSearchParams();
+    const [viewMode, setViewMode] = useState<"selection" | "gallery">("selection");
     const [tab, setTab] = useState<Tab>("architectural");
     const [filter, setFilter] = useState<Filter>("all");
     const { navigate } = useRouteTransition();
@@ -32,6 +33,7 @@ export default function ProjectsGrid() {
     useEffect(() => {
         const categorySlug = searchParams.get("category");
         if (categorySlug) {
+            setViewMode("gallery");
             if (categorySlug === "residential-architecture") {
                 setTab("architectural"); setFilter("residential");
             } else if (categorySlug === "commercial-architecture") {
@@ -60,8 +62,53 @@ export default function ProjectsGrid() {
                     display: flex;
                     flex-direction: column;
                 }
+                .pg-selection-view {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    padding: clamp(140px, 18vh, 180px) clamp(24px, 6vw, 80px) clamp(60px, 10vh, 100px);
+                }
+                .pg-selection-grid {
+                    display: grid;
+                    grid-template-columns: 1fr;
+                    gap: 24px;
+                    width: 100%;
+                    max-width: 1200px;
+                    margin-top: 48px;
+                }
+                @media (min-width: 768px) {
+                    .pg-selection-grid {
+                        grid-template-columns: 1fr 1fr;
+                        gap: 40px;
+                    }
+                }
+                .pg-header-top {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 16px;
+                }
+                .pg-back-btn {
+                    align-self: flex-start;
+                    background: none;
+                    border: none;
+                    color: rgba(227,228,224,0.6);
+                    font-family: var(--font-geist-sans), sans-serif;
+                    font-size: 0.75rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.15em;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 8px 0;
+                    transition: color 0.3s ease;
+                }
+                .pg-back-btn:hover {
+                    color: #fff;
+                }
                 .pg-header {
-                    padding: clamp(100px, 14vh, 140px) clamp(24px, 6vw, 80px) clamp(32px, 5vw, 56px);
+                    padding: clamp(40px, 6vh, 60px) clamp(24px, 6vw, 80px) clamp(32px, 5vw, 56px);
                     border-bottom: 1px solid rgba(255,255,255,0.06);
                 }
                 .pg-eyebrow {
@@ -258,25 +305,72 @@ export default function ProjectsGrid() {
                 }
             `}</style>
 
-            <main className="pg-wrap">
-                {/* Header */}
-                <div className="pg-header">
-                    <span className="pg-eyebrow">Our Work</span>
-                    <h1 className="pg-heading">Explore Our Projects</h1>
-                    <div className="pg-tabs" role="tablist">
-                        {(["architectural", "interior"] as Tab[]).map((t) => (
-                            <button
-                                key={t}
-                                role="tab"
-                                aria-selected={tab === t}
-                                className={`pg-tab${tab === t ? " active" : ""}`}
-                                onClick={() => { setTab(t); setFilter("all"); }}
-                            >
-                                {t === "architectural" ? "Architectural" : "Interior"}
-                            </button>
-                        ))}
+            <main className="pg-wrap animate-in fade-in duration-700">
+                {viewMode === "selection" ? (
+                    <div className="pg-selection-view">
+                        <span className="pg-eyebrow text-center mb-4">Our Work</span>
+                        <h1 className="pg-heading text-center mb-8">Explore Our Projects</h1>
+                        
+                        <div className="pg-selection-grid">
+                            {[
+                                { 
+                                    id: "architectural", 
+                                    title: "Architectural", 
+                                    img: ALL_PROJECTS.find(p => TAB_CATEGORIES["architectural"].includes(p.category))?.coverImage 
+                                },
+                                { 
+                                    id: "interior", 
+                                    title: "Interior", 
+                                    img: ALL_PROJECTS.find(p => TAB_CATEGORIES["interior"].includes(p.category))?.coverImage 
+                                }
+                            ].map((cat) => (
+                                <button
+                                    key={cat.id}
+                                    onClick={() => {
+                                        setTab(cat.id as Tab);
+                                        setViewMode("gallery");
+                                        setFilter("all");
+                                    }}
+                                    className="group relative flex flex-col justify-end h-[420px] md:h-[540px] w-full overflow-hidden rounded-[2px] bg-[#111] shadow-2xl outline-none text-left"
+                                >
+                                    {cat.img && (
+                                        <Image
+                                            src={cat.img}
+                                            alt={cat.title}
+                                            fill
+                                            className="object-cover transition-transform duration-[800ms] ease-out group-hover:scale-105"
+                                        />
+                                    )}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/10 transition-opacity duration-500 group-hover:opacity-100" />
+                                    <div className="relative z-10 p-8 md:p-10 transform transition-transform duration-500 group-hover:-translate-y-2 flex flex-col items-start">
+                                        <h3 className="text-3xl md:text-4xl font-serif text-white tracking-wide mb-6">{cat.title} Projects</h3>
+                                        <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2.5 backdrop-blur-md transition-colors duration-300 group-hover:bg-white/20 group-hover:border-white/40">
+                                            <span className="text-xs font-sans tracking-wide text-white uppercase">
+                                                Explore
+                                            </span>
+                                            <span className="text-white">→</span>
+                                        </div>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                </div>
+                ) : (
+                    <>
+                          {/* Header */}
+                        <div className="pg-header">
+                            <div className="pg-header-top">
+                                <button onClick={() => setViewMode("selection")} className="pg-back-btn">
+                                    <span>←</span> Back to Categories
+                                </button>
+                                <div>
+                                    <span className="pg-eyebrow">Our Work</span>
+                                    <h1 className="pg-heading" style={{ marginBottom: 0 }}>
+                                        {tab === "architectural" ? "Architectural Projects" : "Interior Projects"}
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
 
                 <div className="pg-body">
                     {/* Sidebar filter */}
@@ -294,11 +388,13 @@ export default function ProjectsGrid() {
                         ))}
                     </aside>
 
-                    {/* Grid */}
-                    <div className="pg-grid-wrap" style={{ padding: 0, overflow: "hidden" }}>
-                        <ProjectSlider projects={visibleProjects} />
+                    {/* Gallery */}
+                    <div className="flex-1">
+                        <ImageGallery projects={visibleProjects} itemsPerRow={visibleProjects.length <= 4 ? 2 : 3} />
                     </div>
                 </div>
+                </>
+                )}
             </main>
         </>
     );

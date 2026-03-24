@@ -12,7 +12,7 @@ const COL1 = [
     { label: "Gallery", href: "/gallery" },
 ];
 const COL2 = [
-    { label: "Journal", href: "/journal" },
+    { label: "Blog", href: "/journal" },
     { label: "Contact", href: "/contact" },
     { label: "Careers", href: "/careers" },
 ];

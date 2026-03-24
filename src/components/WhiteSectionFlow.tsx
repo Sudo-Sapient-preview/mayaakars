@@ -23,8 +23,8 @@ const INSTAGRAM_URL = "https://www.instagram.com/mayaakars/";
 const FACEBOOK_URL = "https://www.facebook.com/profile.php?id=100088682401205";
 
 export default function WhiteSectionFlow({
-  heading = "Let's Design Something Meaningful",
-  subtext = "Whether you are building from the ground up or reimagining an existing space, Mayaakars offers a thoughtful, integrated approach to architecture and interior design.",
+  heading = "Let's Shape Your Vision",
+  subtext = "Whether you are building from the ground up or reimagining an existing space, Mayaakars offers a thoughtful and integrated approach to architecture and interior design.",
   primaryLabel = "Schedule a Consultation",
   primaryHref = "/contact",
   secondaryLabel = "Get in Touch",

@@ -8,8 +8,8 @@ const IntroLogoOverlay = dynamic(
   () => import("@/components/loading/IntroLogoOverlay"),
   { ssr: false }
 );
-const ServicesBlocks = dynamic(
-  () => import("@/components/services/ServicesBlocks"),
+const ServicesAccordion = dynamic(
+  () => import("@/components/home/ServicesAccordion"),
   { ssr: false }
 );
 const ProjectsCarousel = dynamic(
@@ -334,7 +334,7 @@ export default function Home() {
         }}
       >
         <HeroSection onReady={() => setCriticalAssetsReady(true)} />
-        <ServicesBlocks showSectionLabel />
+        <ServicesAccordion />
         <ProjectsCarousel />
         <Testimonials />
         <ProcessSteps />

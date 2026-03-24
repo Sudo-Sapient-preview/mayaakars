@@ -642,10 +642,10 @@ export default function JournalPage() {
         </div>
         <section ref={whiteSectionRef} className="manual-white-section">
           <div className="manual-white-content">
-            <h2 className="manual-white-title">Let&apos;s Design Something Meaningful</h2>
+            <h2 className="manual-white-title">Let&apos;s Shape Your Vision</h2>
             <p className="manual-white-sub">
               Whether you are building from the ground up or reimagining an existing space, Mayaakars offers a
-              thoughtful, integrated approach to architecture and interior design.
+              thoughtful and integrated approach to architecture and interior design.
             </p>
             <div className="manual-white-actions">
               <a href="/contact">Schedule a Consultation</a>

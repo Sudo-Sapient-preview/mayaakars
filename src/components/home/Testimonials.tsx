@@ -34,15 +34,19 @@ const BRANDS = [
   { name: "Lamp Craft", file: "lamp craft.webp" },
   { name: "Reliance", file: "Reliance.webp" },
   { name: "Address Makers", file: "Address_Makers.webp" },
-  { name: "Asian Royale", file: "asain royale.webp" },
-  { name: "Century Wood", file: "Century_Plyboards.webp" },
+  { name: "Bosch", file: "Bosch Logo.webp" },
+  { name: "Hettich", file: "Hettich Logo.webp" },
+  { name: "Kohler", file: "Kohler.webp" },
+  { name: "Phillips Lighting", file: "Phillips Lighing Logo.webp" },
+  { name: "Royal Touche", file: "Royal Touche Logo.webp" },
+  { name: "Saint Gobain", file: "Saint Gobain.webp" },
 ];
 
 const CLIENTS = [
-  "Living Walls",
-  "Waverly",
-  "Automac",
-  "Agrocorp",
+  { name: "Living Walls", file: "Living Walls Logo.webp" },
+  { name: "Waverly", file: "Waverly Logo.webp" },
+  { name: "Automac", file: "AutoMac Logo .webp" },
+  { name: "Agrocorp", file: "agrocorp logo .webp" },
 ];
 
 export default function Testimonials() {
@@ -89,10 +93,10 @@ export default function Testimonials() {
     const brands = brandsRef.current;
     if (!brands) return;
 
-    const items = brands.querySelectorAll<HTMLElement>(".brand-item");
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
+          const items = brands.querySelectorAll<HTMLElement>(".brand-item");
           gsap.fromTo(
             items,
             { y: 18, opacity: 0 },
@@ -101,7 +105,7 @@ export default function Testimonials() {
           observer.disconnect();
         }
       },
-      { threshold: 0.25 }
+      { threshold: 0.05 }
     );
     observer.observe(brands);
     return () => observer.disconnect();
@@ -247,9 +251,11 @@ export default function Testimonials() {
         </div>
       </div>
 
+      {/* Brand partners + Clients wrapper */}
+      <div ref={brandsRef}>
+
       {/* Brand partners */}
       <div
-        ref={brandsRef}
         className="max-w-6xl mx-auto pt-20"
         style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
       >
@@ -278,10 +284,10 @@ export default function Testimonials() {
           </h4>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-10 items-center px-4">
-          {BRANDS.map((brand) => (
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-10 items-center px-4">
+          {[...BRANDS, ...CLIENTS].map((item) => (
             <div
-              key={brand.name}
+              key={item.name}
               className="brand-item flex flex-col items-center gap-3"
               style={{ opacity: 0 }}
             >
@@ -300,10 +306,10 @@ export default function Testimonials() {
                 }}
               >
                 <Image
-                  src={`/brands/${brand.file}`}
-                  alt={brand.name}
+                  src={`/brands/${encodeURIComponent(item.file)}`}
+                  alt={item.name}
                   fill
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, (max-width: 1440px) 14vw, 12vw"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, (max-width: 1440px) 20vw, 16vw"
                   className="object-contain"
                 />
               </div>
@@ -315,68 +321,14 @@ export default function Testimonials() {
                   color: "rgba(255,255,255,0.45)",
                 }}
               >
-                {brand.name}
+                {item.name}
               </span>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Clients */}
-      <div
-        className="max-w-6xl mx-auto pt-16 mt-16"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
-      >
-        <div className="text-center mb-12">
-          <p
-            className="uppercase mb-3"
-            style={{
-              letterSpacing: "0.42em",
-              fontSize: "8px",
-              color: "rgba(255,255,255,0.25)",
-              fontWeight: 600,
-            }}
-          >
-            Clients
-          </p>
-          <h4
-            className="font-light italic"
-            style={{
-              fontFamily: "var(--font-cormorant), serif",
-              fontSize: "1.35rem",
-              color: "rgba(227,228,224,0.5)",
-              letterSpacing: "0.02em",
-            }}
-          >
-            Spaces We Have Shaped
-          </h4>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-px" style={{ border: "1px solid rgba(255,255,255,0.07)" }}>
-          {CLIENTS.map((client) => (
-            <div
-              key={client}
-              className="flex items-center justify-center px-6 py-10 group cursor-default"
-              style={{ borderRight: "1px solid rgba(255,255,255,0.07)" }}
-            >
-              <span
-                className="transition-colors duration-300 !group-hover:text-white sm:group-hover:!text-white group-hover:!text-white"
-                style={{
-                  fontFamily: "var(--font-cormorant), serif",
-                  fontSize: "clamp(1.1rem, 2vw, 1.45rem)",
-                  fontWeight: 400,
-                  letterSpacing: "0.08em",
-                  color: "rgba(227,228,224,0.55)",
-                  textAlign: "center",
-                  fontStyle: "italic",
-                }}
-              >
-                {client}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
+      </div>{/* end brandsRef wrapper */}
     </section>
   );
 }

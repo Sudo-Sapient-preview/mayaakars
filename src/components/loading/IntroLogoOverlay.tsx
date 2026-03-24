@@ -305,7 +305,7 @@ export default function IntroLogoOverlay({
             />
           </div>
 
-          <h1 className="intro-word whitespace-nowrap font-serif text-[22px] leading-none tracking-[0.08em] text-[#E3E4E0] uppercase sm:text-[40px] sm:tracking-[0.15em] lg:text-[70px]">
+          <h1 className="intro-word whitespace-nowrap font-sans text-[22px] leading-none tracking-[0.08em] text-[#E3E4E0] uppercase sm:text-[40px] sm:tracking-[0.15em] lg:text-[70px]">
             {BRAND_NAME.split("").map((char, index) => (
               <span
                 key={`${char}-${index}`}

@@ -1,7 +1,42 @@
-import ServicesBlocks from "@/components/services/ServicesBlocks";
+"use client";
+
+import { useState, useRef, useEffect } from "react";
+import { SERVICES } from "@/lib/services-data";
 import Philosophy from "@/components/home/Philosophy";
+import HoverRevealCards from "@/components/ui/hover-reveal-cards";
+import ServiceDetail from "@/components/services/ServiceDetail";
+
+const CARD_ITEMS = SERVICES.map((service) => ({
+    id: service.slug,
+    title: service.title,
+    subtitle: service.subtitle,
+    slug: service.slug,
+    description: service.description || `Discover our specialized approach to ${service.title}.`,
+    imageUrl:
+        service.images[0]?.src ??
+        "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=2000&q=80",
+}));
 
 export default function ServicesPage() {
+  const [activeSlug, setActiveSlug] = useState<string | null>(null);
+  const detailRef = useRef<HTMLDivElement>(null);
+
+  const handleCardClick = (slug: string) => {
+    setActiveSlug(slug);
+  };
+
+  useEffect(() => {
+    if (activeSlug && detailRef.current) {
+      setTimeout(() => {
+        // Offset scroll slightly to account for fixed navbar if any
+        const y = detailRef.current!.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }, 100);
+    }
+  }, [activeSlug]);
+
+  const activeService = SERVICES.find((s) => s.slug === activeSlug);
+
   return (
     <main className="bg-[#050505] text-[#E3E4E0]">
       <section className="border-b border-white/[0.08] px-6 py-24 text-center md:py-28">
@@ -12,7 +47,7 @@ export default function ServicesPage() {
           Our Services
         </p>
         <h1
-          className="mx-auto mb-6 max-w-5xl text-[clamp(2.2rem,7vw,5rem)] uppercase leading-[0.92] text-white"
+          className="mx-auto mb-6 max-w-5xl text-[clamp(1.8rem,5vw,3.5rem)] uppercase leading-[0.92] text-white"
           style={{ fontFamily: "var(--font-cormorant), serif" }}
         >
           Explore What We Design
@@ -21,7 +56,19 @@ export default function ServicesPage() {
           Select a service to explore scope, process, and examples.
         </p>
       </section>
-      <ServicesBlocks />
+
+      <section className="bg-[#0A0A0A] py-16 px-6 md:px-12 lg:px-16 flex justify-center">
+        <HoverRevealCards 
+          items={CARD_ITEMS} 
+          className="max-w-[1600px] w-full" 
+          onCardClick={handleCardClick}
+        />
+      </section>
+
+      <div ref={detailRef} className="w-full">
+        {activeService && <ServiceDetail service={activeService} />}
+      </div>
+
       <Philosophy />
     </main>
   );
