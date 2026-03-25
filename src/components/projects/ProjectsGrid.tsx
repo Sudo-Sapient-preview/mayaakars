@@ -1,9 +1,9 @@
-    "use client";
+"use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
-import { useRouteTransition } from "@/components/navigation/RouteTransitionProvider";
+import { useRouter, useSearchParams } from "next/navigation";
+
 import manifest from "@/data/gallery-manifest.json";
 import ImageGallery from "@/components/ui/image-gallery";
 
@@ -25,26 +25,53 @@ const FILTER_CATEGORIES: Record<Exclude<Filter, "all">, string[]> = {
 
 export default function ProjectsGrid() {
     const searchParams = useSearchParams();
-    const [viewMode, setViewMode] = useState<"selection" | "gallery">("selection");
-    const [tab, setTab] = useState<Tab>("architectural");
-    const [filter, setFilter] = useState<Filter>("all");
-    const { navigate } = useRouteTransition();
+    const router = useRouter();
 
+    // Derive state directly from URL — makes refresh work correctly
+    const urlView = searchParams.get("view") as "selection" | "gallery" | null;
+    const urlTab = searchParams.get("tab") as Tab | null;
+    const urlFilter = searchParams.get("filter") as Filter | null;
+
+    const viewMode: "selection" | "gallery" = urlView === "gallery" ? "gallery" : "selection";
+    const tab: Tab = urlTab === "interior" ? "interior" : "architectural";
+    const [filter, setFilter] = useState<Filter>(urlFilter ?? "all");
+
+
+
+    // Keep filter in sync when navigating via category param (from external links)
     useEffect(() => {
         const categorySlug = searchParams.get("category");
         if (categorySlug) {
-            setViewMode("gallery");
+            let newTab: Tab = "architectural";
+            let newFilter: Filter = "all";
             if (categorySlug === "residential-architecture") {
-                setTab("architectural"); setFilter("residential");
+                newTab = "architectural"; newFilter = "residential";
             } else if (categorySlug === "commercial-architecture") {
-                setTab("architectural"); setFilter("commercial");
+                newTab = "architectural"; newFilter = "commercial";
             } else if (categorySlug === "residential-interiors") {
-                setTab("interior"); setFilter("residential");
+                newTab = "interior"; newFilter = "residential";
             } else if (categorySlug === "commercial-interior") {
-                setTab("interior"); setFilter("commercial");
+                newTab = "interior"; newFilter = "commercial";
             }
+            router.replace(`/projects?view=gallery&tab=${newTab}&filter=${newFilter}`);
         }
-    }, [searchParams]);
+    }, [searchParams, router]);
+
+    // Sync filter state to URL when it changes
+    function handleFilterChange(f: Filter) {
+        setFilter(f);
+        router.push(`/projects?view=gallery&tab=${tab}&filter=${f}`, { scroll: false });
+    }
+
+    function goToGallery(selectedTab: Tab) {
+        router.push(`/projects?view=gallery&tab=${selectedTab}&filter=all`, { scroll: false });
+        setFilter("all");
+    }
+
+    function goToSelection() {
+        router.push(`/projects`, { scroll: false });
+        setFilter("all");
+    }
 
     const tabCats = TAB_CATEGORIES[tab];
     const visibleProjects = ALL_PROJECTS.filter((p) => {
@@ -106,6 +133,42 @@ export default function ProjectsGrid() {
                 }
                 .pg-back-btn:hover {
                     color: #fff;
+                }
+                .pg-back-section {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 24px;
+                    padding: clamp(56px, 10vh, 100px) clamp(24px, 6vw, 80px);
+                    border-top: 1px solid rgba(255,255,255,0.06);
+                }
+                .pg-back-circle {
+                    width: 52px;
+                    height: 52px;
+                    border-radius: 50%;
+                    border: 1.5px solid #C49A3A;
+                    flex-shrink: 0;
+                }
+                .pg-back-cta {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0;
+                    padding: 16px 40px;
+                    border: 1px solid rgba(255,255,255,0.55);
+                    border-radius: 999px;
+                    color: #fff;
+                    background: transparent;
+                    font-family: var(--font-geist-sans), sans-serif;
+                    font-size: 0.72rem;
+                    letter-spacing: 0.22em;
+                    text-transform: uppercase;
+                    cursor: pointer;
+                    transition: background 0.35s ease, border-color 0.35s ease;
+                }
+                .pg-back-cta:hover {
+                    background: rgba(255,255,255,0.06);
+                    border-color: rgba(255,255,255,0.85);
                 }
                 .pg-header {
                     padding: clamp(40px, 6vh, 60px) clamp(24px, 6vw, 80px) clamp(32px, 5vw, 56px);
@@ -326,11 +389,7 @@ export default function ProjectsGrid() {
                             ].map((cat) => (
                                 <button
                                     key={cat.id}
-                                    onClick={() => {
-                                        setTab(cat.id as Tab);
-                                        setViewMode("gallery");
-                                        setFilter("all");
-                                    }}
+                                    onClick={() => goToGallery(cat.id as Tab)}
                                     className="group relative flex flex-col justify-end h-[420px] md:h-[540px] w-full overflow-hidden rounded-[2px] bg-[#111] shadow-2xl outline-none text-left"
                                 >
                                     {cat.img && (
@@ -357,18 +416,12 @@ export default function ProjectsGrid() {
                     </div>
                 ) : (
                     <>
-                          {/* Header */}
                         <div className="pg-header">
-                            <div className="pg-header-top">
-                                <button onClick={() => setViewMode("selection")} className="pg-back-btn">
-                                    <span>←</span> Back to Categories
-                                </button>
-                                <div>
-                                    <span className="pg-eyebrow">Our Work</span>
-                                    <h1 className="pg-heading" style={{ marginBottom: 0 }}>
-                                        {tab === "architectural" ? "Architectural Projects" : "Interior Projects"}
-                                    </h1>
-                                </div>
+                            <div>
+                                <span className="pg-eyebrow">Our Work</span>
+                                <h1 className="pg-heading" style={{ marginBottom: 0 }}>
+                                    {tab === "architectural" ? "Architectural Projects" : "Interior Projects"}
+                                </h1>
                             </div>
                         </div>
 
@@ -380,7 +433,7 @@ export default function ProjectsGrid() {
                             <button
                                 key={f}
                                 className={`pg-filter-btn${filter === f ? " active" : ""}`}
-                                onClick={() => setFilter(f)}
+                                onClick={() => handleFilterChange(f)}
                             >
                                 <span className="pg-filter-dot" />
                                 {f === "all" ? "All" : f.charAt(0).toUpperCase() + f.slice(1)}
@@ -392,6 +445,14 @@ export default function ProjectsGrid() {
                     <div className="flex-1">
                         <ImageGallery projects={visibleProjects} itemsPerRow={visibleProjects.length <= 4 ? 2 : 3} />
                     </div>
+                </div>
+
+                {/* Back to Categories — bottom CTA */}
+                <div className="pg-back-section">
+                    <div className="pg-back-circle" />
+                    <button onClick={goToSelection} className="pg-back-cta">
+                        Back to Categories
+                    </button>
                 </div>
                 </>
                 )}

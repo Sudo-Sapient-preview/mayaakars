@@ -2,6 +2,7 @@
 
 import { SERVICES } from "@/lib/services-data";
 import HoverRevealCards from "@/components/ui/hover-reveal-cards";
+import { useRouteTransition } from "@/components/navigation/RouteTransitionProvider";
 
 const CARD_ITEMS = SERVICES.map((service) => ({
     id: service.slug,
@@ -26,9 +27,15 @@ export default function ServicesAccordion({
     compactTitles = false,
     titleScale = "default",
 }: ServicesAccordionProps) {
+    const { navigate } = useRouteTransition();
+
+    const handleCardClick = (slug: string) => {
+        navigate(`/services?service=${slug}`);
+    };
+
     return (
-        <section className="mk-home-dark-section relative z-[2] min-h-screen w-full flex flex-col justify-center py-24 overflow-hidden bg-[#0A0A0A]">
-            
+        <section className="mk-home-dark-section relative z-[2] min-h-screen w-full flex flex-col justify-center py-24 overflow-hidden">
+
             <div className="relative z-10 w-full max-w-[1600px] mx-auto px-6 md:px-12 lg:px-16">
                 <div className="mb-12 md:mb-20">
                     <p className="text-[10px] uppercase tracking-[0.4em] text-[#C49A3A] mb-4 font-sans max-[768px]:text-center">
@@ -38,9 +45,9 @@ export default function ServicesAccordion({
                         Services
                     </h2>
                 </div>
-              
+
                 <div className="flex w-full items-center justify-center">
-                    <HoverRevealCards items={CARD_ITEMS} className="max-w-none md:gap-4 lg:gap-6" />
+                    <HoverRevealCards items={CARD_ITEMS} className="max-w-none md:gap-4 lg:gap-6" onCardClick={handleCardClick} />
                 </div>
             </div>
         </section>

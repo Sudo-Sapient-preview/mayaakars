@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { Suspense, useState, useRef, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { SERVICES } from "@/lib/services-data";
 import Philosophy from "@/components/home/Philosophy";
 import HoverRevealCards from "@/components/ui/hover-reveal-cards";
@@ -17,9 +18,18 @@ const CARD_ITEMS = SERVICES.map((service) => ({
         "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=2000&q=80",
 }));
 
-export default function ServicesPage() {
+function ServicesContent() {
+  const searchParams = useSearchParams();
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
   const detailRef = useRef<HTMLDivElement>(null);
+
+  // Auto-open service from query param (e.g. ?service=3d-visualisation)
+  useEffect(() => {
+    const param = searchParams.get("service");
+    if (param && SERVICES.some((s) => s.slug === param)) {
+      setActiveSlug(param);
+    }
+  }, [searchParams]);
 
   const handleCardClick = (slug: string) => {
     setActiveSlug(slug);
@@ -28,7 +38,6 @@ export default function ServicesPage() {
   useEffect(() => {
     if (activeSlug && detailRef.current) {
       setTimeout(() => {
-        // Offset scroll slightly to account for fixed navbar if any
         const y = detailRef.current!.getBoundingClientRect().top + window.scrollY - 80;
         window.scrollTo({ top: y, behavior: 'smooth' });
       }, 100);
@@ -58,9 +67,9 @@ export default function ServicesPage() {
       </section>
 
       <section className="bg-[#0A0A0A] py-16 px-6 md:px-12 lg:px-16 flex justify-center">
-        <HoverRevealCards 
-          items={CARD_ITEMS} 
-          className="max-w-[1600px] w-full" 
+        <HoverRevealCards
+          items={CARD_ITEMS}
+          className="max-w-[1600px] w-full"
           onCardClick={handleCardClick}
         />
       </section>
@@ -71,5 +80,13 @@ export default function ServicesPage() {
 
       <Philosophy />
     </main>
+  );
+}
+
+export default function ServicesPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#050505]" />}>
+      <ServicesContent />
+    </Suspense>
   );
 }
