@@ -384,7 +384,7 @@ export default function ProjectsGrid() {
                                 { 
                                     id: "interior", 
                                     title: "Interior", 
-                                    img: "/gallery/Residential Interior .webp"
+                                    img: "/Mayaakars/Residential Interior .webp"
                                 }
                             ].map((cat) => (
                                 <button
@@ -449,7 +449,6 @@ export default function ProjectsGrid() {
 
                 {/* Back to Categories — bottom CTA */}
                 <div className="pg-back-section">
-                    <div className="pg-back-circle" />
                     <button onClick={goToSelection} className="pg-back-cta">
                         Back to Categories
                     </button>

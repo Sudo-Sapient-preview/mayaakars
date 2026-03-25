@@ -172,6 +172,23 @@
   transform: rotate(-180deg) scale(2);
 }
 
+/* Rotation Transition Variant */
+.mk-route-wipe-rotation .mk-route-wipe-left .mk-route-wipe-inner {
+  transform-origin: 50% 50%;
+  transform: rotate(90deg) scale(2.5);
+}
+.mk-route-wipe-rotation .mk-route-wipe-right .mk-route-wipe-inner {
+  transform-origin: 50% 50%;
+  transform: rotate(-90deg) scale(2.5);
+}
+.mk-route-wipe-rotation.is-covering .mk-route-wipe-inner {
+  transform: rotate(0deg) scale(2.5) !important;
+}
+.mk-route-wipe-rotation.is-revealing .mk-route-wipe-inner {
+  transform: rotate(-180deg) scale(2.5) !important;
+}
+
+
 @media (max-width: 768px) {
   .mk-route-wipe-half {
     width: 100%;

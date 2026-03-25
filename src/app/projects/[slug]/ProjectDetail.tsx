@@ -184,7 +184,7 @@ export default function ProjectDetail({ project }: { project: Project }) {
 
                 {/* Simplified CTA */}
                 <section className="pd-cta">
-                    <Link href="/projects" className="pd-cta-btn">
+                    <Link href={backUrl} className="pd-cta-btn" data-transition="rotation">
                         Back to Projects
                         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                             <path d="M11 7H3M6 4L3 7l3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
