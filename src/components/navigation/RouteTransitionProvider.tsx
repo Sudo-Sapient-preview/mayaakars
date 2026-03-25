@@ -14,6 +14,7 @@ import { usePathname, useRouter } from "next/navigation";
 type NavigateOptions = {
   replace?: boolean;
   scroll?: boolean;
+  mode?: "wipe" | "rotation";
 };
 
 type RouteTransitionContextValue = {
@@ -25,6 +26,7 @@ type PendingNavigation = {
   href: string;
   options: NavigateOptions;
 };
+
 
 const COVER_DURATION_MS = 1250;
 const REVEAL_DURATION_MS = 1250;
@@ -72,7 +74,9 @@ export default function RouteTransitionProvider({
   const pathname = usePathname();
 
   const [phase, setPhase] = useState<"idle" | "covering" | "revealing">("idle");
+  const [mode, setMode] = useState<"wipe" | "rotation">("wipe");
   const [isTransitioning, setIsTransitioning] = useState(false);
+
 
   const pendingNavigationRef = useRef<PendingNavigation | null>(null);
   const hasIssuedNavigationRef = useRef(false);
@@ -138,11 +142,13 @@ export default function RouteTransitionProvider({
       if (isTransitioning) return;
 
       clearTimers();
+      const transitionMode = (options as any).mode || "wipe";
       pendingNavigationRef.current = { href: targetHref, options };
       hasIssuedNavigationRef.current = false;
 
       setIsTransitioning(true);
       setPhase("covering");
+      setMode(transitionMode);
       window.dispatchEvent(new Event("mayaakars:route-transition-start"));
 
       coverTimerRef.current = window.setTimeout(() => {
@@ -235,10 +241,15 @@ export default function RouteTransitionProvider({
       if (targetWithoutHash === currentWithoutHash && parsed.hash) return;
 
       event.preventDefault();
+      
+      const targetMode = anchor.getAttribute("data-transition") || "wipe";
+      
       navigate(`${parsed.pathname}${parsed.search}${parsed.hash}`, {
         scroll: anchor.dataset.scroll !== "false",
+        mode: targetMode as any
       });
     };
+
 
     document.addEventListener("click", onDocumentClick, true);
     return () => {
@@ -265,7 +276,7 @@ export default function RouteTransitionProvider({
       {children}
       <div
         aria-hidden
-        className={`mk-route-wipe ${
+        className={`mk-route-wipe mk-route-wipe-${mode} ${
           phase === "idle" ? "" : phase === "covering" ? "is-covering" : "is-revealing"
         }`}
       >

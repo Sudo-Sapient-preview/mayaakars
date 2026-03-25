@@ -18,7 +18,21 @@ export default function ProjectsCarousel() {
     useEffect(() => {
         fetch("/api/projects")
             .then((r) => r.json())
-            .then(setProjects)
+            .then((data: ProjectCategory[]) => {
+                const mapped = data.map(project => {
+                    if (project.slug === "commercial-architecture") {
+                        return { ...project, coverImage: "/Mayaakars/Commercial Architecture.webp" };
+                    }
+                    if (project.slug === "residential-interiors") {
+                        return { ...project, coverImage: "/Mayaakars/Residential Interior .webp" };
+                    }
+                    if (project.slug === "residential-architecture") {
+                        return { ...project, coverImage: "/gallery/Residential Architecture .webp" };
+                    }
+                    return project;
+                });
+                setProjects(mapped);
+            })
             .catch(console.error);
     }, []);
 
