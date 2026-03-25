@@ -1,7 +1,10 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { gsap } from "gsap";
+import { CustomEase } from "gsap/CustomEase";
 import { getServiceBySlug } from "@/lib/services-data";
 import ServiceSlider from "@/components/services/ServiceSlider";
 
@@ -9,6 +12,26 @@ export default function ServiceDetailPage() {
     const params = useParams();
     const slug = params.slug as string;
     const service = getServiceBySlug(slug);
+    const introRef = useRef<HTMLElement>(null);
+
+    useEffect(() => {
+        if (!introRef.current) return;
+
+        gsap.registerPlugin(CustomEase);
+        CustomEase.create("hop", "0.85, 0, 0.15, 1");
+
+        const ctx = gsap.context(() => {
+            gsap.to(".svc-intro-line", {
+                y: 0,
+                duration: 0.9,
+                ease: "power3.out",
+                stagger: 0.1,
+                delay: 1.0,
+            });
+        }, introRef);
+
+        return () => ctx.revert();
+    }, [slug]);
 
     if (!service) {
         return (
@@ -23,10 +46,16 @@ export default function ServiceDetailPage() {
             <style dangerouslySetInnerHTML={{ __html: PAGE_STYLES }} />
 
             {/* ── Section 1: Title + Description ── */}
-            <section className="svc-intro">
-                <span className="svc-label">{service.subtitle}</span>
-                <h1 className="svc-title">{service.title}</h1>
-                <p className="svc-desc">{service.description}</p>
+            <section ref={introRef} className="svc-intro">
+                <div className="svc-intro-clip">
+                    <span className="svc-label svc-intro-line">{service.subtitle}</span>
+                </div>
+                <div className="svc-intro-clip">
+                    <h1 className="svc-title svc-intro-line">{service.title}</h1>
+                </div>
+                <div className="svc-intro-clip">
+                    <p className="svc-desc svc-intro-line">{service.description}</p>
+                </div>
             </section>
 
             {/* ── Section 2: 3D Slider Hero ── */}
@@ -62,14 +91,22 @@ export default function ServiceDetailPage() {
 const PAGE_STYLES = `
   /* ── Intro Section ── */
   .svc-intro {
-    min-height: 100vh;
+    min-height: 75vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 120px 24px 80px;
+    padding: clamp(80px, 12vh, 120px) 24px clamp(40px, 6vh, 56px);
     position: relative;
+  }
+  .svc-intro-clip {
+    overflow: hidden;
+  }
+  .svc-intro-line {
+    display: block;
+    transform: translateY(110%);
+    will-change: transform;
   }
   .svc-label {
     font-size: 0.7rem;
@@ -178,8 +215,8 @@ const PAGE_STYLES = `
 
   @media (max-width: 768px) {
 	    .svc-intro {
-	      padding: 88px 20px 44px;
-	      min-height: auto;
+	      padding: 88px 20px 36px;
+	      min-height: 65vh;
 	    }
 	    .svc-title {
 	      font-size: clamp(2rem, 8.4vw, 2.8rem);

@@ -181,7 +181,7 @@ export default function Home() {
           align-items: center;
           justify-content: center;
           text-align: center;
-          padding: clamp(64px, 12vh, 120px) 24px;
+          padding: clamp(80px, 15vh, 160px) 24px;
         }
 
         .mk-home-white-content {
@@ -341,10 +341,9 @@ export default function Home() {
         <Philosophy />
         <section ref={whiteSectionRef} className="mk-home-white-section">
           <div className="mk-home-white-content">
-            <h2 className="mk-home-white-title">Let&apos;s Design Something Meaningful</h2>
+            <h2 className="mk-home-white-title">Let&apos;s Shape Your Vision</h2>
             <p className="mk-home-white-sub">
-              Whether you are building from the ground up or reimagining an existing space, Mayaakars offers a
-              thoughtful, integrated approach to architecture and interior design.
+              Whether you are building from the ground up or reimagining an existing space, Mayaakars offers a thoughtful and integrated approach to architecture and interior design.
             </p>
             <div className="mk-home-white-actions">
               <a href="/contact">Schedule a Consultation</a>

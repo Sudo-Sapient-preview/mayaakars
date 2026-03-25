@@ -30,7 +30,7 @@ export default function Philosophy() {
   return (
     <section
       ref={sectionRef}
-      className="philosophy-section relative z-[2] flex min-h-[60vh] items-center justify-center px-6 py-24 md:min-h-[70vh]"
+      className="philosophy-section relative z-[2] flex min-h-[60vh] items-center justify-center px-6 py-32 md:min-h-[70vh]"
     >
       <style
         dangerouslySetInnerHTML={{

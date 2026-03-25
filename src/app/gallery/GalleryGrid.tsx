@@ -99,13 +99,17 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
 
         const gridItems: HTMLImageElement[] = [];
 
+        const centerIndex = Math.floor(total / 2);
+        const priorityRadius = Math.ceil(total / 3);
+
         for (let i = 0; i < total; i += 1) {
             const src = images[i];
+            const isCenter = Math.abs(i - centerIndex) < priorityRadius;
 
             const img = document.createElement("img");
-            img.src = src;
             img.alt = "";
             img.decoding = "async";
+            img.fetchPriority = isCenter ? "high" : "low";
             img.classList.add("grid-item");
             img.dataset.imageId = src;
             img.setAttribute("data-interactive", "true");
@@ -122,6 +126,8 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
             img.style.left = `${c * cellW + cellW / 2 - preset.w / 2 + offsetX}px`;
             img.style.top = `${r * cellH + cellH / 2 - preset.h / 2 + offsetY}px`;
 
+            img.src = src;
+            img.style.opacity = "0"; // hidden until animation starts
             dragContainer.appendChild(img);
             gridItems.push(img);
         }
@@ -137,19 +143,37 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
             rafId = window.requestAnimationFrame(renderLoop);
         };
 
-        const tl = gsap.timeline({
-            onComplete: () => {
-                introFinished = true;
-                gsap.set(gridItems, { clearProps: "transform,opacity" });
-                dragContainer.style.transformStyle = "flat";
-                gridItems.forEach((img) => img.classList.add("grid-item--ready"));
-                startRaf();
-            },
-        });
+        // Wait for center images to load before starting animation (max 2.5s wait)
+        const centerItems = gridItems.filter((_, i) => Math.abs(i - centerIndex) < priorityRadius);
+        const imgLoadPromise = Promise.all(
+            centerItems.map((img) =>
+                img.complete
+                    ? Promise.resolve()
+                    : new Promise<void>((resolve) => {
+                          img.onload = () => resolve();
+                          img.onerror = () => resolve();
+                      })
+            )
+        );
+        const timeoutPromise = new Promise<void>((resolve) => setTimeout(resolve, 1500));
 
-        tl.fromTo(titleContainer, { z: -3000, opacity: 0 }, { z: -800, opacity: 0.9, duration: 4, ease: "power3.out" });
-        gsap.set(gridItems, { z: () => -3000 - Math.random() * 2000, opacity: 0 });
-        tl.to(gridItems, { z: 0, opacity: 1, duration: 4.5, ease: "power3.out", stagger: { amount: 2, from: "center" } }, "-=3.5");
+        let tl: gsap.core.Timeline | undefined;
+
+        Promise.race([imgLoadPromise, timeoutPromise]).then(() => {
+            tl = gsap.timeline({
+                onComplete: () => {
+                    introFinished = true;
+                    gridItems.forEach((img) => { img.style.opacity = ""; img.style.willChange = "auto"; });
+                    gsap.set(gridItems, { clearProps: "transform,opacity" });
+                    dragContainer.style.transformStyle = "flat";
+                    gridItems.forEach((img) => img.classList.add("grid-item--ready"));
+                    startRaf();
+                },
+            });
+            tl.fromTo(titleContainer, { z: -3000, opacity: 0 }, { z: -800, opacity: 0.9, duration: 4, ease: "power3.out" });
+            gsap.set(gridItems, { z: () => -3000 - Math.random() * 2000, opacity: 0 });
+            tl.to(gridItems, { z: 0, opacity: 1, duration: 4.5, ease: "power3.out", stagger: { amount: 2, from: "center" } }, "-=3.5");
+        });
 
         let currentX = window.innerWidth / 2 - gridW / 2;
         let currentY = window.innerHeight / 2 - gridH / 2;
@@ -301,7 +325,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
             window.removeEventListener("pointercancel", onPointerCancel);
             window.removeEventListener("blur", onWindowBlur);
             window.cancelAnimationFrame(rafId);
-            tl.kill();
+            tl?.kill();
             gsap.killTweensOf([sceneWrapper, titleContainer, ...gridItems]);
             dragContainer.innerHTML = "";
             document.body.style.cursor = "";
@@ -356,6 +380,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
           box-shadow: 0 15px 40px rgba(0,0,0,0.4);
           pointer-events: auto; -webkit-user-drag: none;
           background-color: #111; color: transparent; border-radius: 4px;
+          will-change: transform, opacity;
         }
         .mk-gallery-page .grid-item--ready {
           transition: transform 0.45s cubic-bezier(0.16,1,0.3,1), opacity 0.35s ease;

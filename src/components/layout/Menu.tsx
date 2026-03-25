@@ -6,7 +6,7 @@ import { gsap } from "gsap";
 import { CustomEase } from "gsap/CustomEase";
 
 const COL1 = [
-    { label: "About", href: "/about" },
+    { label: "About Us", href: "/about" },
     { label: "Projects", href: "/projects" },
     { label: "Services", href: "/services" },
     { label: "Gallery", href: "/gallery" },
@@ -146,38 +146,42 @@ export default function Menu({
             >
                 <div className="menu-col-1 flex-1 flex flex-col justify-center items-center gap-18 max-[1000px]:items-start max-[1000px]:gap-6 max-[640px]:gap-5 max-[1000px]:order-2">
                     {COL1.map((item) => (
-                        <div key={item.label} className="menu-link overflow-hidden">
-                            <Link
-                                href={item.href}
-                                data-interactive
-                                data-route-transition="false"
-                                onClick={onClose}
-                                className="uppercase font-medium tracking-[0.05em] text-black no-underline leading-none block"
-                                style={{ fontSize: "clamp(2.4rem, 7vw, 6rem)" }}
-                            >
-                                <span className="line block translate-y-[110%] will-change-transform">
-                                    {item.label}
-                                </span>
-                            </Link>
+                        <div key={item.label} className="menu-link">
+                            <span style={{ display: "block", overflow: "hidden", paddingTop: "0.12em", paddingBottom: "0.05em", marginTop: "-0.12em", marginBottom: "-0.05em" }}>
+                                <Link
+                                    href={item.href}
+                                    data-interactive
+                                    data-route-transition="false"
+                                    onClick={onClose}
+                                    className="uppercase font-medium tracking-[0.05em] text-black no-underline block"
+                                    style={{ fontSize: "clamp(1.8rem, 5vw, 4rem)", lineHeight: 1 }}
+                                >
+                                    <span className="line block translate-y-[110%] will-change-transform">
+                                        {item.label}
+                                    </span>
+                                </Link>
+                            </span>
                         </div>
                     ))}
                 </div>
 
                 <div className="menu-col-2 flex-1 flex flex-col justify-center items-center gap-18 max-[1000px]:items-start max-[1000px]:gap-6 max-[640px]:gap-5 max-[1000px]:order-1">
                     {COL2.map((item) => (
-                        <div key={item.label} className="menu-link overflow-hidden">
-                            <Link
-                                href={item.href}
-                                data-interactive
-                                data-route-transition="false"
-                                onClick={onClose}
-                                className="font-display italic text-black no-underline leading-none block"
-                                style={{ fontSize: "clamp(2.1rem, 6vw, 5.4rem)" }}
-                            >
-                                <span className="line block translate-y-[110%] will-change-transform">
-                                    {item.label}
-                                </span>
-                            </Link>
+                        <div key={item.label} className="menu-link">
+                            <span style={{ display: "block", overflow: "hidden", paddingTop: "0.05em", paddingBottom: "0.18em", marginTop: "-0.05em", marginBottom: "-0.18em" }}>
+                                <Link
+                                    href={item.href}
+                                    data-interactive
+                                    data-route-transition="false"
+                                    onClick={onClose}
+                                    className="font-display italic text-black no-underline block"
+                                    style={{ fontSize: "clamp(1.6rem, 4.5vw, 3.6rem)", lineHeight: 1.15 }}
+                                >
+                                    <span className="line block translate-y-[110%] will-change-transform">
+                                        {item.label}
+                                    </span>
+                                </Link>
+                            </span>
                         </div>
                     ))}
                 </div>
@@ -192,7 +196,7 @@ export default function Menu({
                             { label: "Terms", href: "/terms" },
                             { label: "Disclaimer", href: "/disclaimer" },
                         ].map((item) => (
-                            <div key={item.label} className="menu-link overflow-hidden">
+                            <div key={item.label} className="menu-link overflow-hidden py-[0.2em] -my-[0.2em]">
                                 <Link
                                     href={item.href}
                                     data-interactive
@@ -200,7 +204,7 @@ export default function Menu({
                                     onClick={onClose}
                                     className="menu-footer-link uppercase text-xl text-black no-underline leading-none block"
                                 >
-                                    <span className="line block translate-y-[110%] will-change-transform">
+                                    <span className="line block translate-y-[110%] will-change-transform pt-1">
                                         {item.label}
                                     </span>
                                 </Link>

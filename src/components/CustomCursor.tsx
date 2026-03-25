@@ -57,15 +57,11 @@ export default function CustomCursor() {
 
         let mouseX = window.innerWidth / 2;
         let mouseY = window.innerHeight / 2;
-        let ringX = mouseX;
-        let ringY = mouseY;
-
-        const speed = 0.18;
 
         const updateTarget = (e: MouseEvent) => {
             mouseX = e.clientX;
             mouseY = e.clientY;
-            startAnimate();
+            ringWrapper!.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
         };
 
         // Click state
@@ -94,28 +90,7 @@ export default function CustomCursor() {
         document.addEventListener("mouseover", onMouseOver);
         document.addEventListener("mouseout", onMouseOut);
 
-        // Lerp render loop for the trailing ring — stops when settled
-        let animationFrameId: number;
-        let rafRunning = false;
-        function animate() {
-            const dx = mouseX - ringX;
-            const dy = mouseY - ringY;
-            ringX += dx * speed;
-            ringY += dy * speed;
-            ringWrapper!.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
-            if (Math.abs(dx) < 0.15 && Math.abs(dy) < 0.15) {
-                rafRunning = false;
-                return;
-            }
-            animationFrameId = requestAnimationFrame(animate);
-        }
-        const startAnimate = () => {
-            if (rafRunning) return;
-            rafRunning = true;
-            animationFrameId = requestAnimationFrame(animate);
-        };
-
-        ringWrapper.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
+        ringWrapper!.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
 
         return () => {
             window.removeEventListener("mousemove", updateTarget as EventListener);
@@ -123,7 +98,6 @@ export default function CustomCursor() {
             window.removeEventListener("mouseup", onMouseUp);
             document.removeEventListener("mouseover", onMouseOver);
             document.removeEventListener("mouseout", onMouseOut);
-            cancelAnimationFrame(animationFrameId);
             document.body.classList.remove("cursor-hovering", "cursor-clicking");
         };
     }, [enabled]);

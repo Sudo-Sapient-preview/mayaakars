@@ -30,11 +30,11 @@ export default function ServicesAccordion({
     const { navigate } = useRouteTransition();
 
     const handleCardClick = (slug: string) => {
-        navigate(`/services?service=${slug}`);
+        navigate(`/services/${slug}`);
     };
 
     return (
-        <section className="mk-home-dark-section relative z-[2] min-h-screen w-full flex flex-col justify-center py-24 overflow-hidden">
+        <section className="mk-home-dark-section relative z-[2] min-h-screen w-full flex flex-col justify-center py-32 overflow-hidden">
 
             <div className="relative z-10 w-full max-w-[1600px] mx-auto px-6 md:px-12 lg:px-16">
                 <div className="mb-12 md:mb-20">

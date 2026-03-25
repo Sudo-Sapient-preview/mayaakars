@@ -44,7 +44,7 @@ const HoverRevealCards: React.FC<HoverRevealCardsProps> = ({
             aria-label={`${item.title}, ${item.subtitle}`}
             tabIndex={0}
             className={cn(
-              'group/card relative h-[420px] md:h-[500px] lg:h-[600px] w-full cursor-pointer overflow-hidden rounded-[2px] bg-cover bg-center shadow-lg transition-all duration-700 ease-in-out',
+              'group/card relative h-[420px] md:h-[500px] lg:h-[600px] w-full cursor-pointer overflow-hidden rounded-2xl border border-[#C49A3A]/20 bg-cover bg-center shadow-lg transition-all duration-700 ease-in-out',
               // On parent hover, apply these styles to all children.
               'group-hover:scale-[0.98] group-hover:opacity-40 group-hover:blur-[2px] group-hover:grayscale-[40%]',
               // On child hover/focus, override parent hover styles to highlight the current item.

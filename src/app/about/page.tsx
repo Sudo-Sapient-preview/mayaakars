@@ -13,14 +13,14 @@ const IMAGES = {
   hero: "/Mayaakars/interior-residencial/panorama-house/living-room-.webp",
   philosophy: "/Mayaakars/architect-residence/panorama-house/title-photo.webp",
   integrated: "/Mayaakars/architect-residence/panorama-house/22.webp",
-  journey: "/Mayaakars/founder.jpg",
+  journey: "/Mayaakars/founder.webp",
   approach: "/Mayaakars/interior-residencial/panorama-house/drawing-room-.webp",
   cta: "/Mayaakars/interior-residencial/house-of-13-arches/living-area.webp",
 };
 
 const STATS = [
   { value: "15+", label: "Years of Practice" },
-  { value: "80+", label: "Projects Delivered" },
+  { value: "500+", label: "Projects Delivered" },
   { value: "2", label: "Design Disciplines" },
   { value: "1", label: "Integrated Studio" },
 ];
@@ -62,61 +62,6 @@ export default function AboutPage() {
             },
           }
         );
-      });
-
-      // 2. Parallax and clip-path for Images
-      const imgWraps = gsap.utils.toArray<HTMLElement>(".gsap-img-wrap");
-      imgWraps.forEach((wrap) => {
-        // Image wrapper reveal
-        gsap.fromTo(
-          wrap,
-          { clipPath: "inset(100% 0% 0% 0%)" },
-          {
-            clipPath: "inset(0% 0% 0% 0%)",
-            duration: 1.5,
-            ease: "power4.inOut",
-            scrollTrigger: {
-              trigger: wrap,
-              start: "top 85%",
-              toggleActions: "play none none none",
-            },
-          }
-        );
-
-        // Zoom inside effect
-        const img = wrap.querySelector("img");
-        if (img) {
-          gsap.fromTo(
-            img,
-            { scale: 1.15 },
-            {
-              scale: 1,
-              duration: 1.8,
-              ease: "power3.out",
-              scrollTrigger: {
-                trigger: wrap,
-                start: "top 85%",
-                toggleActions: "play none none none",
-              },
-            }
-          );
-
-          // Parallax effect on scroll
-          gsap.fromTo(
-            img,
-            { yPercent: -5 },
-            {
-              yPercent: 5,
-              ease: "none",
-              scrollTrigger: {
-                trigger: wrap,
-                start: "top bottom",
-                end: "bottom top",
-                scrub: true,
-              },
-            }
-          );
-        }
       });
 
       // 3. Founder Circular Image reveal
@@ -210,6 +155,9 @@ export default function AboutPage() {
       section.classList.toggle("is-visible", ratio > 0.03);
       body.style.setProperty("--bg-color", mix("#050505", "#e3e4e0", blend));
       body.style.setProperty("--text-color", mix("#f2f2f2", "#0a0a0a", blend));
+      if (textureCanvasRef.current) {
+        textureCanvasRef.current.style.opacity = String(0.4 * (1 - blend));
+      }
       if (blend > 0.62) body.setAttribute("data-navbar-variant", "light");
       else if (prevVariant === null) body.removeAttribute("data-navbar-variant");
       else body.setAttribute("data-navbar-variant", prevVariant);
@@ -224,6 +172,7 @@ export default function AboutPage() {
       if (prevBg) body.style.setProperty("--bg-color", prevBg); else body.style.removeProperty("--bg-color");
       if (prevText) body.style.setProperty("--text-color", prevText); else body.style.removeProperty("--text-color");
       if (prevVariant === null) body.removeAttribute("data-navbar-variant"); else body.setAttribute("data-navbar-variant", prevVariant);
+      if (textureCanvasRef.current) textureCanvasRef.current.style.opacity = "0.4";
     };
   }, []);
 
@@ -233,7 +182,7 @@ export default function AboutPage() {
         .ab-divider { width: 40px; height: 1px; background: #C49A3A; margin-bottom: 20px; opacity: 0.7; }
 
         .gsap-img-wrap { overflow: hidden; border-radius: 2px; }
-        
+
         .ab-white-section {
           --cta-title-progress: 0;
           --cta-copy-progress: 0;
@@ -244,9 +193,6 @@ export default function AboutPage() {
           justify-content: center;
           text-align: center;
           padding: clamp(64px, 12vh, 120px) 24px;
-          background: var(--bg-color, #050505);
-          color: var(--text-color, #f2f2f2);
-          transition: background-color 2.4s cubic-bezier(0.19, 1, 0.22, 1), color 2.2s cubic-bezier(0.19, 1, 0.22, 1);
           position: relative;
           z-index: 2;
         }
@@ -354,7 +300,7 @@ export default function AboutPage() {
       {/* Dot texture — fixed behind everything */}
       <canvas ref={textureCanvasRef} style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none", opacity: 0.4 }} />
 
-      <main ref={mainRef} style={{ position: "relative", zIndex: 1, background: "transparent", color: "#E3E4E0" }}>
+      <main ref={mainRef} style={{ position: "relative", zIndex: 1, background: "var(--bg-color, #050505)", color: "var(--text-color, #f2f2f2)", transition: "background-color 2.4s cubic-bezier(0.19,1,0.22,1), color 2.2s cubic-bezier(0.19,1,0.22,1)" }}>
 
         {/* ── Hero ── */}
         <section
@@ -378,7 +324,7 @@ export default function AboutPage() {
               <h1 style={{ fontFamily: "var(--font-cormorant), serif", fontSize: "clamp(2.8rem, 7vw, 6rem)", fontWeight: 400, lineHeight: 1.02, letterSpacing: "0.01em", margin: "0 0 28px", color: "#E3E4E0" }}>
                 Where Dreams<br />Take Shape
               </h1>
-              <div style={{ fontFamily: "var(--font-geist-sans), sans-serif", fontSize: "clamp(0.9rem, 1.3vw, 1.05rem)", lineHeight: 1.85, color: "rgba(227,228,224,0.65)", maxWidth: "620px" }}>
+              <div style={{ fontFamily: "var(--font-geist-sans), sans-serif", fontSize: "clamp(0.9rem, 1.15vw, 1.05rem)", lineHeight: 1.85, color: "rgba(227,228,224,0.65)", maxWidth: "620px" }}>
                 The name Mayaakars is derived from two simple yet powerful ideas.<br />
                 <br />
                 <span style={{ color: "#E3E4E0" }}>Maya</span> — representing dreams, imagination, and vision.<br />
@@ -398,7 +344,7 @@ export default function AboutPage() {
             <h2 style={{ fontFamily: "var(--font-cormorant), serif", fontSize: "clamp(1.8rem,3.5vw,2.8rem)", fontWeight: 400, color: "#E3E4E0", margin: "0 0 24px", lineHeight: 1.1 }}>
               Our Philosophy
             </h2>
-            <div style={{ fontFamily: "var(--font-geist-sans), sans-serif", fontSize: "clamp(0.85rem,1.1vw,0.95rem)", lineHeight: 1.9, color: "rgba(227,228,224,0.6)", marginBottom: "16px" }}>
+            <div style={{ fontFamily: "var(--font-geist-sans), sans-serif", fontSize: "clamp(0.9rem, 1.15vw, 1.05rem)", lineHeight: 1.8, color: "rgba(227,228,224,0.75)", marginBottom: "16px" }}>
               At Mayaakars, design is not merely about appearance.<br />
               It is about how a space is imagined, shaped, and ultimately experienced.<br />
               Great design emerges when creativity is balanced with precision — when every decision, from spatial planning to the smallest material detail, contributes to a cohesive vision.<br /><br />
@@ -431,10 +377,10 @@ export default function AboutPage() {
             <h2 style={{ fontFamily: "var(--font-cormorant), serif", fontSize: "clamp(1.8rem,3.5vw,2.8rem)", fontWeight: 400, color: "#E3E4E0", margin: "0 0 24px", lineHeight: 1.1 }}>
               Architecture & Interiors as One Conversation
             </h2>
-            <p style={{ fontFamily: "var(--font-geist-sans), sans-serif", fontSize: "clamp(0.85rem,1.1vw,0.95rem)", lineHeight: 1.9, color: "rgba(227,228,224,0.6)", marginBottom: "16px" }}>
+            <p style={{ fontFamily: "var(--font-geist-sans), sans-serif", fontSize: "clamp(0.9rem, 1.15vw, 1.05rem)", lineHeight: 1.8, color: "rgba(227,228,224,0.75)", marginBottom: "16px" }}>
               Rather than treating architecture and interior design as separate disciplines, Mayaakars approaches them as one continuous dialogue.
             </p>
-            <p style={{ fontFamily: "var(--font-geist-sans), sans-serif", fontSize: "clamp(0.85rem,1.1vw,0.95rem)", lineHeight: 1.9, color: "rgba(227,228,224,0.6)" }}>
+            <p style={{ fontFamily: "var(--font-geist-sans), sans-serif", fontSize: "clamp(0.9rem, 1.15vw, 1.05rem)", lineHeight: 1.8, color: "rgba(227,228,224,0.75)" }}>
               Structure, light, materials, and spatial flow are considered together from the very beginning. This integrated process ensures that every element of a project works in harmony — from the architectural framework to the interior experience.<br /><br />
               The result is a design language that feels cohesive, intentional, and complete.
             </p>
@@ -449,10 +395,10 @@ export default function AboutPage() {
                 <div className="ab-divider" />
                 <p style={{ fontSize: "0.65rem", letterSpacing: "0.4em", textTransform: "uppercase", color: "#C49A3A", marginBottom: "20px", fontFamily: "var(--font-geist-sans), sans-serif" }}>Our Journey</p>
                 <h2 style={{ fontFamily: "var(--font-cormorant), serif", fontSize: "clamp(1.8rem,3.5vw,2.8rem)", fontWeight: 400, color: "#E3E4E0", margin: "0 0 24px", lineHeight: 1.1 }}>Fifteen Years of Purposeful Design</h2>
-                <p style={{ fontFamily: "var(--font-geist-sans), sans-serif", fontSize: "clamp(0.85rem,1.1vw,0.95rem)", lineHeight: 1.9, color: "rgba(227,228,224,0.6)", marginBottom: "16px" }}>
+                <p style={{ fontFamily: "var(--font-geist-sans), sans-serif", fontSize: "clamp(0.9rem, 1.15vw, 1.05rem)", lineHeight: 1.8, color: "rgba(227,228,224,0.75)", marginBottom: "16px" }}>
                   Mayaakars was founded by Prajwal Kumar in 2011 with a clear design intent — to shape spaces where vision and structure exist in quiet balance. Over the past Fifteen years, Mayaakars has collaborated with homeowners, developers, and businesses to create spaces that balance function with emotion.
                 </p>
-                <div style={{ fontFamily: "var(--font-geist-sans), sans-serif", fontSize: "clamp(0.85rem,1.1vw,0.95rem)", lineHeight: 1.9, color: "rgba(227,228,224,0.6)" }}>
+                <div style={{ fontFamily: "var(--font-geist-sans), sans-serif", fontSize: "clamp(0.9rem, 1.15vw, 1.05rem)", lineHeight: 1.8, color: "rgba(227,228,224,0.75)" }}>
                   Our portfolio includes:
                   <ul style={{ listStyleType: "disc", paddingLeft: "16px", marginTop: "8px", marginBottom: "8px" }}>
                     <li>Private residences</li>
@@ -489,11 +435,11 @@ export default function AboutPage() {
             <h2 style={{ fontFamily: "var(--font-cormorant), serif", fontSize: "clamp(1.8rem,3.5vw,2.8rem)", fontWeight: 400, color: "#E3E4E0", margin: "0 0 24px", lineHeight: 1.1 }}>
               Our Approach
             </h2>
-            <p style={{ fontFamily: "var(--font-geist-sans), sans-serif", fontSize: "clamp(0.85rem,1.1vw,0.95rem)", lineHeight: 1.9, color: "rgba(227,228,224,0.6)", marginBottom: "16px" }}>
+            <p style={{ fontFamily: "var(--font-geist-sans), sans-serif", fontSize: "clamp(0.9rem, 1.15vw, 1.05rem)", lineHeight: 1.8, color: "rgba(227,228,224,0.75)", marginBottom: "16px" }}>
               Every project begins with listening.<br />
               We take the time to understand the aspirations, lifestyle, and vision of the people we work with. From there, ideas are translated into spatial concepts through careful planning, detailed drawings, and visual exploration.
             </p>
-            <div style={{ fontFamily: "var(--font-geist-sans), sans-serif", fontSize: "clamp(0.85rem,1.1vw,0.95rem)", lineHeight: 1.9, color: "rgba(227,228,224,0.6)" }}>
+            <div style={{ fontFamily: "var(--font-geist-sans), sans-serif", fontSize: "clamp(0.9rem, 1.15vw, 1.05rem)", lineHeight: 1.8, color: "rgba(227,228,224,0.75)" }}>
               Our process typically includes:
               <ul style={{ listStyleType: "disc", paddingLeft: "16px", marginTop: "8px", marginBottom: "8px" }}>
                 <li>Concept development</li>
@@ -531,7 +477,7 @@ export default function AboutPage() {
               {DEFINES.map((item) => (
                 <li key={item} className="gsap-reveal-text" style={{ display: "flex", alignItems: "flex-start", gap: "14px", padding: "16px 0", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
                   <span style={{ color: "#C49A3A", fontSize: "0.45rem", marginTop: "6px", flexShrink: 0 }}>◆</span>
-                  <span style={{ fontFamily: "var(--font-geist-sans), sans-serif", fontSize: "clamp(0.85rem,1.1vw,0.95rem)", lineHeight: 1.7, color: "rgba(227,228,224,0.65)" }}>{item}</span>
+                  <span style={{ fontFamily: "var(--font-geist-sans), sans-serif", fontSize: "clamp(0.9rem, 1.15vw, 1.05rem)", lineHeight: 1.7, color: "rgba(227,228,224,0.75)" }}>{item}</span>
                 </li>
               ))}
             </ul>
@@ -543,8 +489,7 @@ export default function AboutPage() {
           <div className="ab-white-content">
             <h2 className="ab-white-title gsap-reveal-text">Let&apos;s Shape Your Vision</h2>
             <p className="ab-white-sub gsap-reveal-text">
-              Whether you are building something new or reimagining an existing space, we would be honored to help bring your vision to life.<br />
-              Let’s create spaces where dreams take shape.
+              Whether you are building from the ground up or reimagining an existing space, Mayaakars offers a thoughtful and integrated approach to architecture and interior design.
             </p>
             <div className="ab-white-actions gsap-reveal-text">
               <Link href="/contact">Schedule a Consultation</Link>

@@ -99,15 +99,15 @@ export default function ProjectsGrid() {
                 .pg-selection-grid {
                     display: grid;
                     grid-template-columns: 1fr;
-                    gap: 24px;
+                    gap: 20px;
                     width: 100%;
-                    max-width: 1200px;
+                    max-width: 1060px;
                     margin-top: 48px;
                 }
-                @media (min-width: 768px) {
+                @media (min-width: 640px) {
                     .pg-selection-grid {
                         grid-template-columns: 1fr 1fr;
-                        gap: 40px;
+                        gap: 28px;
                     }
                 }
                 .pg-header-top {
@@ -379,18 +379,18 @@ export default function ProjectsGrid() {
                                 { 
                                     id: "architectural", 
                                     title: "Architectural", 
-                                    img: ALL_PROJECTS.find(p => TAB_CATEGORIES["architectural"].includes(p.category))?.coverImage 
+                                    img: "/Mayaakars/Commercial Architecture.webp"
                                 },
                                 { 
                                     id: "interior", 
                                     title: "Interior", 
-                                    img: ALL_PROJECTS.find(p => TAB_CATEGORIES["interior"].includes(p.category))?.coverImage 
+                                    img: "/gallery/Residential Interior .webp"
                                 }
                             ].map((cat) => (
                                 <button
                                     key={cat.id}
                                     onClick={() => goToGallery(cat.id as Tab)}
-                                    className="group relative flex flex-col justify-end h-[420px] md:h-[540px] w-full overflow-hidden rounded-[2px] bg-[#111] shadow-2xl outline-none text-left"
+                                    className="group relative flex flex-col justify-end aspect-[3/4] w-full overflow-hidden rounded-[4px] bg-[#111] shadow-2xl outline-none text-left"
                                 >
                                     {cat.img && (
                                         <Image
@@ -400,14 +400,14 @@ export default function ProjectsGrid() {
                                             className="object-cover transition-transform duration-[800ms] ease-out group-hover:scale-105"
                                         />
                                     )}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/10 transition-opacity duration-500 group-hover:opacity-100" />
-                                    <div className="relative z-10 p-8 md:p-10 transform transition-transform duration-500 group-hover:-translate-y-2 flex flex-col items-start">
-                                        <h3 className="text-3xl md:text-4xl font-serif text-white tracking-wide mb-6">{cat.title} Projects</h3>
-                                        <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2.5 backdrop-blur-md transition-colors duration-300 group-hover:bg-white/20 group-hover:border-white/40">
-                                            <span className="text-xs font-sans tracking-wide text-white uppercase">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent transition-opacity duration-500 group-hover:opacity-100" />
+                                    <div className="relative z-10 p-6 md:p-8 transform transition-transform duration-500 group-hover:-translate-y-1 flex flex-col items-start">
+                                        <h3 className="text-2xl md:text-3xl font-serif text-white tracking-wide mb-4">{cat.title} Projects</h3>
+                                        <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 backdrop-blur-md transition-colors duration-300 group-hover:bg-white/20 group-hover:border-white/40">
+                                            <span className="text-[11px] font-sans tracking-widest text-white uppercase">
                                                 Explore
                                             </span>
-                                            <span className="text-white">→</span>
+                                            <span className="text-white text-sm">→</span>
                                         </div>
                                     </div>
                                 </button>
@@ -443,7 +443,7 @@ export default function ProjectsGrid() {
 
                     {/* Gallery */}
                     <div className="flex-1">
-                        <ImageGallery projects={visibleProjects} itemsPerRow={visibleProjects.length <= 4 ? 2 : 3} />
+                        <ImageGallery projects={visibleProjects} />
                     </div>
                 </div>
 

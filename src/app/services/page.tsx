@@ -1,11 +1,10 @@
 "use client";
 
-import { Suspense, useState, useRef, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import { SERVICES } from "@/lib/services-data";
 import Philosophy from "@/components/home/Philosophy";
 import HoverRevealCards from "@/components/ui/hover-reveal-cards";
-import ServiceDetail from "@/components/services/ServiceDetail";
+import { useRouteTransition } from "@/components/navigation/RouteTransitionProvider";
 
 const CARD_ITEMS = SERVICES.map((service) => ({
     id: service.slug,
@@ -19,32 +18,11 @@ const CARD_ITEMS = SERVICES.map((service) => ({
 }));
 
 function ServicesContent() {
-  const searchParams = useSearchParams();
-  const [activeSlug, setActiveSlug] = useState<string | null>(null);
-  const detailRef = useRef<HTMLDivElement>(null);
-
-  // Auto-open service from query param (e.g. ?service=3d-visualisation)
-  useEffect(() => {
-    const param = searchParams.get("service");
-    if (param && SERVICES.some((s) => s.slug === param)) {
-      setActiveSlug(param);
-    }
-  }, [searchParams]);
+  const { navigate } = useRouteTransition();
 
   const handleCardClick = (slug: string) => {
-    setActiveSlug(slug);
+    navigate(`/services/${slug}`);
   };
-
-  useEffect(() => {
-    if (activeSlug && detailRef.current) {
-      setTimeout(() => {
-        const y = detailRef.current!.getBoundingClientRect().top + window.scrollY - 80;
-        window.scrollTo({ top: y, behavior: 'smooth' });
-      }, 100);
-    }
-  }, [activeSlug]);
-
-  const activeService = SERVICES.find((s) => s.slug === activeSlug);
 
   return (
     <main className="bg-[#050505] text-[#E3E4E0]">
@@ -73,10 +51,6 @@ function ServicesContent() {
           onCardClick={handleCardClick}
         />
       </section>
-
-      <div ref={detailRef} className="w-full">
-        {activeService && <ServiceDetail service={activeService} />}
-      </div>
 
       <Philosophy />
     </main>

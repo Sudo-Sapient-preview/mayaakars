@@ -26,8 +26,16 @@
     --accent: #2A2A2A;
   }
 
+  html {
+    font-size: 17px;
+  }
+
   body {
     @apply bg-[var(--bg-dark)] text-[var(--text-light)] overflow-x-hidden min-h-screen selection:bg-[var(--gold)] selection:text-[var(--bg-dark)];
+  }
+
+  img, video {
+    @apply rounded-2xl;
   }
 
   /* Utility classes from SKILL.md */
