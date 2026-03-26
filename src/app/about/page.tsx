@@ -491,6 +491,9 @@ export default function AboutPage() {
             <p className="ab-white-sub gsap-reveal-text">
               Whether you are building from the ground up or reimagining an existing space, Mayaakars offers a thoughtful and integrated approach to architecture and interior design.
             </p>
+            <p className="ab-white-sub gsap-reveal-text">
+              Let’s create spaces where dreams take shape.
+            </p>
             <div className="ab-white-actions gsap-reveal-text">
               <Link href="/contact">Schedule a Consultation</Link>
               <Link href="/contact">Get in Touch</Link>
