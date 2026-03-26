@@ -20,7 +20,7 @@ const GALLERY_IMAGES = [
     "/gallery/innova8-2.webp",
     "/gallery/lobby-area.webp",
     "/gallery/Residential Architecture .webp",
-    "/gallery/Residential Interior .webp",
+    "/gallery/Residential Interior.webp",
     "/gallery/stairs.webp",
     "/gallery/title-photo.webp",
     "/gallery/wadrobe.webp",
