@@ -294,6 +294,7 @@ export default function AboutPage() {
 
         @media (max-width: 768px) {
           .ab-two-col { grid-template-columns: 1fr !important; }
+          .ab-hero-gap { padding-top: clamp(60px, 10vw, 100px) !important; }
         }
       `}</style>
 
@@ -337,7 +338,7 @@ export default function AboutPage() {
         </section>
 
         {/* ── Philosophy — text left, image right ── */}
-        <section style={{ padding: "0 clamp(24px,6vw,80px) clamp(80px,12vw,140px)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(40px,6vw,100px)", alignItems: "center" }} className="ab-two-col">
+        <section style={{ padding: "0 clamp(24px,6vw,80px) clamp(80px,12vw,140px)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(40px,6vw,100px)", alignItems: "center" }} className="ab-two-col ab-hero-gap">
           <div className="gsap-reveal-text">
             <div className="ab-divider" />
             <p style={{ fontSize: "0.65rem", letterSpacing: "0.4em", textTransform: "uppercase", color: "#C49A3A", marginBottom: "20px", fontFamily: "var(--font-geist-sans), sans-serif" }}>Our Philosophy</p>
