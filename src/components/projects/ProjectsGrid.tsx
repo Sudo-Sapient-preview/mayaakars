@@ -89,6 +89,10 @@ export default function ProjectsGrid() {
                     display: flex;
                     flex-direction: column;
                 }
+                .pg-wrap--gallery {
+                    min-height: 0;
+                    padding: 0;
+                }
                 .pg-selection-view {
                     flex: 1;
                     display: flex;
@@ -368,7 +372,7 @@ export default function ProjectsGrid() {
                 }
             `}</style>
 
-            <main className="pg-wrap animate-in fade-in duration-700">
+            <main className={`pg-wrap animate-in fade-in duration-700${viewMode === "gallery" ? " pg-wrap--gallery" : ""}`}>
                 {viewMode === "selection" ? (
                     <div className="pg-selection-view">
                         <span className="pg-eyebrow text-center mb-4">Our Work</span>
@@ -416,44 +420,20 @@ export default function ProjectsGrid() {
                     </div>
                 ) : (
                     <>
-                        <div className="pg-header">
-                            <div>
-                                <span className="pg-eyebrow">Our Work</span>
-                                <h1 className="pg-heading" style={{ marginBottom: 0 }}>
-                                    {tab === "architectural" ? "Architectural Projects" : "Interior Projects"}
-                                </h1>
-                            </div>
-                        </div>
+                        {/* Spotlight Gallery — starts immediately */}
+                        <ImageGallery
+                            projects={visibleProjects}
+                            tabLabel={tab === "architectural" ? "Architectural" : "Interior"}
+                            key={`${tab}-${filter}`}
+                        />
 
-                <div className="pg-body">
-                    {/* Sidebar filter */}
-                    <aside className="pg-sidebar" aria-label="Filter projects">
-                        <p className="pg-filter-label">Filter</p>
-                        {(["all", "commercial", "residential"] as Filter[]).map((f) => (
-                            <button
-                                key={f}
-                                className={`pg-filter-btn${filter === f ? " active" : ""}`}
-                                onClick={() => handleFilterChange(f)}
-                            >
-                                <span className="pg-filter-dot" />
-                                {f === "all" ? "All" : f.charAt(0).toUpperCase() + f.slice(1)}
+                        {/* Back to Categories — bottom CTA */}
+                        <div className="pg-back-section">
+                            <button onClick={goToSelection} className="pg-back-cta">
+                                Back to Categories
                             </button>
-                        ))}
-                    </aside>
-
-                    {/* Gallery */}
-                    <div className="flex-1">
-                        <ImageGallery projects={visibleProjects} />
-                    </div>
-                </div>
-
-                {/* Back to Categories — bottom CTA */}
-                <div className="pg-back-section">
-                    <button onClick={goToSelection} className="pg-back-cta">
-                        Back to Categories
-                    </button>
-                </div>
-                </>
+                        </div>
+                    </>
                 )}
             </main>
         </>

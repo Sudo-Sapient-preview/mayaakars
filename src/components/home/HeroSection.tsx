@@ -506,7 +506,7 @@ export default function HeroSection({ onReady }: HeroSectionProps) {
             className="px-6 text-center font-serif text-3xl uppercase tracking-[0.12em] text-white/80 sm:text-5xl"
             style={{ fontFamily: "var(--font-cormorant), serif" }}
           >
-            Let&apos;s Shape your Vision.
+            Let&apos;s Shape your Dream.
           </h2>
         </div>
 
@@ -615,7 +615,7 @@ export default function HeroSection({ onReady }: HeroSectionProps) {
             <div className="relative w-full max-w-[700px] text-center">
               <div ref={step1Ref} className="step-content step-1 flex items-center justify-center">
                 <h2 className="px-6 text-center text-[20px] leading-[1.15] tracking-tight text-white sm:text-[24px] md:px-0 md:text-[32px] lg:text-[48px]" style={{ fontFamily: "var(--font-cormorant)", textShadow: "0 4px 12px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.6)" }}>
-                  Where Vision
+                  Where Dream
                   <br />
                   <span className="italic text-[#FFD700]" style={{ fontFamily: "var(--font-cormorant)" }}>Takes Shape</span>
                 </h2>
