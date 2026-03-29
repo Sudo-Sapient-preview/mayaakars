@@ -241,42 +241,72 @@ function MobileCarousel({ projects }: { projects: ProjectCategory[] }) {
     const containerRef = useRef<HTMLDivElement>(null);
     const touchRef = useRef({ startX: 0, startY: 0, isSwipe: false });
     const { navigate } = useRouteTransition();
+    
+    // Create clones for infinite loop
+    const displayProjects = [
+        projects[projects.length - 1],
+        ...projects,
+        projects[0]
+    ];
 
     useEffect(() => {
         const container = containerRef.current;
         if (!container) return;
 
+        // Start at the first real item (skip the first clone)
+        container.scrollLeft = window.innerWidth * 0.85;
+
         let raf = 0;
         const animate = () => {
             const containerCenter = container.scrollLeft + window.innerWidth / 2;
             const cards = Array.from(container.querySelectorAll<HTMLElement>(".pc-mob-card"));
+            const cardW = window.innerWidth * 0.85;
+
+            // Handle Looping
+            const maxScroll = container.scrollWidth - container.clientWidth;
+            if (container.scrollLeft <= 5) {
+                container.scrollLeft = container.scrollWidth - container.clientWidth - cardW - 5;
+            } else if (container.scrollLeft >= maxScroll - 5) {
+                container.scrollLeft = cardW + 5;
+            }
 
             cards.forEach((card) => {
                 const cardCenter = card.offsetLeft + card.offsetWidth / 2;
-                const distFromCenter = Math.abs(containerCenter - cardCenter);
-                const maxDist = window.innerWidth;
-                let intensity = 1 - distFromCenter / maxDist;
+                const diff = cardCenter - containerCenter;
+                const distFromCenter = Math.abs(diff);
+                
+                // Normalizing intensity: 1 at center, 0 at one screen distance
+                let intensity = 1 - (distFromCenter / (window.innerWidth * 1.2));
                 if (intensity < 0) intensity = 0;
-                intensity = Math.pow(intensity, 1.2);
+                intensity = Math.pow(intensity, 1.5);
 
                 const inner = card.querySelector<HTMLElement>(".pc-mob-inner");
                 const img = card.querySelector<HTMLImageElement>("img");
                 const info = card.querySelector<HTMLElement>(".pc-mob-info");
 
                 if (inner) {
-                    const scale = 0.85 + 0.15 * intensity;
-                    inner.style.transform = `scale(${scale})`;
+                    // "left slide bigger and bit below"
+                    // If diff is negative, card is on the left.
+                    // We bias the scale and Y-offset toward the left quadrant.
+                    const isLeft = diff < 0;
+                    const bias = isLeft ? (Math.abs(diff) / window.innerWidth) * 0.8 : 0;
+                    
+                    const scale = (0.85 + 0.15 * intensity) + (bias * 0.1);
+                    const yOffset = (1 - intensity) * 30 + (bias * 40);
+                    
+                    inner.style.transform = `translateY(${yOffset}px) scale(${scale})`;
                 }
+                
                 if (img) {
                     img.style.filter = `grayscale(${80 - intensity * 80}%) brightness(${0.5 + intensity * 0.5})`;
-                    const flexDist = cardCenter - containerCenter;
-                    const parallax = flexDist * 0.25;
-                    img.style.transform = `translateX(${parallax}px) scale(1.15)`;
+                    const parallax = diff * 0.15;
+                    img.style.transform = `translateX(${parallax}px) scale(1.1)`;
                 }
+                
                 if (info) {
-                    info.style.opacity = String(Math.pow(intensity, 2));
-                    const yOffset = (1 - intensity) * 50;
-                    info.style.transform = `translateY(${yOffset}px)`;
+                    info.style.opacity = String(Math.pow(intensity, 2.5));
+                    const infoY = (1 - intensity) * 40;
+                    info.style.transform = `translateY(${infoY}px)`;
                 }
             });
 
@@ -285,7 +315,7 @@ function MobileCarousel({ projects }: { projects: ProjectCategory[] }) {
         raf = requestAnimationFrame(animate);
 
         return () => cancelAnimationFrame(raf);
-    }, []);
+    }, [projects]);
 
     return (
         <section className="mk-home-dark-section relative z-[2]">
@@ -312,9 +342,9 @@ function MobileCarousel({ projects }: { projects: ProjectCategory[] }) {
                     }
                 }}
             >
-                {projects.map((project, index) => (
+                {displayProjects.map((project, index) => (
                     <div
-                        key={project.slug}
+                        key={`${project.slug}-${index}`}
                         className="pc-mob-card"
                         role="button"
                         aria-label={`Open ${project.title}`}
@@ -330,7 +360,7 @@ function MobileCarousel({ projects }: { projects: ProjectCategory[] }) {
                                 <div className="pc-mob-title">{project.title}</div>
                                 <div className="pc-mob-subtitle">View Project</div>
                             </div>
-                            {index === 0 ? <div className="pc-scroll-hint">Swipe Left -&gt;</div> : null}
+                            {index === 1 && <div className="pc-scroll-hint">Swipe Left -&gt;</div>}
                         </div>
                     </div>
                 ))}
@@ -461,9 +491,9 @@ const MOBILE_STYLES = `
   }
   .pc-mob-card {
     flex-shrink: 0;
-    width: 100vw;
+    width: 85vw;
     height: 82dvh;
-    scroll-snap-align: start;
+    scroll-snap-align: center;
     scroll-snap-stop: always;
     position: relative;
     cursor: pointer;
@@ -472,13 +502,13 @@ const MOBILE_STYLES = `
     align-items: center;
   }
   .pc-mob-inner {
-    width: 85vw;
-    height: calc(85vw * 0.625);
-    margin-top: -8vh;
+    width: 75vw;
+    height: calc(75vw * 0.625);
+    margin-top: -10vh;
     position: relative;
     background: transparent;
     will-change: transform;
-    -webkit-box-reflect: below 25px linear-gradient(transparent, transparent 50%, rgba(255, 255, 255, 0.15));
+    -webkit-box-reflect: below 20px linear-gradient(transparent, transparent 60%, rgba(255, 255, 255, 0.1));
   }
   @media (max-width: 480px) {
     .pc-mob-container,
@@ -486,7 +516,9 @@ const MOBILE_STYLES = `
       height: 78dvh;
     }
     .pc-mob-inner {
-      margin-top: -6vh;
+      margin-top: -8vh;
+      width: 80vw;
+      height: calc(80vw * 0.625);
     }
   }
   .pc-mob-inner img {
@@ -531,12 +563,12 @@ const MOBILE_STYLES = `
   }
   .pc-scroll-hint {
     position: absolute;
-    bottom: -80px;
+    bottom: -100px;
     right: 0;
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 10px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 13px;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 10px;
     animation: pcPulseHint 2s infinite ease-in-out;
     pointer-events: none;
     z-index: 10;

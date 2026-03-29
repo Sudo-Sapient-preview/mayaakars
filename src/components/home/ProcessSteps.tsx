@@ -17,26 +17,48 @@ export default function ProcessSteps() {
     const section = sectionRef.current;
     if (!section) return;
 
-    let observer: IntersectionObserver;
-    
-    // Delay attaching the observer so Next.js dynamic imports 
-    // have time to render their heights and push this section down.
+    let sectionObserver: IntersectionObserver;
+    let scrollHandler: (() => void) | null = null;
+
     const timeout = setTimeout(() => {
-      observer = new IntersectionObserver(
+      // Section entrance animation
+      sectionObserver = new IntersectionObserver(
         (entries) => {
           if (entries[0].isIntersecting) {
             section.classList.add("is-visible");
-            observer.disconnect();
+            sectionObserver.disconnect();
           }
         },
         { threshold: 0.3 }
       );
-      observer.observe(section);
+      sectionObserver.observe(section);
+
+      // Per-step scroll highlight (mobile single-column only)
+      if (window.innerWidth <= 540) {
+        const steps = Array.from(section.querySelectorAll<HTMLElement>(".ps-step"));
+
+        const updateActive = () => {
+          const mid = window.innerHeight / 2;
+          let closest: HTMLElement | null = null;
+          let minDist = Infinity;
+          steps.forEach((el) => {
+            const rect = el.getBoundingClientRect();
+            const dist = Math.abs(rect.top + rect.height / 2 - mid);
+            if (dist < minDist) { minDist = dist; closest = el; }
+          });
+          steps.forEach((el) => el.classList.toggle("is-active", el === closest));
+        };
+
+        updateActive();
+        scrollHandler = updateActive;
+        window.addEventListener("scroll", updateActive, { passive: true });
+      }
     }, 1500);
 
     return () => {
       clearTimeout(timeout);
-      if (observer) observer.disconnect();
+      if (sectionObserver) sectionObserver.disconnect();
+      if (scrollHandler) window.removeEventListener("scroll", scrollHandler);
     };
   }, []);
 
@@ -124,17 +146,33 @@ export default function ProcessSteps() {
         .ps-wrap.is-visible .ps-step:nth-child(5) { transition-delay: 1.25s; }
         .ps-wrap.is-visible .ps-step:nth-child(6) { transition-delay: 1.4s; }
 
-        /* Step hover fx */
-        .ps-step:hover .ps-dot {
+        /* Step hover fx (desktop only) */
+        @media (min-width: 541px) {
+          .ps-step:hover .ps-dot {
+            background: #ffffff !important;
+            border-color: #ffffff !important;
+            box-shadow: 0 0 12px rgba(255,255,255,0.4) !important;
+          }
+          .ps-step:hover .ps-num,
+          .ps-step:hover .ps-title {
+            color: #ffffff !important;
+          }
+          .ps-step:hover .ps-desc {
+            color: rgba(255,255,255,0.9) !important;
+          }
+        }
+
+        /* Scroll-activated highlight (mobile) */
+        .ps-step.is-active .ps-dot {
           background: #ffffff !important;
           border-color: #ffffff !important;
           box-shadow: 0 0 12px rgba(255,255,255,0.4) !important;
         }
-        .ps-step:hover .ps-num,
-        .ps-step:hover .ps-title {
+        .ps-step.is-active .ps-num,
+        .ps-step.is-active .ps-title {
           color: #ffffff !important;
         }
-        .ps-step:hover .ps-desc {
+        .ps-step.is-active .ps-desc {
           color: rgba(255,255,255,0.9) !important;
         }
 
@@ -166,7 +204,7 @@ export default function ProcessSteps() {
           font-family: var(--font-cormorant), serif;
           font-size: clamp(1.8rem, 3vw, 2.5rem);
           font-weight: 400;
-          color: rgba(196,154,58,0.18);
+          color: rgba(196,154,58,0.45);
           line-height: 1;
           margin-bottom: 12px;
           letter-spacing: 0.02em;

@@ -405,7 +405,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
           position: absolute; top: 0; bottom: 0;
           width: 22vw; max-width: 280px;
           display: flex; align-items: center;
-          cursor: pointer; z-index: 2;
+          cursor: pointer; z-index: 10;
         }
         .mk-lb-side-left { left: 0; justify-content: flex-start; padding-left: 16px; }
         .mk-lb-side-right { right: 0; justify-content: flex-end; padding-right: 16px; }

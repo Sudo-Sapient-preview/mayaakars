@@ -20,12 +20,20 @@ const Testimonials = dynamic(
   () => import("@/components/home/Testimonials"),
   { ssr: false }
 );
-const Philosophy = dynamic(
-  () => import("@/components/home/Philosophy"),
+const OurClients = dynamic(
+  () => import("@/components/home/OurClients"),
   { ssr: false }
 );
 const ProcessSteps = dynamic(
   () => import("@/components/home/ProcessSteps"),
+  { ssr: false }
+);
+const BrandPartners = dynamic(
+  () => import("@/components/home/BrandPartners"),
+  { ssr: false }
+);
+const Philosophy = dynamic(
+  () => import("@/components/home/Philosophy"),
   { ssr: false }
 );
 
@@ -337,7 +345,9 @@ export default function Home() {
         <ServicesAccordion />
         <ProjectsCarousel />
         <Testimonials />
+        <OurClients />
         <ProcessSteps />
+        <BrandPartners />
         <Philosophy />
         <section ref={whiteSectionRef} className="mk-home-white-section">
           <div className="mk-home-white-content">

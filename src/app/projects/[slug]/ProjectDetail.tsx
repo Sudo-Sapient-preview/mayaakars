@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { gsap } from "gsap";
 
@@ -11,6 +11,7 @@ type Project = {
     category: string;
     coverImage: string;
     images: string[];
+    description?: string;
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -21,11 +22,35 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 const BACK_URLS: Record<string, string> = {
-    "architect-commercial": "/projects?view=gallery&tab=architectural&filter=commercial",
-    "architect-residence": "/projects?view=gallery&tab=architectural&filter=residential",
-    "interior-commercial": "/projects?view=gallery&tab=interior&filter=commercial",
-    "interior-residencial": "/projects?view=gallery&tab=interior&filter=residential",
+    "architect-commercial": "/projects?view=gallery&tab=architectural&filter=all",
+    "architect-residence": "/projects?view=gallery&tab=architectural&filter=all",
+    "interior-commercial": "/projects?view=gallery&tab=interior&filter=all",
+    "interior-residencial": "/projects?view=gallery&tab=interior&filter=all",
 };
+
+/**
+ * Repeating 8-image bento pattern (3-col grid):
+ * Row 1: [wide 2col] [tall 1col 2rows]
+ * Row 2: [normal]   [normal] (tall cont.)
+ * Row 3: [tall 2rows] [wide 2col]
+ * Row 4: (tall cont.) [normal] [normal]
+ */
+function getBentoStyle(index: number): React.CSSProperties {
+    const pos = index % 8;
+    const cycle = Math.floor(index / 8);
+    const r = cycle * 4; // row offset (1-indexed base below)
+    switch (pos) {
+        case 0: return { gridColumn: "1 / 3", gridRow: `${r + 1}` };
+        case 1: return { gridColumn: "3", gridRow: `${r + 1} / ${r + 3}` };
+        case 2: return { gridColumn: "1", gridRow: `${r + 2}` };
+        case 3: return { gridColumn: "2", gridRow: `${r + 2}` };
+        case 4: return { gridColumn: "1", gridRow: `${r + 3} / ${r + 5}` };
+        case 5: return { gridColumn: "2 / 4", gridRow: `${r + 3}` };
+        case 6: return { gridColumn: "2", gridRow: `${r + 4}` };
+        case 7: return { gridColumn: "3", gridRow: `${r + 4}` };
+        default: return {};
+    }
+}
 
 export default function ProjectDetail({ project }: { project: Project }) {
     const categoryLabel = CATEGORY_LABELS[project.category] ?? project.category;
@@ -99,27 +124,48 @@ export default function ProjectDetail({ project }: { project: Project }) {
                     letter-spacing: 0.05em;
                 }
 
-                /* Image grid — 2 per row */
+                /* Bento grid */
                 .pd-grid-section {
-                    padding: clamp(48px, 7vw, 96px) clamp(24px, 6vw, 80px);
+                    padding: clamp(32px, 4vw, 64px) clamp(8px, 2vw, 24px);
                 }
-                .pd-grid {
+                .pd-bento {
                     display: grid;
-                    grid-template-columns: 1fr 1fr;
+                    grid-template-columns: repeat(3, 1fr);
+                    grid-auto-rows: clamp(220px, 26vw, 380px);
                     gap: 4px;
                 }
-                .pd-grid-item {
-                    position: relative; aspect-ratio: 4/3;
-                    overflow: hidden; background: #111;
-                    padding: 0;
+                .pd-bento-item {
+                    position: relative;
+                    overflow: hidden;
+                    background: #111;
                 }
-                .pd-grid-item img {
+                .pd-bento-item img {
                     position: absolute; inset: 0;
                     width: 100%; height: 100%; object-fit: cover;
                     transition: transform 0.6s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease;
                     opacity: 0.88;
                 }
-                .pd-grid-item:hover img { transform: scale(1.04); opacity: 1; }
+                .pd-bento-item:hover img { transform: scale(1.04); opacity: 1; }
+                @media (max-width: 640px) {
+                    .pd-bento {
+                        grid-template-columns: 1fr;
+                        grid-auto-rows: unset;
+                    }
+                    .pd-bento-item {
+                        grid-column: 1 !important;
+                        grid-row: auto !important;
+                        position: relative;
+                        height: auto;
+                    }
+                    .pd-bento-item img {
+                        position: relative;
+                        width: 100%;
+                        height: auto;
+                        display: block;
+                        opacity: 0.88;
+                        image-orientation: from-image;
+                    }
+                }
 
 
                 /* CTA */
@@ -160,17 +206,20 @@ export default function ProjectDetail({ project }: { project: Project }) {
                         <h1 className="pd-title pd-intro-line" style={{ transform: "translateY(110%)" }}>{project.title}</h1>
                     </div>
                     <div className="pd-intro-clip">
-                        <p className="pd-count pd-intro-line" style={{ transform: "translateY(110%)" }}>{project.images.length} Photographs</p>
+                        <p className="pd-count pd-intro-line" style={{ transform: "translateY(110%)" }}>
+                            {project.description ?? `${project.images.length} Photographs`}
+                        </p>
                     </div>
                 </section>
 
-                {/* Image Grid */}
+                {/* Bento Image Grid */}
                 <section className="pd-grid-section">
-                    <div className="pd-grid">
+                    <div className="pd-bento">
                         {project.images.map((src, i) => (
                             <div
                                 key={i}
-                                className="pd-grid-item"
+                                className="pd-bento-item"
+                                style={getBentoStyle(i)}
                             >
                                 <img
                                     src={src}
@@ -184,7 +233,7 @@ export default function ProjectDetail({ project }: { project: Project }) {
 
                 {/* Simplified CTA */}
                 <section className="pd-cta">
-                    <Link href={backUrl} className="pd-cta-btn" data-transition="rotation">
+                    <Link href={backUrl} className="pd-cta-btn" data-interactive>
                         Back to Projects
                         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                             <path d="M11 7H3M6 4L3 7l3 3" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />

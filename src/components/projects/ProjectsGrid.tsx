@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useRouteTransition } from "@/components/navigation/RouteTransitionProvider";
 
 import manifest from "@/data/gallery-manifest.json";
 import ImageGallery from "@/components/ui/image-gallery";
@@ -25,7 +26,7 @@ const FILTER_CATEGORIES: Record<Exclude<Filter, "all">, string[]> = {
 
 export default function ProjectsGrid() {
     const searchParams = useSearchParams();
-    const router = useRouter();
+    const { navigate } = useRouteTransition();
 
     // Derive state directly from URL — makes refresh work correctly
     const urlView = searchParams.get("view") as "selection" | "gallery" | null;
@@ -34,11 +35,9 @@ export default function ProjectsGrid() {
 
     const viewMode: "selection" | "gallery" = urlView === "gallery" ? "gallery" : "selection";
     const tab: Tab = urlTab === "interior" ? "interior" : "architectural";
-    const [filter, setFilter] = useState<Filter>(urlFilter ?? "all");
+    const filter: Filter = (urlFilter as Filter) ?? "all";
 
-
-
-    // Keep filter in sync when navigating via category param (from external links)
+    // Keep state in sync when navigating via category param (from external links)
     useEffect(() => {
         const categorySlug = searchParams.get("category");
         if (categorySlug) {
@@ -53,24 +52,21 @@ export default function ProjectsGrid() {
             } else if (categorySlug === "commercial-interior") {
                 newTab = "interior"; newFilter = "commercial";
             }
-            router.replace(`/projects?view=gallery&tab=${newTab}&filter=${newFilter}`);
+            navigate(`/projects?view=gallery&tab=${newTab}&filter=${newFilter}`, { replace: true });
         }
-    }, [searchParams, router]);
+    }, [searchParams, navigate]);
 
-    // Sync filter state to URL when it changes
+    // Navigation helpers
     function handleFilterChange(f: Filter) {
-        setFilter(f);
-        router.push(`/projects?view=gallery&tab=${tab}&filter=${f}`, { scroll: false });
+        navigate(`/projects?view=gallery&tab=${tab}&filter=${f}`, { scroll: false });
     }
 
     function goToGallery(selectedTab: Tab) {
-        router.push(`/projects?view=gallery&tab=${selectedTab}&filter=all`, { scroll: false });
-        setFilter("all");
+        navigate(`/projects?view=gallery&tab=${selectedTab}&filter=all`, { scroll: false });
     }
 
     function goToSelection() {
-        router.push(`/projects`, { scroll: false });
-        setFilter("all");
+        navigate(`/projects`, { scroll: false });
     }
 
     const tabCats = TAB_CATEGORIES[tab];

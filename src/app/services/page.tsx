@@ -44,7 +44,7 @@ function ServicesContent() {
         </p>
       </section>
 
-      <section className="bg-[#0A0A0A] py-16 px-6 md:px-12 lg:px-16 flex justify-center">
+      <section className="py-16 px-6 md:px-12 lg:px-16 flex justify-center">
         <HoverRevealCards
           items={CARD_ITEMS}
           className="max-w-[1600px] w-full"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouteTransition } from "@/components/navigation/RouteTransitionProvider";
 
 interface GalleryItem {
   id: string;
@@ -19,7 +19,7 @@ export default function ImageGallery({
   projects,
   tabLabel = "Our Projects",
 }: ImageGalleryProps) {
-  const router = useRouter();
+  const { navigate } = useRouteTransition();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<any>(null);
   const resizeRef = useRef<(() => void) | null>(null);
@@ -34,125 +34,121 @@ export default function ImageGallery({
       const { ScrollTrigger } = await import("gsap/ScrollTrigger");
       gsap.registerPlugin(ScrollTrigger);
 
-      if (!mounted || !wrapperRef.current) return;
+      // Small delay to let React/DOM layout settle for accurate measurements
+      setTimeout(() => {
+        if (!mounted || !wrapperRef.current) return;
 
-      const section = wrapperRef.current.querySelector(
-        ".psl-section"
-      ) as HTMLElement;
-      if (!section) return;
+        const section = wrapperRef.current.querySelector(".psl-section") as HTMLElement;
+        if (!section) return;
 
-      const titlesContainer = section.querySelector(
-        ".psl-titles-container"
-      ) as HTMLElement;
-      const titlesWrap = section.querySelector(".psl-titles") as HTMLElement;
-      const bgImg = section.querySelector(".psl-bg-img img") as HTMLImageElement;
-      const imagesWrap = section.querySelector(".psl-images") as HTMLElement;
-      const titleEls = Array.from(
-        titlesWrap.querySelectorAll("h1")
-      ) as HTMLElement[];
-      const imageEls = Array.from(
-        imagesWrap.querySelectorAll(".psl-img")
-      ) as HTMLElement[];
+        const titlesContainer = section.querySelector(".psl-titles-container") as HTMLElement;
+        const titlesWrap = section.querySelector(".psl-titles") as HTMLElement;
+        const bgImg = section.querySelector(".psl-bg-img img") as HTMLImageElement;
+        const imagesWrap = section.querySelector(".psl-images") as HTMLElement;
+        if (!titlesWrap || !imagesWrap || !titlesContainer) return;
 
-      const count = projects.length;
-      const gap = count > 1 ? Math.min(0.08, 0.65 / (count - 1)) : 0.08;
-      const speed = 0.3;
-      const scrollMult = Math.max(8, count + 4);
+        const titleEls = Array.from(titlesWrap.querySelectorAll("h1")) as HTMLElement[];
+        const imageEls = Array.from(imagesWrap.querySelectorAll(".psl-img")) as HTMLElement[];
 
-      let currentActive = 0;
+        const count = projects.length;
+        const vh = window.innerHeight;
+        const th = titlesWrap.scrollHeight;
 
-      function calcArc() {
-        const small = window.innerWidth <= 768;
-        const cw = window.innerWidth * (small ? 0.55 : 0.3);
-        const ch = window.innerHeight;
-        const sx = cw - (small ? 140 : 220);
-        return {
-          sx, sy: -200, ey: ch + 200,
-          cx: sx + (small ? 500 * 0.45 : 500), cy: ch / 2,
-        };
-      }
+        // Dynamic speed: Window of visibility scales with project count
+        // This keeps the arc clean by only allowing ~1.5 to 2 images visible at once
+        const itemScrollDur = (th / (count || 1)) / (vh + th);
+        // Tighter visibility for higher counts to prevent merging
+        const speed = count > 6 ? 0.18 : 0.28;
 
-      let arc = calcArc();
+        const scrollMult = Math.max(12, count * 3);
 
-      function bezier(t: number) {
-        const x = (1 - t) * (1 - t) * arc.sx + 2 * (1 - t) * t * arc.cx + t * t * arc.sx;
-        const y = (1 - t) * (1 - t) * arc.sy + 2 * (1 - t) * t * arc.cy + t * t * arc.ey;
-        return { x, y };
-      }
+        // Dynamically space out titles based on count
+        titlesWrap.style.gap = count > 6 ? "40vh" : "18vh";
+        let currentActive = 0;
+        const IMG_W = 360, IMG_H = 270;
 
-      function imgProg(i: number, overall: number) {
-        const s = i * gap;
-        const e = s + speed;
-        if (overall < s) return -1;
-        if (overall > e) return 2;
-        return (overall - s) / speed;
-      }
+        function calcArc() {
+          const small = window.innerWidth <= 768;
+          const cw = window.innerWidth * (small ? 0.55 : 0.3);
+          const ch = window.innerHeight;
+          const sx = cw - (small ? 140 : 220);
+          return { sx, sy: -220, ey: ch + 220, cx: sx + (small ? 500 * 0.45 : 520), cy: ch / 2 };
+        }
 
-      // Initial state: first title centered, rest below
-      const vh = window.innerHeight;
-      gsap.set(titlesWrap, { y: vh * 0.3 });
-      imageEls.forEach((img) => gsap.set(img, { opacity: 0 }));
-      titlesContainer.style.setProperty("--bo", "1");
-      titlesContainer.style.setProperty("--ao", "1");
+        let arc = calcArc();
+        function bezier(t: number) {
+          const x = (1 - t) * (1 - t) * arc.sx + 2 * (1 - t) * t * arc.cx + t * t * arc.sx;
+          const y = (1 - t) * (1 - t) * arc.sy + 2 * (1 - t) * t * arc.cy + t * t * arc.ey;
+          return { x, y };
+        }
 
-      if (triggerRef.current) {
-        triggerRef.current.kill();
-        triggerRef.current = null;
-      }
-      if (!mounted) return;
+        const titleOffsets = titleEls.map(t => t.offsetTop + t.offsetHeight / 2);
 
-      triggerRef.current = ScrollTrigger.create({
-        trigger: section,
-        start: "top top",
-        end: () => `+=${window.innerHeight * scrollMult}px`,
-        pin: true,
-        pinSpacing: true,
-        scrub: 1.5,
-        onUpdate: (self: any) => {
-          if (!mounted) return;
-          const p = self.progress;
-          const sp = p; // 0 → 1 maps directly
+        gsap.set(titlesWrap, { y: vh });
+        imageEls.forEach((img) => gsap.set(img, { opacity: 0 }));
+        titlesContainer.style.setProperty("--bo", "1");
+        titlesContainer.style.setProperty("--ao", "1");
 
-          const vh = window.innerHeight;
-          const th = titlesWrap.scrollHeight;
-          // Start from 30% down, scroll to fully above viewport
-          const startY = vh * 0.3;
-          const endY = -(th + 50);
-          const currentY = startY + sp * (endY - startY);
-          gsap.set(titlesWrap, { y: currentY });
+        if (triggerRef.current) {
+          triggerRef.current.kill();
+          triggerRef.current = null;
+        }
 
-          imageEls.forEach((img, i) => {
-            const ip = imgProg(i, sp);
-            if (ip < 0 || ip > 1) {
-              gsap.set(img, { opacity: 0 });
-            } else {
-              const pos = bezier(ip);
-              gsap.set(img, { x: pos.x - 100, y: pos.y - 75, opacity: 1 });
+        triggerRef.current = ScrollTrigger.create({
+          trigger: section,
+          start: "top top",
+          end: () => `+=${window.innerHeight * scrollMult}px`,
+          pin: true,
+          pinSpacing: true,
+          scrub: 1.5,
+          onUpdate: (self: any) => {
+            if (!mounted) return;
+            const sp = self.progress;
+            const curVh = window.innerHeight;
+            const curTh = titlesWrap.scrollHeight;
+
+            // Scroll titles
+            const currentY = curVh - sp * (curVh + curTh);
+            gsap.set(titlesWrap, { y: currentY });
+
+            // Detect Active
+            const mid = curVh / 2;
+            let ci = 0, cd = Infinity;
+            titleEls.forEach((t, i) => {
+              const r = t.getBoundingClientRect();
+              const d = Math.abs(r.top + r.height / 2 - mid);
+              if (d < cd) { cd = d; ci = i; }
+            });
+
+            if (ci !== currentActive) {
+              titleEls[currentActive].style.opacity = "0.25";
+              titleEls[ci].style.opacity = "1";
+              if (bgImg && projects[ci]) bgImg.src = projects[ci].coverImage;
+              currentActive = ci;
             }
-          });
 
-          // Active title
-          const mid = vh / 2;
-          let ci = 0, cd = Infinity;
-          titleEls.forEach((t, i) => {
-            const r = t.getBoundingClientRect();
-            const d = Math.abs(r.top + r.height / 2 - mid);
-            if (d < cd) { cd = d; ci = i; }
-          });
-          if (ci !== currentActive) {
-            titleEls[currentActive].style.opacity = "0.25";
-            titleEls[ci].style.opacity = "1";
-            if (bgImg && projects[ci]) bgImg.src = projects[ci].coverImage;
-            currentActive = ci;
-          }
-        },
-      });
+            // Sync Images
+            imageEls.forEach((img, i) => {
+              const off_i = titleOffsets[i];
+              const spCentered = (curVh / 2 + off_i) / (curVh + curTh);
+              const ip = (sp - (spCentered - speed / 2)) / speed;
 
-      resizeRef.current = () => {
-        arc = calcArc();
-        ScrollTrigger.refresh();
-      };
-      window.addEventListener("resize", resizeRef.current);
+              if (ip < 0 || ip > 1) {
+                gsap.set(img, { opacity: 0 });
+              } else {
+                const pos = bezier(ip);
+                gsap.set(img, { x: pos.x - IMG_W / 2, y: pos.y - IMG_H / 2, opacity: 1 });
+              }
+            });
+          },
+        });
+
+        resizeRef.current = () => {
+          arc = calcArc();
+          ScrollTrigger.refresh();
+        };
+        window.addEventListener("resize", resizeRef.current);
+      }, 100);
     };
 
     init();
@@ -199,6 +195,7 @@ export default function ImageGallery({
           height: 100%;
           object-fit: cover;
           opacity: 0.55;
+          image-orientation: from-image;
         }
         .psl-bg-img::after {
           content: "";
@@ -245,14 +242,16 @@ export default function ImageGallery({
           height: 100%;
           display: flex;
           flex-direction: column;
-          gap: 5rem;
+          gap: 15vh;
           z-index: 2;
           will-change: transform;
         }
         .psl-titles h1 {
-          font-family: var(--font-cormorant), serif;
-          font-size: clamp(2rem, 5.5vw, 3.8rem);
+          font-family: var(--font-geist-sans), sans-serif;
+          font-size: clamp(1rem, 4vw, 2rem);
           font-weight: 400;
+          text-transform: uppercase;
+          letter-spacing: 0.5em;
           color: #E3E4E0;
           opacity: 0.25;
           transition: opacity 0.35s ease;
@@ -278,16 +277,19 @@ export default function ImageGallery({
         }
         .psl-img {
           position: absolute;
-          width: 200px;
-          height: 150px;
+          width: 360px;
+          height: 270px;
           will-change: transform, opacity;
-          border-radius: 4px;
+          border-radius: 6px;
           overflow: hidden;
+          box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+          pointer-events: auto;
         }
         .psl-img img {
           width: 100%;
           height: 100%;
           object-fit: cover;
+          image-orientation: from-image;
         }
         .psl-header {
           position: absolute;
@@ -328,7 +330,7 @@ export default function ImageGallery({
               <h1
                 key={project.id}
                 style={{ opacity: index === 0 ? 1 : 0.25 }}
-                onClick={() => router.push(`/projects/${project.id}`)}
+                onClick={() => navigate(`/projects/${project.id}`)}
               >
                 {project.title}
               </h1>
@@ -338,7 +340,13 @@ export default function ImageGallery({
 
         <div className="psl-images">
           {projects.map((project) => (
-            <div key={project.id} className="psl-img">
+            <div
+              key={project.id}
+              className="psl-img"
+              onClick={() => navigate(`/projects/${project.id}`)}
+              data-interactive
+              style={{ cursor: "pointer" }}
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={project.coverImage} alt={project.title} />
             </div>

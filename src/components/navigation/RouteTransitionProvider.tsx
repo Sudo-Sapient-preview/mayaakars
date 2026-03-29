@@ -9,7 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 type NavigateOptions = {
   replace?: boolean;
@@ -72,6 +72,7 @@ export default function RouteTransitionProvider({
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const [phase, setPhase] = useState<"idle" | "covering" | "revealing">("idle");
   const [mode, setMode] = useState<"wipe" | "rotation">("wipe");
@@ -200,7 +201,7 @@ export default function RouteTransitionProvider({
 
   useEffect(() => {
     maybeRevealForCompletedNavigation();
-  }, [maybeRevealForCompletedNavigation, pathname]);
+  }, [maybeRevealForCompletedNavigation, pathname, searchParams]);
 
   useEffect(() => {
     if (!isTransitioning) return;

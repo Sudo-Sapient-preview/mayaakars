@@ -295,6 +295,8 @@ export default function AboutPage() {
         @media (max-width: 768px) {
           .ab-two-col { grid-template-columns: 1fr !important; }
           .ab-hero-gap { padding-top: clamp(60px, 10vw, 100px) !important; }
+          .ab-two-col .ab-img { order: 1; }
+          .ab-two-col .ab-text { order: 2; }
         }
       `}</style>
 
@@ -339,7 +341,7 @@ export default function AboutPage() {
 
         {/* ── Philosophy — text left, image right ── */}
         <section style={{ padding: "0 clamp(24px,6vw,80px) clamp(80px,12vw,140px)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(40px,6vw,100px)", alignItems: "center" }} className="ab-two-col ab-hero-gap">
-          <div className="gsap-reveal-text">
+          <div className="gsap-reveal-text ab-text">
             <div className="ab-divider" />
             <p style={{ fontSize: "0.65rem", letterSpacing: "0.4em", textTransform: "uppercase", color: "#C49A3A", marginBottom: "20px", fontFamily: "var(--font-geist-sans), sans-serif" }}>Our Philosophy</p>
             <h2 style={{ fontFamily: "var(--font-cormorant), serif", fontSize: "clamp(1.8rem,3.5vw,2.8rem)", fontWeight: 400, color: "#E3E4E0", margin: "0 0 24px", lineHeight: 1.1 }}>
@@ -358,7 +360,7 @@ export default function AboutPage() {
               This approach allows us to create spaces that are not only visually refined but also deeply functional and enduring.
             </div>
           </div>
-          <div className="gsap-reveal-text">
+          <div className="gsap-reveal-text ab-img">
             <div className="gsap-img-wrap" style={{ aspectRatio: "4/5", position: "relative" }}>
               <Image src={IMAGES.philosophy} alt="Architectural design" fill className="object-cover" sizes="(max-width:768px) 100vw, 50vw" />
             </div>
@@ -367,12 +369,12 @@ export default function AboutPage() {
 
         {/* ── Integrated — image left, text right ── */}
         <section style={{ padding: "0 clamp(24px,6vw,80px) clamp(80px,12vw,140px)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(40px,6vw,100px)", alignItems: "center" }} className="ab-two-col">
-          <div className="gsap-reveal-text">
+          <div className="gsap-reveal-text ab-img">
             <div className="gsap-img-wrap" style={{ aspectRatio: "4/5", position: "relative" }}>
               <Image src={IMAGES.integrated} alt="Interior design" fill className="object-cover" sizes="(max-width:768px) 100vw, 50vw" />
             </div>
           </div>
-          <div className="gsap-reveal-text">
+          <div className="gsap-reveal-text ab-text">
             <div className="ab-divider" />
             <p style={{ fontSize: "0.65rem", letterSpacing: "0.4em", textTransform: "uppercase", color: "#C49A3A", marginBottom: "20px", fontFamily: "var(--font-geist-sans), sans-serif" }}>Integrated Design</p>
             <h2 style={{ fontFamily: "var(--font-cormorant), serif", fontSize: "clamp(1.8rem,3.5vw,2.8rem)", fontWeight: 400, color: "#E3E4E0", margin: "0 0 24px", lineHeight: 1.1 }}>
@@ -391,7 +393,7 @@ export default function AboutPage() {
         {/* ── Journey Stats ── */}
         <section style={{ padding: "clamp(60px,10vw,120px) clamp(24px,6vw,80px)", borderTop: "1px solid rgba(255,255,255,0.06)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(40px,6vw,80px)", alignItems: "center" }} className="ab-two-col">
-            <div>
+            <div className="ab-text">
               <div className="gsap-reveal-text">
                 <div className="ab-divider" />
                 <p style={{ fontSize: "0.65rem", letterSpacing: "0.4em", textTransform: "uppercase", color: "#C49A3A", marginBottom: "20px", fontFamily: "var(--font-geist-sans), sans-serif" }}>Our Journey</p>
@@ -420,8 +422,8 @@ export default function AboutPage() {
                 ))}
               </div>
             </div>
-            <div className="gsap-reveal-text" style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%", height: "100%" }}>
-              <div className="gsap-founder-wrap" style={{ position: "relative", width: "clamp(200px, 25vw, 320px)", aspectRatio: "1/1", borderRadius: "50%", overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)" }}>
+            <div className="gsap-reveal-text ab-img" style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%", height: "100%" }}>
+              <div className="gsap-founder-wrap" style={{ position: "relative", width: "clamp(280px, 38vw, 480px)", aspectRatio: "1/1", borderRadius: "50%", overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)" }}>
                 <Image src={IMAGES.journey} alt="Prajwal Kumar - Founder" fill className="object-cover" sizes="(max-width:768px) 240px, 320px" />
               </div>
             </div>
@@ -430,7 +432,7 @@ export default function AboutPage() {
 
         {/* ── Our Approach ── */}
         <section style={{ padding: "clamp(80px,12vw,140px) clamp(24px,6vw,80px)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(40px,6vw,100px)", alignItems: "center" }} className="ab-two-col">
-          <div className="gsap-reveal-text">
+          <div className="gsap-reveal-text ab-text">
             <div className="ab-divider" />
             <p style={{ fontSize: "0.65rem", letterSpacing: "0.4em", textTransform: "uppercase", color: "#C49A3A", marginBottom: "20px", fontFamily: "var(--font-geist-sans), sans-serif" }}>Our Process</p>
             <h2 style={{ fontFamily: "var(--font-cormorant), serif", fontSize: "clamp(1.8rem,3.5vw,2.8rem)", fontWeight: 400, color: "#E3E4E0", margin: "0 0 24px", lineHeight: 1.1 }}>
@@ -452,7 +454,7 @@ export default function AboutPage() {
               This structured yet flexible approach allows us to guide a project from its earliest idea to its final realization with clarity and consistency.
             </div>
           </div>
-          <div className="gsap-reveal-text">
+          <div className="gsap-reveal-text ab-img">
             <div className="gsap-img-wrap" style={{ aspectRatio: "4/5", position: "relative" }}>
               <Image src={IMAGES.approach} alt="Our approach" fill className="object-cover" sizes="(max-width:768px) 100vw, 50vw" />
             </div>
@@ -461,12 +463,12 @@ export default function AboutPage() {
 
         {/* ── What Defines Mayaakars ── */}
         <section style={{ padding: "clamp(80px,12vw,140px) clamp(24px,6vw,80px)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(40px,6vw,100px)", alignItems: "center" }} className="ab-two-col">
-          <div className="gsap-reveal-text">
+          <div className="gsap-reveal-text ab-img">
             <div className="gsap-img-wrap" style={{ aspectRatio: "3/4", position: "relative" }}>
               <Image src={IMAGES.cta} alt="What defines us" fill className="object-cover" sizes="(max-width:768px) 100vw, 50vw" />
             </div>
           </div>
-          <div>
+          <div className="ab-text">
             <div className="gsap-reveal-text">
               <div className="ab-divider" />
               <p style={{ fontSize: "0.65rem", letterSpacing: "0.4em", textTransform: "uppercase", color: "#C49A3A", marginBottom: "20px", fontFamily: "var(--font-geist-sans), sans-serif" }}>What Defines Us</p>
