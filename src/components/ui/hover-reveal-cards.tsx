@@ -53,7 +53,7 @@ const HoverRevealCards: React.FC<HoverRevealCardsProps> = ({
               'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/50 focus-visible:ring-offset-2 ring-offset-background',
               cardClassName
             )}
-            style={{ backgroundImage: `url(${item.imageUrl})` }}
+            style={{ backgroundImage: `url("${item.imageUrl}")` }}
           >
             {/* Gradient overlay for text contrast */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/10 transition-opacity duration-500 group-hover/card:opacity-90" />

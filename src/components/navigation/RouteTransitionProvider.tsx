@@ -8,6 +8,7 @@ import {
   useMemo,
   useRef,
   useState,
+  Suspense,
 } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -65,7 +66,7 @@ const sameDocumentHashJump = (href: string) => {
   );
 };
 
-export default function RouteTransitionProvider({
+function RouteTransitionInner({
   children,
 }: {
   children: React.ReactNode;
@@ -289,6 +290,18 @@ export default function RouteTransitionProvider({
         </div>
       </div>
     </RouteTransitionContext.Provider>
+  );
+}
+
+export default function RouteTransitionProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <Suspense fallback={null}>
+      <RouteTransitionInner>{children}</RouteTransitionInner>
+    </Suspense>
   );
 }
 
