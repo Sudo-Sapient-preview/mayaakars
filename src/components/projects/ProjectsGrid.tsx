@@ -379,7 +379,7 @@ export default function ProjectsGrid() {
                                 { 
                                     id: "architectural", 
                                     title: "Architectural", 
-                                    img: "/Mayaakars/Commercial Architecture.webp"
+                                    img: "/Mayaakars/architect-residence/panorama-house/05.webp"
                                 },
                                 { 
                                     id: "interior", 
