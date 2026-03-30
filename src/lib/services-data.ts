@@ -83,7 +83,7 @@ export const SERVICES: Service[] = [
                 "/Mayaakars/interior-residencial/WindMills%20of%20your%20Mind/_DSC1066.webp",
                 "/Mayaakars/interior-residencial/Shantanu%20Chakrvarty%20%26%20Roshni%20Saraf%20(%20Brigade%20Exotica%20)/_DSC0731.webp",
                 "/Mayaakars/interior-residencial/Abhishek%20Ray%20%26%20Pinky%20Ray%20(%20Another%20Sky%20By%20Living%20Wall%20)/_DSC0347.webp",
-                "/Mayaakars/interior-residencial/Shantanu%20Chakrvarty%20%26%20Roshni%20Saraf%20(%20Brigade%20Exotica%20)/_DSC0672.webp",
+                "/Mayaakars/interior-residencial/Shantanu%20Chakrvarty%20%26%20Roshni%20Saraf%20(%20Brigade%20Exotica%20)/_DSC0729.webp",
             ]},
             { title: "Decor", src: "/Mayaakars/interior-residencial/Shantanu%20Chakrvarty%20%26%20Roshni%20Saraf%20(%20Brigade%20Exotica%20)/_DSC0928.webp", gallery: [
                 "/Mayaakars/interior-residencial/Shantanu%20Chakrvarty%20%26%20Roshni%20Saraf%20(%20Brigade%20Exotica%20)/_DSC0689.webp",
