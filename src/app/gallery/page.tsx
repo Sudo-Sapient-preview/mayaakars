@@ -58,7 +58,7 @@ const GALLERY_IMAGES = [
     "/Mayaakars/interior-residencial/patil-residence/puja-room.webp",
     "/Mayaakars/interior-residencial/Shantanu%20Chakrvarty%20%26%20Roshni%20Saraf%20(%20Brigade%20Exotica%20)/_DSC0731.webp",
     "/Mayaakars/interior-residencial/Abhishek%20Ray%20%26%20Pinky%20Ray%20(%20Another%20Sky%20By%20Living%20Wall%20)/_DSC0347.webp",
-    "/Mayaakars/interior-residencial/Shantanu%20Chakrvarty%20%26%20Roshni%20Saraf%20(%20Brigade%20Exotica%20)/_DSC0672.PNG",
+    "/Mayaakars/interior-residencial/Shantanu%20Chakrvarty%20%26%20Roshni%20Saraf%20(%20Brigade%20Exotica%20)/_DSC0672.webp",
     // Decor
     "/Mayaakars/interior-residencial/Shantanu%20Chakrvarty%20%26%20Roshni%20Saraf%20(%20Brigade%20Exotica%20)/_DSC0812.webp",
     "/Mayaakars/interior-residencial/Visagan%20(%20Secrete%20Soil%20)/_DSC1741.webp",
