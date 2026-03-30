@@ -58,8 +58,26 @@ export default function ServiceDetailPage() {
                 </div>
             </section>
 
-            {/* ── Section 2: 3D Slider Hero ── */}
-            <ServiceSlider slides={service.images} />
+            {/* ── Section 2: Image Layout ── */}
+            {slug === "architecture" ? (
+                <section className="arch-layout">
+                    <div className="arch-steps-list">
+                        {service.images.slice(1).map((img, i) => (
+                            <div key={i} className="arch-step-item">
+                                <div className="arch-step-meta">
+                                    <span className="arch-step-num">0{i + 1}</span>
+                                    <span className="arch-step-name">{img.title}</span>
+                                </div>
+                                <div className={`arch-step-img-wrap${i === 0 ? " arch-step-img-wrap--portrait" : ""}`}>
+                                    <img src={img.src} alt={img.title} className="arch-step-img" />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            ) : (
+                <ServiceSlider slides={service.images} />
+            )}
 
             {/* ── Section 3: Scope ── */}
             <section className="svc-scope">
@@ -91,7 +109,7 @@ export default function ServiceDetailPage() {
 const PAGE_STYLES = `
   /* ── Intro Section ── */
   .svc-intro {
-    min-height: 75vh;
+    min-height: 50vh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -132,6 +150,88 @@ const PAGE_STYLES = `
     line-height: 1.8;
     color: rgba(227, 228, 224, 0.65);
     font-weight: 400;
+  }
+
+  /* ── Architecture Layout ── */
+  .arch-layout {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px 24px 80px;
+  }
+  .arch-steps-header {
+    margin-bottom: 48px;
+  }
+  .arch-steps-title {
+    font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    line-height: 1.15;
+    color: #E3E4E0;
+    margin-top: 16px;
+    text-transform: uppercase;
+  }
+  .arch-steps-list {
+    display: flex;
+    flex-direction: column;
+  }
+  .arch-step-item {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 40px;
+    align-items: center;
+    padding: 36px 0;
+    border-bottom: 1px solid rgba(196, 154, 58, 0.12);
+  }
+  .arch-step-item:first-child {
+    border-top: 1px solid rgba(196, 154, 58, 0.12);
+  }
+  .arch-step-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .arch-step-num {
+    font-size: 0.65rem;
+    letter-spacing: 0.35em;
+    color: #C49A3A;
+    font-weight: 600;
+  }
+  .arch-step-name {
+    font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
+    font-size: clamp(1.3rem, 2vw, 1.8rem);
+    font-weight: 400;
+    color: rgba(227, 228, 224, 0.85);
+    letter-spacing: 0.02em;
+    line-height: 1.3;
+  }
+  .arch-step-img-wrap {
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    border-radius: 2px;
+  }
+  .arch-step-img-wrap--portrait {
+    aspect-ratio: 2 / 2.5;
+  }
+  .arch-step-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s ease;
+  }
+  .arch-step-item:hover .arch-step-img {
+    transform: scale(1.04);
+  }
+
+  @media (max-width: 640px) {
+    .arch-layout {
+      padding: 40px 20px 60px;
+    }
+    .arch-step-item {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
   }
 
   /* ── Scope Section ── */

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef } from "react";
 
 const PHILOSOPHY_TEXT =
-  "We believe architecture is not just structure - it is the art of shaping how people live, feel, and dream. Every space we create is a conversation between light, material, and emotion.";
+  "We believe architecture and interiors are not separate disciplines, but a continuous process of shaping vision into form.\nAt Mayaakars, every space begins as an idea — evolving through light, material, and proportion into environments that are both lived and felt.";
 
 export default function Philosophy() {
   const sectionRef = useRef<HTMLElement>(null);

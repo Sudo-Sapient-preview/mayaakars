@@ -78,7 +78,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
         const numCols = isMobile ? 4 : 7;
         const total = images.length; // show every image exactly once
         const numRows = Math.ceil(total / numCols);
-        const baseSize = isMobile ? window.innerWidth * 0.4 : 320;
+        const baseSize = isMobile ? window.innerWidth * 0.35 : 300;
         const cellW = baseSize;
         const cellH = baseSize;
         const gridW = numCols * cellW;
@@ -89,12 +89,12 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
 
         const mScale = isMobile ? 0.6 : 1;
         const sizePresets = [
-            { w: 160 * mScale, h: 220 * mScale },
-            { w: 240 * mScale, h: 150 * mScale },
-            { w: 140 * mScale, h: 260 * mScale },
-            { w: 180 * mScale, h: 180 * mScale },
-            { w: 110 * mScale, h: 140 * mScale },
-            { w: 260 * mScale, h: 320 * mScale },
+            { w: 200 * mScale, h: 260 * mScale },
+            { w: 280 * mScale, h: 180 * mScale },
+            { w: 180 * mScale, h: 300 * mScale },
+            { w: 220 * mScale, h: 220 * mScale },
+            { w: 240 * mScale, h: 180 * mScale },
+            { w: 300 * mScale, h: 360 * mScale },
         ];
 
         const gridItems: HTMLImageElement[] = [];
@@ -117,14 +117,14 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
 
             const preset = sizePresets[Math.floor(Math.random() * sizePresets.length)];
             img.style.width = `${preset.w}px`;
-            img.style.height = `${preset.h}px`;
+            img.style.height = "auto";
 
             const r = Math.floor(i / numCols);
             const c = i % numCols;
-            const offsetX = (Math.random() - 0.5) * (80 * mScale);
-            const offsetY = (Math.random() - 0.5) * (80 * mScale);
+            const offsetX = (Math.random() - 0.5) * (60 * mScale);
+            const offsetY = (Math.random() - 0.5) * (60 * mScale);
             img.style.left = `${c * cellW + cellW / 2 - preset.w / 2 + offsetX}px`;
-            img.style.top = `${r * cellH + cellH / 2 - preset.h / 2 + offsetY}px`;
+            img.style.top = `${r * cellH + offsetY}px`;
 
             img.src = src;
             img.style.opacity = "0"; // hidden until animation starts
@@ -189,7 +189,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
         let initialTargetY = targetY;
         let movedBeyondClickThreshold = false;
         let pendingImageId: string | null = null;
-        const clickDragThreshold = 8;
+        const clickDragThreshold = 5;
 
         dragContainer.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
 
@@ -254,7 +254,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
 
         const onPointerDown = (e: PointerEvent) => {
             if (e.pointerType === "mouse" && e.button !== 0) return;
-            const id = getIdFromPoint(e.clientX, e.clientY) ?? getIdFromTarget(e.target);
+            const id = getIdFromTarget(e.target) ?? getIdFromPoint(e.clientX, e.clientY);
             handleDown(e.clientX, e.clientY, id, e.pointerId);
         };
 
@@ -376,7 +376,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
         }
         .mk-gallery-page #drag-container:active { cursor: grabbing; }
         .mk-gallery-page .grid-item {
-          position: absolute; object-fit: cover;
+          position: absolute ;
           box-shadow: 0 15px 40px rgba(0,0,0,0.4);
           pointer-events: auto; -webkit-user-drag: none;
           background-color: #111; color: transparent; border-radius: 4px;
