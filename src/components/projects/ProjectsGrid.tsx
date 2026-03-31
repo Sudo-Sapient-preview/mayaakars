@@ -7,6 +7,7 @@ import { useRouteTransition } from "@/components/navigation/RouteTransitionProvi
 
 import manifest from "@/data/gallery-manifest.json";
 import ImageGallery from "@/components/ui/image-gallery";
+import ArchToggle from "@/components/ui/ArchToggle";
 
 type GalleryItem = { id: string; title: string; category: string; coverImage: string };
 const ALL_PROJECTS = manifest as GalleryItem[];
@@ -62,7 +63,8 @@ export default function ProjectsGrid() {
     }
 
     function goToGallery(selectedTab: Tab) {
-        navigate(`/projects?view=gallery&tab=${selectedTab}&filter=all`, { scroll: false });
+        const defaultFilter = selectedTab === "architectural" ? "residential" : "all";
+        navigate(`/projects?view=gallery&tab=${selectedTab}&filter=${defaultFilter}`, { scroll: false });
     }
 
     function goToSelection() {
@@ -417,11 +419,28 @@ export default function ProjectsGrid() {
                 ) : (
                     <>
                         {/* Spotlight Gallery — starts immediately */}
-                        <ImageGallery
-                            projects={visibleProjects}
-                            tabLabel={tab === "architectural" ? "Architectural" : "Interior"}
-                            key={`${tab}-${filter}`}
-                        />
+                        <div style={{ position: "relative" }}>
+                            <ImageGallery
+                                projects={visibleProjects}
+                                tabLabel={tab === "architectural" ? "Architectural" : "Interior"}
+                                key={`${tab}-${filter}`}
+                            />
+
+                            {/* Residential / Commercial toggle — architectural only */}
+                            {tab === "architectural" && (
+                                <div style={{
+                                    position: "fixed",
+                                    bottom: "clamp(32px, 5vh, 56px)",
+                                    right: "clamp(24px, 3vw, 48px)",
+                                    zIndex: 50,
+                                }}>
+                                    <ArchToggle
+                                        value={filter === "commercial" ? "commercial" : "residential"}
+                                        onChange={(v) => handleFilterChange(v)}
+                                    />
+                                </div>
+                            )}
+                        </div>
 
                         {/* Back to Categories — bottom CTA */}
                         <div className="pg-back-section">
