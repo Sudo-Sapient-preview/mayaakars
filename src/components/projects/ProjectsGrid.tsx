@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useRouteTransition } from "@/components/navigation/RouteTransitionProvider";
 
 import manifest from "@/data/gallery-manifest.json";
@@ -28,6 +28,7 @@ const FILTER_CATEGORIES: Record<Exclude<Filter, "all">, string[]> = {
 export default function ProjectsGrid() {
     const searchParams = useSearchParams();
     const { navigate } = useRouteTransition();
+    const router = useRouter();
 
     // Derive state directly from URL — makes refresh work correctly
     const urlView = searchParams.get("view") as "selection" | "gallery" | null;
@@ -59,7 +60,8 @@ export default function ProjectsGrid() {
 
     // Navigation helpers
     function handleFilterChange(f: Filter) {
-        navigate(`/projects?view=gallery&tab=${tab}&filter=${f}`, { scroll: false });
+        // Use router.replace (no transition) for toggle — instant switch
+        router.replace(`/projects?view=gallery&tab=${tab}&filter=${f}`, { scroll: false });
     }
 
     function goToGallery(selectedTab: Tab) {
