@@ -430,8 +430,8 @@ export default function ProjectsGrid() {
                             {tab === "architectural" && (
                                 <div style={{
                                     position: "fixed",
-                                    bottom: "clamp(32px, 5vh, 56px)",
-                                    right: "clamp(24px, 3vw, 48px)",
+                                    top: "clamp(80px, 10vh, 120px)",
+                                    left: "clamp(20px, 2vw, 36px)",
                                     zIndex: 50,
                                 }}>
                                     <ArchToggle
