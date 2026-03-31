@@ -39,6 +39,8 @@ export default function ProjectsGrid() {
     const tab: Tab = urlTab === "interior" ? "interior" : "architectural";
     const filter: Filter = (urlFilter as Filter) ?? "all";
 
+    const [transitioning, setTransitioning] = useState(false);
+
     // Keep state in sync when navigating via category param (from external links)
     useEffect(() => {
         const categorySlug = searchParams.get("category");
@@ -60,8 +62,12 @@ export default function ProjectsGrid() {
 
     // Navigation helpers
     function handleFilterChange(f: Filter) {
-        // Use router.replace (no transition) for toggle — instant switch
-        router.replace(`/projects?view=gallery&tab=${tab}&filter=${f}`, { scroll: false });
+        if (f === filter) return;
+        setTransitioning(true);
+        setTimeout(() => {
+            router.replace(`/projects?view=gallery&tab=${tab}&filter=${f}`, { scroll: false });
+            setTimeout(() => setTransitioning(false), 80);
+        }, 420);
     }
 
     function goToGallery(selectedTab: Tab) {
@@ -422,11 +428,17 @@ export default function ProjectsGrid() {
                     <>
                         {/* Spotlight Gallery — starts immediately */}
                         <div style={{ position: "relative" }}>
-                            <ImageGallery
-                                projects={visibleProjects}
-                                tabLabel={tab === "architectural" ? "Architectural" : "Interior"}
-                                key={`${tab}-${filter}`}
-                            />
+                            <div style={{
+                                opacity: transitioning ? 0 : 1,
+                                transition: "opacity 0.42s ease",
+                                pointerEvents: transitioning ? "none" : "auto",
+                            }}>
+                                <ImageGallery
+                                    projects={visibleProjects}
+                                    tabLabel={tab === "architectural" ? "Architectural" : "Interior"}
+                                    key={`${tab}-${filter}`}
+                                />
+                            </div>
 
                             {/* Residential / Commercial toggle — architectural only */}
                             {tab === "architectural" && (
