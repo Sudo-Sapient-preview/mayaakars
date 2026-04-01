@@ -60,7 +60,8 @@ export default function ImageGallery({
         // Tighter visibility for higher counts to prevent merging
         const speed = count > 6 ? 0.18 : 0.28;
 
-        const scrollMult = Math.max(12, count * 3);
+        // Significantly reduce scroll duration to eliminate blank space after last card
+        const scrollMult = Math.max(3, count * 1.5);
 
         // Dynamically space out titles based on count
         titlesWrap.style.gap = count > 6 ? "40vh" : "18vh";
