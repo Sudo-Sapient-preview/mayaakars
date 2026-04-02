@@ -440,8 +440,7 @@ export default function ProjectsGrid() {
                                 />
                             </div>
 
-                            {/* Residential / Commercial toggle — architectural only */}
-                            {tab === "architectural" && (
+                            {(tab === "architectural" || tab === "interior") && (
                                 <div style={{
                                     position: "fixed",
                                     top: "clamp(80px, 10vh, 120px)",
@@ -449,7 +448,7 @@ export default function ProjectsGrid() {
                                     zIndex: 50,
                                 }}>
                                     <ArchToggle
-                                        value={filter === "commercial" ? "commercial" : "residential"}
+                                        value={filter === "commercial" ? "commercial" : filter === "residential" ? "residential" : "residential"}
                                         onChange={(v) => handleFilterChange(v)}
                                     />
                                 </div>
