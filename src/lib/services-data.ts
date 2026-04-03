@@ -135,7 +135,7 @@ export const SERVICES: Service[] = [
         ],
         idealFor: "Clients seeking complete turnkey delivery with ongoing design oversight",
         images: [
-            { title: "Panorama House", src: "/Mayaakars/interior-residencial/Hari%20(%20Secrete%20Soil%20)/_DSC2766.webp" },
+            { title: "Panorama House", src: "/Mayaakars/interior-residencial/panorama-house/front-of-the-house-.webp" },
             { title: "Panorama House", src: "/Mayaakars/architect-residence/panorama-house/05.webp" },
             { title: "Solaris Energy", src: "/Mayaakars/interior-commercial/solaris-energy/lobby-area.webp" },
             { title: "The Grid", src: "/Mayaakars/interior-commercial/the-grid/innova8-2.webp" },

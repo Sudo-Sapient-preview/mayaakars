@@ -39,6 +39,8 @@ const GALLERY_IMAGES = [
     "/Mayaakars/interior-residencial/kumar-residence/living-area-1-.webp",
     "/Mayaakars/interior-residencial/panorama-house/hall-.webp",
     "/Mayaakars/interior-residencial/patil-residence/living-area.webp",
+    "/Mayaakars/interior-residencial/Laxmi%20Paradise%20Fall/Hero%20Image%20.webp",
+    "/Mayaakars/interior-residencial/Laxmi%20Paradise%20Fall/IMG_0028%20-%20Edited.webp",
     // Dining Room
     "/Mayaakars/interior-residencial/house-of-13-arches/dining-area.webp",
     "/Mayaakars/interior-residencial/kumar-residence/dining-area.webp",
@@ -66,6 +68,8 @@ const GALLERY_IMAGES = [
     "/Mayaakars/interior-residencial/Shesh%20(%20Secret%20Soil%20)/_DSC1843.webp",
     "/Mayaakars/interior-residencial/Ganesh%20Babu%20(%20Century%20Ethos%20)/3.webp",
     "/Mayaakars/interior-residencial/Visagan%20(%20Secrete%20Soil%20)/_DSC1593.webp",
+    "/Mayaakars/interior-residencial/Laxmi%20Paradise%20Fall/0494e81a-25e1-4f20-9523-29dd2e79c666.webp",
+    "/Mayaakars/interior-residencial/Laxmi%20Paradise%20Fall/3efd6608-0449-4ebb-a0a5-41147b9d7258.webp",
 ];
 
 // Grid thumbnails: optimized via Next.js image API (~640px), full-res for lightbox
