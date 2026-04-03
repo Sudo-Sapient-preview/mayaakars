@@ -22,8 +22,8 @@ export default function ArchToggle({ value, onChange }: ArchToggleProps) {
     }, [value]);
 
     const springRef = useRef({
-        top: { pos: value === "residential" ? 6 : -6, vel: 0, target: value === "residential" ? 6 : -6 },
-        bot: { pos: value === "residential" ? -6 : 6, vel: 0, target: value === "residential" ? -6 : 6 }
+        top: { pos: value === "residential" ? -6 : 6, vel: 0, target: value === "residential" ? -6 : 6 },
+        bot: { pos: value === "residential" ? 6 : -6, vel: 0, target: value === "residential" ? 6 : -6 }
     });
 
     const rafIdRef = useRef<number | null>(null);
@@ -78,9 +78,9 @@ export default function ArchToggle({ value, onChange }: ArchToggleProps) {
     useEffect(() => {
         const s = springRef.current;
         if (isRes) {
-            s.top.target = 6; s.top.vel = -4; s.bot.target = -6; s.bot.vel = 4;
-        } else {
             s.top.target = -6; s.top.vel = 4; s.bot.target = 6; s.bot.vel = -4;
+        } else {
+            s.top.target = 6; s.top.vel = -4; s.bot.target = -6; s.bot.vel = 4;
         }
         if (!rafIdRef.current) {
             lastTRef.current = null;
