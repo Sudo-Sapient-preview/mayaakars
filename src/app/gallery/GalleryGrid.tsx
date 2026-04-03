@@ -403,7 +403,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
         /* Side previews */
         .mk-lb-side {
           position: absolute; top: 0; bottom: 0;
-          width: 22vw; max-width: 280px;
+          width: 35vw;
           display: flex; align-items: center;
           cursor: pointer; z-index: 10;
         }
@@ -422,7 +422,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
           background: linear-gradient(to left, rgba(5,5,5,0.85) 0%, transparent 100%);
         }
         .mk-lb-side-img {
-          width: 100%; height: 62vh;
+          width: 100%; height: 62vh; max-width: 280px;
           object-fit: cover; border-radius: 3px;
           opacity: 0.28; filter: blur(1px);
           transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), filter 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1);
@@ -439,18 +439,19 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
           border: 1px solid rgba(255,255,255,0.2);
           background: rgba(10,10,10,0.6);
           display: flex; align-items: center; justify-content: center;
-          color: #e3e4e0; transition: border-color 0.2s, background 0.2s;
+          color: #e3e4e0; transition: all 0.3s ease;
           pointer-events: none;
         }
         .mk-lb-side-left .mk-lb-side-arrow { left: 20px; }
         .mk-lb-side-right .mk-lb-side-arrow { right: 20px; }
         .mk-lb-side:hover .mk-lb-side-arrow {
-          border-color: rgba(196,154,58,0.6); background: rgba(196,154,58,0.12);
+          border-color: rgba(196,154,58,0.8); background: rgba(196,154,58,0.2);
+          transform: scale(1.1);
         }
 
         /* Main image */
         .mk-lb-main {
-          position: relative; z-index: 3;
+          position: relative; z-index: 15;
           max-width: min(56vw, 900px); max-height: 88vh;
           display: flex; align-items: center; justify-content: center;
           flex-shrink: 0;
@@ -519,7 +520,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
                     </button>
 
                     {/* Left preview */}
-                    <div className="mk-lb-side mk-lb-side-left" onClick={(e) => { e.stopPropagation(); prev(); }}>
+                    <div className="mk-lb-side mk-lb-side-left" onClick={(e) => { e.stopPropagation(); prev(); }} data-interactive>
                         <img src={items[prevIndex].thumb} alt="" className="mk-lb-side-img" />
                         <div className="mk-lb-side-arrow">
                             <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
@@ -534,7 +535,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
                     </div>
 
                     {/* Right preview */}
-                    <div className="mk-lb-side mk-lb-side-right" onClick={(e) => { e.stopPropagation(); next(); }}>
+                    <div className="mk-lb-side mk-lb-side-right" onClick={(e) => { e.stopPropagation(); next(); }} data-interactive>
                         <img src={items[nextIndex].thumb} alt="" className="mk-lb-side-img" />
                         <div className="mk-lb-side-arrow">
                             <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
