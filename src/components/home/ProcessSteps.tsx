@@ -9,6 +9,7 @@ const STEPS = [
   { num: "04", title: "Execution", desc: "Craft on site. We coordinate closely with contractors to ensure every detail is delivered with precision." },
   { num: "05", title: "Handover", desc: "Your space, complete. We walk you through every element and remain available long after the keys are handed over." },
 ];
+const MOBILE_STACK_BREAKPOINT = 900;
 
 export default function ProcessSteps() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -34,7 +35,7 @@ export default function ProcessSteps() {
       sectionObserver.observe(section);
 
       // Per-step scroll highlight (mobile single-column only)
-      if (window.innerWidth <= 540) {
+      if (window.innerWidth <= MOBILE_STACK_BREAKPOINT) {
         const steps = Array.from(section.querySelectorAll<HTMLElement>(".ps-step"));
 
         const updateActive = () => {
@@ -228,13 +229,33 @@ export default function ProcessSteps() {
         }
         @media (max-width: 900px) {
           .ps-grid {
-            grid-template-columns: 1fr 1fr;
-            gap: 40px 24px;
+            grid-template-columns: 1fr;
+            gap: 32px;
           }
           .ps-line { display: none; }
-        }
-        @media (max-width: 540px) {
-          .ps-grid { grid-template-columns: 1fr; gap: 36px; }
+
+          .ps-step {
+            position: relative;
+            padding: 0 0 0 32px;
+          }
+
+          .ps-dot {
+            position: absolute;
+            top: 2px;
+            left: 0;
+            margin-bottom: 0;
+          }
+
+          .ps-step:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            top: 14px;
+            left: 4px;
+            bottom: -28px;
+            width: 1px;
+            background: linear-gradient(to bottom, rgba(196,154,58,0.5), rgba(196,154,58,0.16));
+            pointer-events: none;
+          }
         }
       `}</style>
 

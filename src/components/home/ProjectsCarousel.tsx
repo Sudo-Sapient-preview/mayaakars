@@ -360,10 +360,15 @@ function MobileCarousel({ projects }: { projects: ProjectCategory[] }) {
                                 <div className="pc-mob-title">{project.title}</div>
                                 <div className="pc-mob-subtitle">View Project</div>
                             </div>
-                            {index === 1 && <div className="pc-scroll-hint">Swipe Left -&gt;</div>}
                         </div>
                     </div>
                 ))}
+            </div>
+            <div className="pc-scroll-hint-row" aria-hidden="true">
+                <div className="pc-scroll-hint-pill">
+                    <span className="pc-scroll-hint-text">Swipe Left</span>
+                    <span className="pc-scroll-hint-arrow">-&gt;</span>
+                </div>
             </div>
         </section>
     );
@@ -561,17 +566,38 @@ const MOBILE_STYLES = `
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.6);
   }
-  .pc-scroll-hint {
-    position: absolute;
-    bottom: -100px;
-    right: 0;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 10px;
-    animation: pcPulseHint 2s infinite ease-in-out;
+  .pc-scroll-hint-row {
+    margin-top: 12px;
+    padding: 0 24px 28px;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
     pointer-events: none;
-    z-index: 10;
+  }
+  .pc-scroll-hint-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(196, 154, 58, 0.45);
+    background: linear-gradient(90deg, rgba(196, 154, 58, 0.22), rgba(196, 154, 58, 0.08));
+    box-shadow: 0 0 22px rgba(196, 154, 58, 0.18);
+  }
+  .pc-scroll-hint-text {
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.24em;
+    line-height: 1;
+  }
+  .pc-scroll-hint-arrow {
+    color: #c49a3a;
+    font-size: 13px;
+    line-height: 1;
+    animation: pcPulseHint 2s infinite ease-in-out;
   }
   @keyframes pcPulseHint {
     0%,

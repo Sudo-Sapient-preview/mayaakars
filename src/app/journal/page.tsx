@@ -87,6 +87,50 @@ export default function JournalPage() {
     };
   }, []);
 
+  useEffect(() => {
+    const rows = Array.from(document.querySelectorAll<HTMLElement>(".mk-blog-page .grid-row"));
+    if (!rows.length) return;
+
+    let raf = 0;
+
+    const updateActiveRow = () => {
+      const viewportMid = window.innerHeight * 0.52;
+      let activeRow: HTMLElement | null = null;
+      let minDistance = Infinity;
+
+      rows.forEach((row) => {
+        const rect = row.getBoundingClientRect();
+        const isVisible = rect.bottom > window.innerHeight * 0.12 && rect.top < window.innerHeight * 0.88;
+        if (!isVisible) return;
+
+        const rowMid = rect.top + rect.height / 2;
+        const distance = Math.abs(rowMid - viewportMid);
+        if (distance < minDistance) {
+          minDistance = distance;
+          activeRow = row;
+        }
+      });
+
+      rows.forEach((row) => row.classList.toggle("active", row === activeRow));
+    };
+
+    const requestUpdate = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(updateActiveRow);
+    };
+
+    requestUpdate();
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdate);
+      rows.forEach((row) => row.classList.remove("active"));
+    };
+  }, []);
+
   return (
     <>
       <style>{`
@@ -289,6 +333,7 @@ export default function JournalPage() {
           color: var(--gold);
           margin-bottom: 15px;
           font-weight: 600;
+          transition: background-color 0.5s ease, box-shadow 0.5s ease, color 0.5s ease, border-color 0.5s ease;
         }
 
         .mk-blog-page .anim-element h3 {
@@ -300,6 +345,7 @@ export default function JournalPage() {
           letter-spacing: 1px;
           line-height: 1.35;
           color: #ffffff;
+          transition: color 0.6s ease, text-shadow 0.6s ease;
         }
 
         .mk-blog-page .anim-element p {
@@ -307,6 +353,33 @@ export default function JournalPage() {
           color: var(--muted);
           line-height: 2;
           font-weight: 400;
+          transition: color 0.6s ease;
+        }
+
+        .mk-blog-page .grid-row.active .image-wrapper {
+          transform: translateY(-3px);
+          box-shadow: 0 0 0 1px rgba(200, 169, 92, 0.38), 0 26px 72px rgba(200, 169, 92, 0.24), 0 22px 60px rgba(0, 0, 0, 0.82);
+        }
+
+        .mk-blog-page .grid-row.active .image-wrapper img {
+          filter: brightness(0.56);
+          transform: scale(1.02);
+        }
+
+        .mk-blog-page .grid-row.active .badge {
+          background: rgba(200, 169, 92, 0.14);
+          border-color: rgba(200, 169, 92, 0.9);
+          color: #e8c47b;
+          box-shadow: 0 0 18px rgba(200, 169, 92, 0.3);
+        }
+
+        .mk-blog-page .grid-row.active .anim-element h3 {
+          color: #ffffff;
+          text-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
+        }
+
+        .mk-blog-page .grid-row.active .anim-element p {
+          color: rgba(255, 255, 255, 0.98);
         }
 
         .mk-blog-page .text-animate,
@@ -480,7 +553,7 @@ export default function JournalPage() {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 80px;
+            margin-bottom: 48px;
             gap: 0;
           }
 
@@ -488,7 +561,7 @@ export default function JournalPage() {
             order: 1;
             width: 100%;
             padding: 0 20px;
-            margin-bottom: 32px;
+            margin-bottom: 20px;
           }
 
           .mk-blog-page .left-col {

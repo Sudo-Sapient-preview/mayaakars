@@ -1,24 +1,27 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo, type TouchEvent } from "react";
 import { gsap } from "gsap";
 
 type GalleryItem = { thumb: string; full: string };
 type LightboxState = { index: number } | null;
 
 export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
-    const images = items.map((i) => i.thumb); // grid uses thumbs
+    const images = useMemo(() => items.map((i) => i.thumb), [items]); // grid uses thumbs
     const dragContainerRef = useRef<HTMLDivElement>(null);
     const zoomWrapperRef = useRef<HTMLDivElement>(null);
     const sceneWrapperRef = useRef<HTMLDivElement>(null);
     const titleContainerRef = useRef<HTMLDivElement>(null);
-    const openLightboxRef = useRef<((src: string) => void) | null>(null);
+    const lbTouchRef = useRef({ x: 0, y: 0 });
 
     const [lightbox, setLightbox] = useState<LightboxState>(null);
+    const [isMobileViewport, setIsMobileViewport] = useState(false);
+    const [slideDirection, setSlideDirection] = useState<"next" | "prev">("next");
 
-    openLightboxRef.current = (src: string) => {
+    const openLightboxBySrc = useCallback((src: string) => {
         const index = images.indexOf(src);
         const i = index === -1 ? 0 : index;
+        setSlideDirection("next");
         setLightbox({ index: i });
         // preload current + adjacent full-res images
         [i, (i + 1) % items.length, (i - 1 + items.length) % items.length].forEach((idx) => {
@@ -28,7 +31,14 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
             link.href = items[idx].full;
             document.head.appendChild(link);
         });
-    };
+    }, [images, items]);
+
+    useEffect(() => {
+        const checkViewport = () => setIsMobileViewport(window.innerWidth <= 768);
+        checkViewport();
+        window.addEventListener("resize", checkViewport);
+        return () => window.removeEventListener("resize", checkViewport);
+    }, []);
 
     const closeLightbox = useCallback(() => setLightbox(null), []);
 
@@ -43,6 +53,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
     const prev = useCallback(() =>
         setLightbox((lb) => {
             if (!lb) return lb;
+            setSlideDirection("prev");
             const next = (lb.index - 1 + items.length) % items.length;
             preloadFull((next - 1 + items.length) % items.length);
             return { index: next };
@@ -51,6 +62,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
     const next = useCallback(() =>
         setLightbox((lb) => {
             if (!lb) return lb;
+            setSlideDirection("next");
             const next = (lb.index + 1) % items.length;
             preloadFull((next + 1) % items.length);
             return { index: next };
@@ -75,19 +87,20 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
         if (!dragContainer || !zoomWrapper || !sceneWrapper || !titleContainer) return;
 
         const isMobile = window.innerWidth <= 768;
-        const numCols = isMobile ? 4 : 7;
+        const numCols = isMobile ? 3 : 7;
         const total = images.length; // show every image exactly once
         const numRows = Math.ceil(total / numCols);
-        const baseSize = isMobile ? window.innerWidth * 0.35 : 300;
-        const cellW = baseSize;
-        const cellH = baseSize;
+        const baseSize = isMobile ? window.innerWidth * 0.42 : 300;
+        const cellW = isMobile ? baseSize * 1.15 : baseSize;
+        const cellH = isMobile ? baseSize * 1.18 : baseSize;
         const gridW = numCols * cellW;
         const gridH = numRows * cellH;
 
         dragContainer.style.width = `${gridW}px`;
         dragContainer.style.height = `${gridH}px`;
 
-        const mScale = isMobile ? 0.6 : 1;
+        const mScale = isMobile ? 0.5 : 1;
+        const jitter = isMobile ? 24 : 60;
         const sizePresets = [
             { w: 200 * mScale, h: 260 * mScale },
             { w: 280 * mScale, h: 180 * mScale },
@@ -121,8 +134,8 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
 
             const r = Math.floor(i / numCols);
             const c = i % numCols;
-            const offsetX = (Math.random() - 0.5) * (60 * mScale);
-            const offsetY = (Math.random() - 0.5) * (60 * mScale);
+            const offsetX = (Math.random() - 0.5) * jitter;
+            const offsetY = (Math.random() - 0.5) * jitter;
             img.style.left = `${c * cellW + cellW / 2 - preset.w / 2 + offsetX}px`;
             img.style.top = `${r * cellH + offsetY}px`;
 
@@ -189,7 +202,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
         let initialTargetY = targetY;
         let movedBeyondClickThreshold = false;
         let pendingImageId: string | null = null;
-        const clickDragThreshold = 5;
+        const clickDragThreshold = isMobile ? 12 : 5;
 
         dragContainer.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
 
@@ -244,7 +257,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
         const releaseDrag = (allowClick: boolean, pointerId: number) => {
             if (activePointerId !== pointerId) return;
             if (allowClick && isDragging && !movedBeyondClickThreshold && pendingImageId) {
-                openLightboxRef.current?.(pendingImageId);
+                openLightboxBySrc(pendingImageId);
             }
             isDragging = false;
             activePointerId = null;
@@ -330,11 +343,31 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
             dragContainer.innerHTML = "";
             document.body.style.cursor = "";
         };
-    }, [images]);
+    }, [images, openLightboxBySrc]);
 
     const lbIndex = lightbox?.index ?? 0;
     const prevIndex = (lbIndex - 1 + items.length) % items.length;
     const nextIndex = (lbIndex + 1) % items.length;
+
+    const onLightboxTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+        const touch = event.touches[0];
+        if (!touch) return;
+        lbTouchRef.current = { x: touch.clientX, y: touch.clientY };
+    };
+
+    const onLightboxTouchEnd = (event: TouchEvent<HTMLDivElement>) => {
+        const touch = event.changedTouches[0];
+        if (!touch) return;
+
+        const dx = touch.clientX - lbTouchRef.current.x;
+        const dy = touch.clientY - lbTouchRef.current.y;
+        const isSwipe = Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2;
+        if (!isSwipe) return;
+
+        event.stopPropagation();
+        if (dx < 0) next();
+        else prev();
+    };
 
     return (
         <>
@@ -466,6 +499,17 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
           from { opacity: 0; transform: scale(0.93) translateY(14px); filter: blur(6px); }
           to   { opacity: 1; transform: scale(1)    translateY(0);    filter: blur(0px); }
         }
+        @keyframes lb-slide-next {
+          from { opacity: 0; transform: translateX(24px) scale(0.985); }
+          to   { opacity: 1; transform: translateX(0) scale(1); }
+        }
+        @keyframes lb-slide-prev {
+          from { opacity: 0; transform: translateX(-24px) scale(0.985); }
+          to   { opacity: 1; transform: translateX(0) scale(1); }
+        }
+        .mk-lb-mobile-hint {
+          display: none;
+        }
 
         /* Close */
         .mk-lb-close {
@@ -487,13 +531,40 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
         }
 
         @media (max-width: 768px) {
-          .mk-lb-side { width: 28vw; }
-          .mk-lb-main { max-width: min(80vw, 600px); }
-          .mk-lb-side-img { height: 45vh; }
+          .mk-lb-side { display: none; }
+          .mk-lb-main { max-width: 94vw; width: 94vw; }
+          .mk-lb-main.is-mobile-slider {
+            touch-action: pan-y;
+          }
+          .mk-lb-img {
+            max-height: 76vh;
+          }
+          .mk-lb-img.mk-lb-img-slide-next {
+            animation: lb-slide-next 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+          }
+          .mk-lb-img.mk-lb-img-slide-prev {
+            animation: lb-slide-prev 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+          }
+          .mk-lb-mobile-hint {
+            display: block;
+            position: fixed;
+            bottom: 48px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.6rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: rgba(227, 228, 224, 0.42);
+            z-index: 10000;
+            pointer-events: none;
+          }
         }
         @media (max-width: 480px) {
-          .mk-lb-side { display: none; }
-          .mk-lb-main { max-width: 94vw; }
+          .mk-lb-main { max-width: 96vw; width: 96vw; }
+          .mk-lb-img { max-height: 72vh; }
+          .mk-lb-close { top: 14px; right: 14px; width: 36px; height: 36px; }
+          .mk-lb-counter { bottom: 16px; font-size: 0.62rem; letter-spacing: 0.2em; }
+          .mk-lb-mobile-hint { bottom: 40px; font-size: 0.57rem; letter-spacing: 0.14em; }
         }
       `}</style>
 
@@ -519,33 +590,46 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
                         </svg>
                     </button>
 
-                    {/* Left preview */}
-                    <div className="mk-lb-side mk-lb-side-left" onClick={(e) => { e.stopPropagation(); prev(); }} data-interactive>
-                        <img src={items[prevIndex].thumb} alt="" className="mk-lb-side-img" />
-                        <div className="mk-lb-side-arrow">
-                            <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                                <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
+                    {!isMobileViewport && (
+                        <div className="mk-lb-side mk-lb-side-left" onClick={(e) => { e.stopPropagation(); prev(); }} data-interactive>
+                            <img src={items[prevIndex].thumb} alt="" className="mk-lb-side-img" />
+                            <div className="mk-lb-side-arrow">
+                                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                                    <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Main image — full resolution */}
-                    <div className="mk-lb-main" onClick={(e) => e.stopPropagation()}>
-                        <img key={items[lbIndex].full} src={items[lbIndex].full} alt="" className="mk-lb-img" />
+                    <div
+                        className={`mk-lb-main${isMobileViewport ? " is-mobile-slider" : ""}`}
+                        onClick={(e) => e.stopPropagation()}
+                        onTouchStart={isMobileViewport ? onLightboxTouchStart : undefined}
+                        onTouchEnd={isMobileViewport ? onLightboxTouchEnd : undefined}
+                    >
+                        <img
+                            key={`${items[lbIndex].full}-${lbIndex}`}
+                            src={items[lbIndex].full}
+                            alt=""
+                            className={`mk-lb-img${isMobileViewport ? ` mk-lb-img-slide-${slideDirection}` : ""}`}
+                        />
                     </div>
 
-                    {/* Right preview */}
-                    <div className="mk-lb-side mk-lb-side-right" onClick={(e) => { e.stopPropagation(); next(); }} data-interactive>
-                        <img src={items[nextIndex].thumb} alt="" className="mk-lb-side-img" />
-                        <div className="mk-lb-side-arrow">
-                            <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                                <path d="M5 2l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
+                    {!isMobileViewport && (
+                        <div className="mk-lb-side mk-lb-side-right" onClick={(e) => { e.stopPropagation(); next(); }} data-interactive>
+                            <img src={items[nextIndex].thumb} alt="" className="mk-lb-side-img" />
+                            <div className="mk-lb-side-arrow">
+                                <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                                    <path d="M5 2l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Counter */}
                     <span className="mk-lb-counter">{lbIndex + 1} / {items.length}</span>
+                    {isMobileViewport && <span className="mk-lb-mobile-hint">Swipe left or right</span>}
                 </div>
             )}
         </>
