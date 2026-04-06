@@ -13,14 +13,14 @@ type GalleryItem = { id: string; title: string; category: string; coverImage: st
 const ALL_PROJECTS = manifest as GalleryItem[];
 
 type Tab = "architectural" | "interior";
-type Filter = "all" | "commercial" | "residential";
+type Filter = "commercial" | "residential";
 
 const TAB_CATEGORIES: Record<Tab, string[]> = {
     architectural: ["architect-commercial", "architect-residence"],
     interior: ["interior-commercial", "interior-residencial"],
 };
 
-const FILTER_CATEGORIES: Record<Exclude<Filter, "all">, string[]> = {
+const FILTER_CATEGORIES: Record<Filter, string[]> = {
     commercial: ["architect-commercial", "interior-commercial"],
     residential: ["architect-residence", "interior-residencial"],
 };
@@ -37,7 +37,7 @@ export default function ProjectsGrid() {
 
     const viewMode: "selection" | "gallery" = urlView === "gallery" ? "gallery" : "selection";
     const tab: Tab = urlTab === "interior" ? "interior" : "architectural";
-    const filter: Filter = (urlFilter as Filter) ?? "all";
+    const filter: Filter = urlFilter === "commercial" ? "commercial" : "residential";
 
     const [transitioning, setTransitioning] = useState(false);
 
@@ -71,8 +71,7 @@ export default function ProjectsGrid() {
     }
 
     function goToGallery(selectedTab: Tab) {
-        const defaultFilter = selectedTab === "architectural" ? "residential" : "all";
-        navigate(`/projects?view=gallery&tab=${selectedTab}&filter=${defaultFilter}`, { scroll: false });
+        navigate(`/projects?view=gallery&tab=${selectedTab}&filter=residential`, { scroll: false });
     }
 
     function goToSelection() {
@@ -82,9 +81,14 @@ export default function ProjectsGrid() {
     const tabCats = TAB_CATEGORIES[tab];
     const visibleProjects = ALL_PROJECTS.filter((p) => {
         if (!tabCats.includes(p.category)) return false;
-        if (filter === "all") return true;
         return FILTER_CATEGORIES[filter].includes(p.category);
     });
+
+    useEffect(() => {
+        if (viewMode !== "gallery") return;
+        if (urlFilter === "commercial" || urlFilter === "residential") return;
+        router.replace(`/projects?view=gallery&tab=${tab}&filter=residential`, { scroll: false });
+    }, [viewMode, urlFilter, router, tab]);
 
     return (
         <>
@@ -448,7 +452,7 @@ export default function ProjectsGrid() {
                                     zIndex: 50,
                                 }}>
                                     <ArchToggle
-                                        value={filter === "commercial" ? "commercial" : filter === "residential" ? "residential" : "residential"}
+                                        value={filter}
                                         onChange={(v) => handleFilterChange(v)}
                                     />
                                 </div>
