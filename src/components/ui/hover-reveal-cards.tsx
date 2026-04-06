@@ -29,7 +29,7 @@ const HoverRevealCards: React.FC<HoverRevealCardsProps> = ({
     <div
       role="list"
       className={cn(
-        'group grid w-full grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4',
+        'group grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 max-[640px]:grid-cols-2 max-[640px]:gap-3',
         className
       )}
     >
@@ -44,7 +44,7 @@ const HoverRevealCards: React.FC<HoverRevealCardsProps> = ({
             aria-label={`${item.title}, ${item.subtitle}`}
             tabIndex={0}
             className={cn(
-              'group/card relative h-[46vw] min-h-[180px] max-h-[260px] sm:h-[420px] md:h-[500px] lg:h-[600px] w-full cursor-pointer overflow-hidden rounded-2xl border border-[#C49A3A]/20 bg-cover bg-center shadow-lg transition-all duration-700 ease-in-out',
+              'group/card relative h-[420px] md:h-[500px] lg:h-[600px] w-full cursor-pointer overflow-hidden rounded-2xl border border-[#C49A3A]/20 bg-cover bg-center shadow-lg transition-all duration-700 ease-in-out max-[640px]:h-[46vw] max-[640px]:min-h-[180px] max-[640px]:max-h-[260px]',
               // On parent hover, apply these styles to all children.
               'group-hover:scale-[0.98] group-hover:opacity-40 group-hover:blur-[2px] group-hover:grayscale-[40%]',
               // On child hover/focus, override parent hover styles to highlight the current item.
@@ -59,12 +59,12 @@ const HoverRevealCards: React.FC<HoverRevealCardsProps> = ({
             <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-black/10 transition-opacity duration-500 group-hover/card:opacity-90" />
 
             {/* Card Content */}
-            <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-6 md:p-8 text-[#E3E4E0]">
+            <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8 text-[#E3E4E0] max-[640px]:p-4">
               <div className="transform transition-all duration-500 will-change-transform group-hover/card:-translate-y-1">
-                <p className="text-[9px] sm:text-[11px] font-sans uppercase tracking-[0.24em] sm:tracking-[0.3em] text-[#C49A3A] opacity-90 mb-3 sm:mb-4">
+                <p className="text-[10px] sm:text-[11px] font-sans uppercase tracking-[0.3em] text-[#C49A3A] opacity-90 mb-4 max-[640px]:text-[9px] max-[640px]:tracking-[0.24em] max-[640px]:mb-3">
                   {item.subtitle}
                 </p>
-                <h3 className="text-xl sm:text-3xl font-serif leading-[1.1] font-medium tracking-tight">
+                <h3 className="text-2xl sm:text-3xl font-serif leading-[1.1] font-medium tracking-tight max-[640px]:text-xl">
                   {item.title}
                 </h3>
               </div>
