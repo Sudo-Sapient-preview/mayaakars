@@ -46,7 +46,7 @@ export default function ProjectsGrid() {
         const categorySlug = searchParams.get("category");
         if (categorySlug) {
             let newTab: Tab = "architectural";
-            let newFilter: Filter = "all";
+            let newFilter: Filter = "residential";
             if (categorySlug === "residential-architecture") {
                 newTab = "architectural"; newFilter = "residential";
             } else if (categorySlug === "commercial-architecture") {
