@@ -115,13 +115,13 @@ export default function ContactPage() {
             <p className="m-0 text-base">Phone: +91 97318 47847</p>
             <p className="m-0 text-base">Email: mail@ordientgroup.com</p>
             <address className="mt-4 not-italic text-[clamp(1rem,2vw,1.35rem)] leading-relaxed text-[var(--text-dark-soft)]">
-              303, 2nd Floor, 15th A Cross Rd,
+              Near Gayatri Lakefront, Bridge 3,
               <br />
-              Sector A, Yelahanka Satellite Town,
+              Outer Ring Road, Subramani Nagar,
               <br />
-              Yelahanka New Town,
+              Guddadahalli, Hebbal Kempapura,
               <br />
-              Bengaluru, Karnataka 560064
+              Bengaluru, Karnataka 560024
             </address>
           </div>
         </div>

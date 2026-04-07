@@ -262,7 +262,7 @@ import { Cormorant_Garamond, Geist } from 'next/font/google'
 - Form fields: Name, Email, Phone, Project Type (dropdown), Message
 - Subtle DotField or LiquidGrid texture background
 - POST to `/api/contact` → ERP stub
-- Studio address + phone + email (from bottom.html: +91 88844 96888, info@mayaakars.com, Yelahanka, Bengaluru)
+- Studio address + phone + email (from bottom.html: +91 88844 96888, info@mayaakars.com, Near Gayatri Lakefront, Bridge 3, Outer Ring Road, Subramani Nagar, Guddadahalli, Hebbal Kempapura, Bengaluru, Karnataka 560024)
 
 **Careers** — minimal job listings:
 
