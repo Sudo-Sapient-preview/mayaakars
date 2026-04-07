@@ -2,10 +2,16 @@
   "name": "temp-next-app",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
-    "dev": "node scripts/generate-projects-json.mjs && next dev",
-    "build": "node scripts/generate-projects-json.mjs && next build",
+    "clean": "node scripts/clean-next.mjs",
+    "dev": "node scripts/generate-projects-json.mjs && next dev --webpack",
+    "build": "npm run clean && node scripts/generate-projects-json.mjs && next build --webpack",
+    "build:standalone": "npm run build && node scripts/prepare-standalone.mjs",
     "start": "next start",
+    "start:standalone": "node .next/standalone/server.js",
     "lint": "eslint",
     "convert-images": "node scripts/convert-to-webp.mjs",
     "convert-images:dry": "node scripts/convert-to-webp.mjs --dry-run",

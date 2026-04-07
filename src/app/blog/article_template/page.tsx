@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
@@ -24,7 +25,7 @@ function ArticleTemplateContent() {
         {article ? (
           <>
             <header className="article-hero">
-              <img src={article.image} alt="Hero Image" className="hero-bg" />
+              <Image src={article.image} alt="Hero Image" fill className="hero-bg" sizes="100vw" priority />
               <div className="hero-overlay" />
               <div className="category-badge">{article.category}</div>
               <h1 className="article-title">{article.title}</h1>

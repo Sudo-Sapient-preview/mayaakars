@@ -60,6 +60,12 @@ export default function HeroSection({ onReady }: HeroSectionProps) {
         connection.effectiveType.includes("3g"));
     const isLowPowerDevice = (navigator.hardwareConcurrency ?? 8) <= 4;
     const isMobileViewport = window.innerWidth <= 768;
+    const lowBandwidthMode =
+      prefersReducedMotion ||
+      saveData ||
+      isSlowConnection ||
+      isLowPowerDevice ||
+      isMobileViewport;
     const useVideoSequence = false;
 
     let readyNotified = false;
@@ -208,13 +214,17 @@ export default function HeroSection({ onReady }: HeroSectionProps) {
       video.style.display = "none";
       canvas.style.display = "block";
 
-      for (let i = 0; i < 24; i += 1) {
+      const initialPreloadCount = lowBandwidthMode ? 12 : 24;
+      const preloadBatchSize = lowBandwidthMode ? 3 : 6;
+      const preloadIntervalMs = lowBandwidthMode ? 220 : 140;
+
+      for (let i = 0; i < initialPreloadCount; i += 1) {
         loadFrame(i, true);
       }
-      preloadIndex = 24;
+      preloadIndex = initialPreloadCount;
 
       preloadTimer = window.setInterval(() => {
-        for (let i = 0; i < 6 && preloadIndex < FRAME_COUNT; i += 1) {
+        for (let i = 0; i < preloadBatchSize && preloadIndex < FRAME_COUNT; i += 1) {
           loadFrame(preloadIndex);
           preloadIndex += 1;
         }
@@ -222,7 +232,7 @@ export default function HeroSection({ onReady }: HeroSectionProps) {
           window.clearInterval(preloadTimer);
           preloadTimer = 0;
         }
-      }, 140);
+      }, preloadIntervalMs);
 
       frameReadyFallbackTimer = window.setTimeout(() => {
         markReady();

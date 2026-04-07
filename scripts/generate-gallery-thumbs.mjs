@@ -1,6 +1,6 @@
 import sharp from "sharp";
-import { readFileSync, mkdirSync, existsSync } from "fs";
-import { join, basename, extname } from "path";
+import { mkdirSync, existsSync } from "fs";
+import { join } from "path";
 
 const ROOT = process.cwd();
 const OUT_DIR = join(ROOT, "public", "gallery");

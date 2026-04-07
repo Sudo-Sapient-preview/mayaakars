@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { useRouteTransition } from "@/components/navigation/RouteTransitionProvider";
 
@@ -630,9 +631,11 @@ export default function JournalPage() {
             </div>
             <div className="center-col">
               <div className="image-wrapper" onClick={() => navigate("/blog/article_template?id=how-interior-design-shapes-the-way-we-live")}>
-                <img
+                <Image
                   src="/Mayaakars/interior-residencial/panorama-house/living-room.webp"
                   alt="Interior Design"
+                  fill
+                  sizes="(max-width: 900px) 92vw, 600px"
                 />
                 <div className="read-more-overlay">
                   <span>Read More</span>
@@ -665,9 +668,11 @@ export default function JournalPage() {
             </div>
             <div className="center-col">
               <div className="image-wrapper" onClick={() => navigate("/blog/article_template?id=thoughtful-architecture-in-modern-homes")}>
-                <img
+                <Image
                   src="/Mayaakars/architect-residence/panorama-house/title-photo.webp"
                   alt="Modern Architecture"
+                  fill
+                  sizes="(max-width: 900px) 92vw, 600px"
                 />
                 <div className="read-more-overlay">
                   <span>Read More</span>
@@ -692,9 +697,11 @@ export default function JournalPage() {
             </div>
             <div className="center-col">
               <div className="image-wrapper" onClick={() => navigate("/blog/article_template?id=the-role-of-lighting-in-interior-design")}>
-                <img
+                <Image
                   src="/Mayaakars/interior-commercial/shizuka-nook/chandelier.webp"
                   alt="Lighting Design"
+                  fill
+                  sizes="(max-width: 900px) 92vw, 600px"
                 />
                 <div className="read-more-overlay">
                   <span>Read More</span>

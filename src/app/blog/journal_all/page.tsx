@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { blogData } from "@/lib/blogData";
 
 export default function JournalAllPage() {
@@ -162,7 +163,7 @@ export default function JournalAllPage() {
             {blogData.map((article) => (
               <Link key={article.id} href={`/blog/article_template?id=${article.id}`} className="article-card">
                 <div className="image-wrapper">
-                  <img src={article.image} alt={article.title} />
+                  <Image src={article.image} alt={article.title} fill sizes="(max-width: 768px) 100vw, 33vw" />
                 </div>
                 <div className="card-meta">
                   <span>{article.category}</span>

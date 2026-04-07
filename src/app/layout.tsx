@@ -5,6 +5,7 @@ import CustomCursor from "@/components/CustomCursor";
 import SmoothScroll from "@/components/SmoothScroll";
 import Navbar from "@/components/layout/Navbar";
 import RouteTransitionProvider from "@/components/navigation/RouteTransitionProvider";
+import { SITE_URL } from "@/lib/site";
 
 const montserrat = Montserrat({
   variable: "--font-geist-sans",
@@ -19,8 +20,6 @@ const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
   display: "swap",
 });
-
-const SITE_URL = "https://www.mayaakars.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -53,7 +52,7 @@ export const metadata: Metadata = {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Mayaakars — Architecture & Interior Design",
+        alt: "Mayaakars - Architecture & Interior Design",
       },
     ],
   },

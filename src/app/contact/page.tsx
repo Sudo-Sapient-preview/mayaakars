@@ -69,15 +69,20 @@ export default function ContactPage() {
         body: JSON.stringify(payload),
       });
 
+      const data = (await response.json().catch(() => null)) as { error?: string } | null;
+
       if (!response.ok) {
-        throw new Error("Request failed");
+        throw new Error(data?.error || "Request failed");
       }
 
       setStatus("done");
       form.reset();
-    } catch {
+    } catch (error) {
       setStatus("idle");
-      setSubmitError("We could not send your enquiry right now. Please try again in a moment.");
+      const message = error instanceof Error ? error.message : "";
+      setSubmitError(
+        message || "We could not send your enquiry right now. Please try again in a moment."
+      );
     }
   };
 

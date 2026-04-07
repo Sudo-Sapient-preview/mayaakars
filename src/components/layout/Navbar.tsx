@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Menu from "./Menu";
@@ -79,11 +80,14 @@ export default function Navbar({ variant }: NavbarProps) {
                         }`}
                         aria-hidden={!brandVisible}
                     >
-                        <img
+                        <Image
                             src="/logo-gold.webp"
                             alt="Mayaakars logo"
+                            width={40}
+                            height={40}
                             className="h-7 w-7 object-contain max-[360px]:h-6 max-[360px]:w-6 sm:h-10 sm:w-10"
                             draggable={false}
+                            priority
                         />
                         <h1 className={`whitespace-nowrap font-sans text-[14px] uppercase leading-none tracking-[0.12em] max-[360px]:text-[13px] sm:text-[22px] sm:tracking-[0.15em] ${fgColor}`}>
                             {BRAND_NAME.split("").map((char, index) => (

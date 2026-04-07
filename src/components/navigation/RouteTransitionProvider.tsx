@@ -66,6 +66,9 @@ const sameDocumentHashJump = (href: string) => {
   );
 };
 
+const isTransitionMode = (value: string | null): value is NonNullable<NavigateOptions["mode"]> =>
+  value === "wipe" || value === "rotation";
+
 function RouteTransitionInner({
   children,
 }: {
@@ -144,7 +147,7 @@ function RouteTransitionInner({
       if (isTransitioning) return;
 
       clearTimers();
-      const transitionMode = (options as any).mode || "wipe";
+      const transitionMode = options.mode ?? "wipe";
       pendingNavigationRef.current = { href: targetHref, options };
       hasIssuedNavigationRef.current = false;
 
@@ -244,11 +247,12 @@ function RouteTransitionInner({
 
       event.preventDefault();
       
-      const targetMode = anchor.getAttribute("data-transition") || "wipe";
+      const targetModeAttr = anchor.getAttribute("data-transition");
+      const targetMode = isTransitionMode(targetModeAttr) ? targetModeAttr : "wipe";
       
       navigate(`${parsed.pathname}${parsed.search}${parsed.hash}`, {
         scroll: anchor.dataset.scroll !== "false",
-        mode: targetMode as any
+        mode: targetMode
       });
     };
 

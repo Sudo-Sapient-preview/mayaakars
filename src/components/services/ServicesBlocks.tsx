@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { SERVICES } from "@/lib/services-data";
 
@@ -61,15 +61,6 @@ function ServiceBlock({
     isOpen: boolean;
     onToggle: () => void;
 }) {
-    const bodyRef = useRef<HTMLDivElement>(null);
-    const [height, setHeight] = useState(0);
-
-    useEffect(() => {
-        const el = bodyRef.current;
-        if (!el) return;
-        setHeight(isOpen ? el.scrollHeight : 0);
-    }, [isOpen]);
-
     const num = String(index + 1).padStart(2, "0");
 
     return (
@@ -154,15 +145,15 @@ function ServiceBlock({
 
             {/* Expandable body */}
             <div
-                ref={bodyRef}
                 style={{
-                    height: `${height}px`,
-                    overflow: "hidden",
-                    transition: "height 1.8s cubic-bezier(0.22, 1, 0.36, 1)",
+                    display: "grid",
+                    gridTemplateRows: isOpen ? "1fr" : "0fr",
+                    transition: "grid-template-rows 1.8s cubic-bezier(0.22, 1, 0.36, 1)",
                 }}
             >
                 <div
                     style={{
+                        overflow: "hidden",
                         padding: "0 clamp(24px, 6vw, 80px) clamp(32px, 5vw, 56px)",
                         paddingLeft: `calc(clamp(24px, 6vw, 80px) + 3rem + clamp(16px, 3vw, 40px))`,
                     }}

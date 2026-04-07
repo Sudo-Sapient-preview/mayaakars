@@ -1,6 +1,7 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import Link from "next/link";
 import { gsap } from "gsap";
 

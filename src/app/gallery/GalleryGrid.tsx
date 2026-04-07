@@ -592,6 +592,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
 
                     {!isMobileViewport && (
                         <div className="mk-lb-side mk-lb-side-left" onClick={(e) => { e.stopPropagation(); prev(); }} data-interactive>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={items[prevIndex].thumb} alt="" className="mk-lb-side-img" />
                             <div className="mk-lb-side-arrow">
                                 <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
@@ -608,6 +609,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
                         onTouchStart={isMobileViewport ? onLightboxTouchStart : undefined}
                         onTouchEnd={isMobileViewport ? onLightboxTouchEnd : undefined}
                     >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             key={`${items[lbIndex].full}-${lbIndex}`}
                             src={items[lbIndex].full}
@@ -618,6 +620,7 @@ export default function GalleryGrid({ items }: { items: GalleryItem[] }) {
 
                     {!isMobileViewport && (
                         <div className="mk-lb-side mk-lb-side-right" onClick={(e) => { e.stopPropagation(); next(); }} data-interactive>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={items[nextIndex].thumb} alt="" className="mk-lb-side-img" />
                             <div className="mk-lb-side-arrow">
                                 <svg width="13" height="13" viewBox="0 0 14 14" fill="none">

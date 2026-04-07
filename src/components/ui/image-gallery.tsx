@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import { useEffect, useRef } from "react";
 import { useRouteTransition } from "@/components/navigation/RouteTransitionProvider";
@@ -15,13 +16,21 @@ interface ImageGalleryProps {
   tabLabel?: string;
 }
 
+type ScrollTriggerHandle = {
+  kill: () => void;
+};
+
+type ScrollTriggerUpdate = {
+  progress: number;
+};
+
 export default function ImageGallery({
   projects,
   tabLabel = "Our Projects",
 }: ImageGalleryProps) {
   const { navigate } = useRouteTransition();
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<any>(null);
+  const triggerRef = useRef<ScrollTriggerHandle | null>(null);
   const resizeRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
@@ -52,11 +61,9 @@ export default function ImageGallery({
 
         const count = projects.length;
         const vh = window.innerHeight;
-        const th = titlesWrap.scrollHeight;
 
         // Dynamic speed: Window of visibility scales with project count
         // This keeps the arc clean by only allowing ~1.5 to 2 images visible at once
-        const itemScrollDur = (th / (count || 1)) / (vh + th);
         // Tighter visibility for higher counts to prevent merging
         const speed = count > 6 ? 0.18 : 0.28;
 
@@ -102,7 +109,7 @@ export default function ImageGallery({
           pin: true,
           pinSpacing: true,
           scrub: 1.5,
-          onUpdate: (self: any) => {
+          onUpdate: (self: ScrollTriggerUpdate) => {
             if (!mounted) return;
             const sp = self.progress;
             const curVh = window.innerHeight;
@@ -321,7 +328,6 @@ export default function ImageGallery({
 
       <section className="psl-section">
         <div className="psl-bg-img">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={projects[0]?.coverImage} alt="background" />
         </div>
 
@@ -348,7 +354,6 @@ export default function ImageGallery({
               data-interactive
               style={{ cursor: "pointer" }}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={project.coverImage} alt={project.title} />
             </div>
           ))}

@@ -71,13 +71,13 @@ const gsapHook = `
 `;
 
 // Insert the GSAP hook after `useReveal(heroRef);`
-code = code.replace(/useReveal\(heroRef\);/, \`
+code = code.replace(/useReveal\(heroRef\);/, `
   const mainRef = useRef<HTMLElement>(null);
   useEffect(() => {
-\${gsapHook}
+${gsapHook}
     return () => ctx.revert();
   }, []);
-\`);
+`);
 
 // Add mainRef to the <main> element
 code = code.replace(/<main style=\{\{ position: "relative"/, '<main ref={mainRef} style={{ position: "relative"');

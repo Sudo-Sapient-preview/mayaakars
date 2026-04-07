@@ -15,18 +15,7 @@ const CARD_ITEMS = SERVICES.map((service) => ({
         "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=2000&q=80",
 }));
 
-type ServicesAccordionProps = {
-    touchPreview?: boolean;
-    compactTitles?: boolean;
-    titleScale?: "default" | "medium" | "compact";
-};
-
-export default function ServicesAccordion({
-    // Keeping props signature to not break parent pages importing this
-    touchPreview = true,
-    compactTitles = false,
-    titleScale = "default",
-}: ServicesAccordionProps) {
+export default function ServicesAccordion() {
     const { navigate } = useRouteTransition();
 
     const handleCardClick = (slug: string) => {

@@ -126,6 +126,7 @@ export default function AboutPage() {
   // White scroll-blend CTA (mirrors homepage)
   useEffect(() => {
     const section = ctaSectionRef.current;
+    const textureCanvas = textureCanvasRef.current;
     if (!section) return;
     const body = document.body;
     const hexToRgb = (hex: string) => { const n = parseInt(hex.replace("#", ""), 16); return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 }; };
@@ -155,8 +156,8 @@ export default function AboutPage() {
       section.classList.toggle("is-visible", ratio > 0.03);
       body.style.setProperty("--bg-color", mix("#050505", "#e3e4e0", blend));
       body.style.setProperty("--text-color", mix("#f2f2f2", "#0a0a0a", blend));
-      if (textureCanvasRef.current) {
-        textureCanvasRef.current.style.opacity = String(0.4 * (1 - blend));
+      if (textureCanvas) {
+        textureCanvas.style.opacity = String(0.4 * (1 - blend));
       }
       if (blend > 0.62) body.setAttribute("data-navbar-variant", "light");
       else if (prevVariant === null) body.removeAttribute("data-navbar-variant");
@@ -172,7 +173,7 @@ export default function AboutPage() {
       if (prevBg) body.style.setProperty("--bg-color", prevBg); else body.style.removeProperty("--bg-color");
       if (prevText) body.style.setProperty("--text-color", prevText); else body.style.removeProperty("--text-color");
       if (prevVariant === null) body.removeAttribute("data-navbar-variant"); else body.setAttribute("data-navbar-variant", prevVariant);
-      if (textureCanvasRef.current) textureCanvasRef.current.style.opacity = "0.4";
+      if (textureCanvas) textureCanvas.style.opacity = "0.4";
     };
   }, []);
 

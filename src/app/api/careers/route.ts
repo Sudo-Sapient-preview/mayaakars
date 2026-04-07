@@ -1,132 +1,183 @@
 import { NextRequest, NextResponse } from "next/server";
+import { promises as fs } from "node:fs";
+import path from "node:path";
 
-export async function POST(req: NextRequest) {
-  const requestId = Date.now().toString(36) + Math.random().toString(36).substr(2);
+export const runtime = "nodejs";
+
+type CareerPayload = {
+  fullName: string;
+  email: string;
+  phone: string;
+  city: string;
+  position: string;
+  experience: string;
+  availability: string;
+  qualification: string;
+  organization: string;
+  portfolioLink: string;
+  resumeLink: string;
+  coverLetterLink: string;
+};
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const REQUIRED_FIELDS: Array<keyof CareerPayload> = [
+  "fullName",
+  "email",
+  "phone",
+  "city",
+  "position",
+  "resumeLink",
+];
+const WEBHOOK_TIMEOUT_MS = 10000;
+
+const MAX_LENGTH: Record<keyof CareerPayload, number> = {
+  fullName: 120,
+  email: 160,
+  phone: 40,
+  city: 120,
+  position: 120,
+  experience: 80,
+  availability: 80,
+  qualification: 160,
+  organization: 160,
+  portfolioLink: 500,
+  resumeLink: 500,
+  coverLetterLink: 500,
+};
+
+function toCleanString(value: FormDataEntryValue | null) {
+  return String(value ?? "").trim();
+}
+
+function normalizePayload(formData: FormData): CareerPayload {
+  return {
+    fullName: toCleanString(formData.get("fullName")),
+    email: toCleanString(formData.get("email")),
+    phone: toCleanString(formData.get("phone")),
+    city: toCleanString(formData.get("city")),
+    position: toCleanString(formData.get("position")),
+    experience: toCleanString(formData.get("experience")),
+    availability: toCleanString(formData.get("availability")),
+    qualification: toCleanString(formData.get("qualification")),
+    organization: toCleanString(formData.get("organization")),
+    portfolioLink: toCleanString(formData.get("portfolioLink")),
+    resumeLink: toCleanString(formData.get("resumeLink")),
+    coverLetterLink: toCleanString(formData.get("coverLetterLink")),
+  };
+}
+
+function isValidUrl(value: string) {
+  if (!value) return true;
 
   try {
-    console.log(`[api/careers:${requestId}] Starting careers application submission`);
+    const parsed = new URL(value);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
 
-    // Parse multipart form data
+function validatePayload(payload: CareerPayload) {
+  const missingField = REQUIRED_FIELDS.find((field) => !payload[field]);
+  if (missingField) {
+    return `Missing required field: ${missingField}`;
+  }
+
+  if (!EMAIL_PATTERN.test(payload.email)) {
+    return "Please enter a valid email address.";
+  }
+
+  const oversizedField = (Object.keys(MAX_LENGTH) as Array<keyof CareerPayload>).find(
+    (field) => payload[field].length > MAX_LENGTH[field]
+  );
+  if (oversizedField) {
+    return `${oversizedField} is too long.`;
+  }
+
+  if (!isValidUrl(payload.resumeLink)) {
+    return "Resume link must be a valid URL.";
+  }
+
+  if (!isValidUrl(payload.portfolioLink)) {
+    return "Portfolio link must be a valid URL.";
+  }
+
+  if (!isValidUrl(payload.coverLetterLink)) {
+    return "Cover letter link must be a valid URL.";
+  }
+
+  return null;
+}
+
+async function appendFallbackRecord(fileName: string, record: unknown) {
+  const fallbackPath = path.join(process.cwd(), "data", fileName);
+  await fs.mkdir(path.dirname(fallbackPath), { recursive: true });
+  await fs.appendFile(fallbackPath, `${JSON.stringify(record)}\n`, "utf8");
+  return fallbackPath;
+}
+
+export async function POST(req: NextRequest) {
+  const requestId = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+
+  try {
     const formData = await req.formData();
-    
-    // Extract form fields
-    const fullName = formData.get("fullName") as string;
-    const email = formData.get("email") as string;
-    const phone = formData.get("phone") as string;
-    const city = formData.get("city") as string;
-    const position = formData.get("position") as string;
-    const experience = formData.get("experience") as string;
-    const availability = formData.get("availability") as string;
-    const qualification = formData.get("qualification") as string;
-    const organization = formData.get("organization") as string;
-    const portfolioLink = formData.get("portfolioLink") as string;
-    const resumeLink = formData.get("resumeLink") as string;
-    const coverLetterLink = formData.get("coverLetterLink") as string;
+    const payload = normalizePayload(formData);
+    const validationError = validatePayload(payload);
 
-    // Validate required fields
-    if (!fullName || !email || !phone || !city || !position) {
-      console.log(`[api/careers:${requestId}] Validation failed: missing required fields`);
-      return NextResponse.json(
-        { error: "Missing required fields: name, email, phone, city, position" },
-        { status: 400 }
-      );
+    if (validationError) {
+      console.error(`[api/careers:${requestId}] ${validationError}`);
+      return NextResponse.json({ error: validationError }, { status: 400 });
     }
 
-    console.log(`[api/careers:${requestId}] Form fields validated`);
-    console.log(`[api/careers:${requestId}] Resume link provided: ${resumeLink ? "yes" : "no"}`);
-    console.log(`[api/careers:${requestId}] Cover letter link provided: ${coverLetterLink ? "yes" : "no"}`);
-    console.log(`[api/careers:${requestId}] Portfolio link provided: ${portfolioLink ? "yes" : "no"}`);
-
-    // Prepare payload for Apps Script
-    const payload = {
-      fullName,
-      email,
-      phone,
-      city,
-      position,
-      experience,
-      availability,
-      qualification,
-      organization,
-      portfolioLink,
-      resumeLink,
-      coverLetterLink,
+    const record = {
+      ...payload,
       submittedAt: new Date().toISOString(),
-      source: "mayaakars-careers-page"
+      source: "mayaakars-careers-page",
     };
 
-    console.log(`[api/careers:${requestId}] Payload prepared`);
-
-    // Send to Apps Script webhook
     const webhookUrl = process.env.GOOGLE_CAREERS_WEBHOOK_URL;
-    if (!webhookUrl) {
-      console.error(`[api/careers:${requestId}] GOOGLE_CAREERS_WEBHOOK_URL not configured`);
-      return NextResponse.json(
-        { error: "Webhook URL not configured" },
-        { status: 500 }
-      );
+    if (webhookUrl) {
+      try {
+        const webhookResponse = await fetch(webhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(record),
+          signal: AbortSignal.timeout(WEBHOOK_TIMEOUT_MS),
+        });
+
+        const webhookData = (await webhookResponse.json().catch(() => null)) as
+          | { ok?: boolean; error?: string; rowWritten?: number }
+          | null;
+
+        if (webhookResponse.ok && webhookData?.ok === true) {
+          return NextResponse.json({
+            ok: true,
+            destination: "webhook",
+            rowWritten: webhookData.rowWritten,
+          });
+        }
+
+        if (webhookData?.error) {
+          console.error(`[api/careers:${requestId}] Webhook returned an error`, webhookData);
+        } else {
+          console.error(`[api/careers:${requestId}] Webhook did not confirm success`);
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Unknown webhook error";
+        console.error(`[api/careers:${requestId}] Webhook request failed: ${message}`);
+      }
+    } else {
+      console.warn(`[api/careers:${requestId}] GOOGLE_CAREERS_WEBHOOK_URL not configured`);
     }
 
-    console.log(`[api/careers:${requestId}] Attempting webhook POST to: ${webhookUrl}`);
-
-    const webhookResponse = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+    const fallbackPath = await appendFallbackRecord("career-applications.jsonl", record);
+    console.warn(`[api/careers:${requestId}] Saved application to local fallback`, {
+      fallbackPath,
     });
-
-    const webhookBody = await webhookResponse.text();
-    console.log(`[api/careers:${requestId}] Webhook response status: ${webhookResponse.status}`);
-    console.log(`[api/careers:${requestId}] Webhook response body (first 500 chars): ${webhookBody.substring(0, 500)}`);
-
-    // Validate webhook response
-    if (!webhookResponse.ok) {
-      console.error(`[api/careers:${requestId}] Webhook failed with status ${webhookResponse.status}`);
-      console.error(`[api/careers:${requestId}] Full webhook body: ${webhookBody}`);
-      return NextResponse.json(
-        { error: "Failed to submit application. Please try again." },
-        { status: 500 }
-      );
-    }
-
-    // Parse webhook response
-    let webhookData;
-    try {
-      webhookData = JSON.parse(webhookBody);
-      console.log(`[api/careers:${requestId}] Webhook JSON parsed successfully`);
-      console.log(`[api/careers:${requestId}] Webhook response ok flag: ${webhookData.ok}`);
-    } catch {
-      console.error(`[api/careers:${requestId}] Failed to parse webhook JSON`);
-      console.error(`[api/careers:${requestId}] Webhook returned raw: ${webhookBody}`);
-      return NextResponse.json(
-        { error: "Invalid response from server" },
-        { status: 500 }
-      );
-    }
-
-    // Check if webhook succeeded
-    if (!webhookData.ok) {
-      console.error(`[api/careers:${requestId}] Webhook returned error: ${webhookData.error}`);
-      return NextResponse.json(
-        { error: webhookData.error || "Application submission failed" },
-        { status: 500 }
-      );
-    }
-
-    console.log(`[api/careers:${requestId}] Application submitted successfully - row ${webhookData.rowWritten}`);
-
-    return NextResponse.json({
-      ok: true,
-      message: "Application submitted successfully",
-      rowWritten: webhookData.rowWritten
-    });
+    return NextResponse.json({ ok: true, destination: "local-file" });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    const errorStack = error instanceof Error ? error.stack : "";
-    console.error(`[api/careers:${requestId}] Error: ${errorMessage}`);
-    if (errorStack) {
-      console.error(`[api/careers:${requestId}] Stack: ${errorStack}`);
-    }
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error(`[api/careers:${requestId}] Error: ${message}`);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

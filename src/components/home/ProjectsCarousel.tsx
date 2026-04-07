@@ -1,12 +1,26 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import { useEffect, useRef, useState } from "react";
 import type { ProjectCategory } from "@/lib/projects-data";
 import { useRouteTransition } from "@/components/navigation/RouteTransitionProvider";
+import projectsData from "@/lib/generated-projects.json";
+
+const PROJECTS = (projectsData as ProjectCategory[]).map((project) => {
+    if (project.slug === "commercial-architecture") {
+        return { ...project, coverImage: "/Mayaakars/Commercial Architecture.webp" };
+    }
+    if (project.slug === "residential-interiors") {
+        return { ...project, coverImage: "/Mayaakars/Residential Interior .webp" };
+    }
+    if (project.slug === "residential-architecture") {
+        return { ...project, coverImage: "/gallery/Residential Architecture .webp" };
+    }
+    return project;
+});
 
 export default function ProjectsCarousel() {
     const [isMobile, setIsMobile] = useState(false);
-    const [projects, setProjects] = useState<ProjectCategory[]>([]);
 
     useEffect(() => {
         const check = () => setIsMobile(window.innerWidth <= 768);
@@ -15,33 +29,12 @@ export default function ProjectsCarousel() {
         return () => window.removeEventListener("resize", check);
     }, []);
 
-    useEffect(() => {
-        fetch("/api/projects")
-            .then((r) => r.json())
-            .then((data: ProjectCategory[]) => {
-                const mapped = data.map(project => {
-                    if (project.slug === "commercial-architecture") {
-                        return { ...project, coverImage: "/Mayaakars/Commercial Architecture.webp" };
-                    }
-                    if (project.slug === "residential-interiors") {
-                        return { ...project, coverImage: "/Mayaakars/Residential Interior .webp" };
-                    }
-                    if (project.slug === "residential-architecture") {
-                        return { ...project, coverImage: "/gallery/Residential Architecture .webp" };
-                    }
-                    return project;
-                });
-                setProjects(mapped);
-            })
-            .catch(console.error);
-    }, []);
-
-    if (!projects.length) return null;
+    if (!PROJECTS.length) return null;
 
     return isMobile ? (
-        <MobileCarousel projects={projects} />
+        <MobileCarousel projects={PROJECTS} />
     ) : (
-        <DesktopCarousel projects={projects} />
+        <DesktopCarousel projects={PROJECTS} />
     );
 }
 
@@ -192,7 +185,7 @@ function DesktopCarousel({ projects }: { projects: ProjectCategory[] }) {
             window.removeEventListener("pointermove", onPointerMove);
             window.removeEventListener("pointerup", onPointerUp);
         };
-    }, [navigate, projects, theta]);
+    }, [navigate, numCards, projects, theta]);
 
     return (
         <section className="mk-home-dark-section relative z-[2]">

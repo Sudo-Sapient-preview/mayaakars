@@ -8,6 +8,41 @@ const PHILOSOPHY_TEXT =
 export default function Philosophy() {
   const sectionRef = useRef<HTMLElement>(null);
   const tokens = useMemo(() => PHILOSOPHY_TEXT.split(/(\s+)/), []);
+  const segments = useMemo(() => {
+    return tokens.reduce<{
+      charCount: number;
+      items: Array<
+        | { type: "space"; key: string; value: string }
+        | { type: "word"; key: string; letters: Array<{ key: string; value: string; delay: number }> }
+      >;
+    }>(
+      (acc, token, tokenIndex) => {
+        if (/^\s+$/.test(token)) {
+          acc.items.push({
+            type: "space",
+            key: `space-${tokenIndex}`,
+            value: token,
+          });
+          return acc;
+        }
+
+        const letters = token.split("").map((char, letterIndex) => ({
+          key: `${tokenIndex}-${letterIndex}`,
+          value: char,
+          delay: (acc.charCount + letterIndex) * 0.018,
+        }));
+
+        acc.items.push({
+          type: "word",
+          key: `word-${tokenIndex}`,
+          letters,
+        });
+        acc.charCount += token.length;
+        return acc;
+      },
+      { charCount: 0, items: [] }
+    ).items;
+  }, [tokens]);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -68,34 +103,25 @@ export default function Philosophy() {
           className="text-[clamp(1.25rem,3.5vw,2.5rem)] leading-[1.4] text-[#E3E4E0]/80"
           style={{ fontFamily: "var(--font-cormorant), serif", fontStyle: "italic" }}
         >
-          {(() => {
-            let charIndex = 0;
-
-            return tokens.map((token, tokenIndex) => {
-              if (/^\s+$/.test(token)) {
-                return (
-                  <span key={`space-${tokenIndex}`} className="phil-space" aria-hidden="true">
-                    {token}
+          {segments.map((segment) =>
+            segment.type === "space" ? (
+              <span key={segment.key} className="phil-space" aria-hidden="true">
+                {segment.value}
+              </span>
+            ) : (
+              <span key={segment.key} className="phil-word">
+                {segment.letters.map((letter) => (
+                  <span
+                    key={letter.key}
+                    className="phil-char"
+                    style={{ animationDelay: `${letter.delay}s` }}
+                  >
+                    {letter.value}
                   </span>
-                );
-              }
-
-              return (
-                <span key={`word-${tokenIndex}`} className="phil-word">
-                  {token.split("").map((char, letterIndex) => {
-                    const delay = charIndex * 0.018;
-                    charIndex += 1;
-
-                    return (
-                      <span key={`${tokenIndex}-${letterIndex}`} className="phil-char" style={{ animationDelay: `${delay}s` }}>
-                        {char}
-                      </span>
-                    );
-                  })}
-                </span>
-              );
-            });
-          })()}
+                ))}
+              </span>
+            )
+          )}
         </p>
       </div>
     </section>
